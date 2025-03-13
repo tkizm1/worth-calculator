@@ -25,7 +25,8 @@ const SalaryCalculator = () => {
     workEnvironment: '1.0',   // 工作环境系数
     heterogeneity: '1.0',     // 异性环境系数
     teamwork: '1.0',          // 同事环境系数
-    education: '1.6'          // 学历系数
+    education: '1.6',         // 学历系数
+    cityFactor: '1.0'         // 城市系数，默认为三线城市
   });
 
   const calculateWorkingDays = useCallback(() => {
@@ -71,7 +72,8 @@ const SalaryCalculator = () => {
     
     const environmentFactor = Number(formData.workEnvironment) * 
                             Number(formData.heterogeneity) * 
-                            Number(formData.teamwork);
+                            Number(formData.teamwork) *
+                            Number(formData.cityFactor);
     
     return (dailySalary * environmentFactor) / 
            (35 * (workHours + commuteHours - 0.5 * breakHours) * Number(formData.education));
@@ -250,7 +252,23 @@ const SalaryCalculator = () => {
             />
 
             <RadioGroup
-              label="异性环境"
+              label="所在城市"
+              name="cityFactor"
+              value={formData.cityFactor}
+              onChange={handleInputChange}
+              options={[
+                { label: '一线城市', value: '0.70' },
+                { label: '新一线城市', value: '0.80' },
+                { label: '二线城市', value: '1.0' },
+                { label: '三线城市', value: '1.10' },
+                { label: '四线城市', value: '1.25' },
+                { label: '县城', value: '1.40' },
+                { label: '乡镇', value: '1.50' },
+              ]}
+            />
+
+            <RadioGroup
+              label="交友环境"
               name="heterogeneity"
               value={formData.heterogeneity}
               onChange={handleInputChange}
