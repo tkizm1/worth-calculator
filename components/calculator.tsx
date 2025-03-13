@@ -3,6 +3,15 @@
 import React, { useState, useCallback } from 'react';
 import { Wallet, Github} from 'lucide-react'; // 保留需要的组件
 
+const inputLimits = {
+  annualSalary: { min: 0, max: Infinity },
+  workDaysPerWeek: { min: 1, max: 7 },
+  annualLeave: { min: 0, max: 365 },
+  publicHolidays: { min: 0, max: 365 },
+  workHours: { min: 1, max: 24 },
+  commuteHours: { min: 0, max: 24 },
+  breakHours: { min: 0, max: 24 }
+};
 
 const SalaryCalculator = () => {
   const [formData, setFormData] = useState({
@@ -23,16 +32,29 @@ const SalaryCalculator = () => {
     const weeksPerYear = 52;
     const totalWorkDays = weeksPerYear * formData.workDaysPerWeek;
     const totalLeaves = Number(formData.annualLeave) + Number(formData.publicHolidays);
-    return totalWorkDays - totalLeaves;
+    return Math.max(totalWorkDays - totalLeaves, 0);
   }, [formData.workDaysPerWeek, formData.annualLeave, formData.publicHolidays]);
 
   const calculateDailySalary = useCallback(() => {
     if (!formData.annualSalary) return 0;
     const workingDays = calculateWorkingDays();
-    return Number(formData.annualSalary) / workingDays;
+    return Number(formData.annualSalary) / workingDays; // 除 0 不管, Infinity(爽到爆炸)!
   }, [formData.annualSalary, calculateWorkingDays]);
 
   const handleInputChange = (name: string, value: string) => {
+    if (name in inputLimits) {
+      const numValue = Number(value);
+      if (!isNaN(numValue)) {
+        const limits = inputLimits[name as keyof typeof inputLimits];
+        const clampedValue = Math.max(limits.min, Math.min(limits.max, numValue));
+        setFormData(prev => ({
+          ...prev,
+          [name]: clampedValue.toString()
+        }));
+        return;
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
