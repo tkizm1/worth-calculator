@@ -16,12 +16,12 @@ const inputLimits = {
 const SalaryCalculator = () => {
   const [formData, setFormData] = useState({
     annualSalary: '',         // 年薪
-    workDaysPerWeek: 5,       // 每周工作天数
-    annualLeave: 5,           // 年假天数
-    publicHolidays: 11,       // 法定节假日
-    workHours: 10,             // 工作时长
-    commuteHours: 2,          // 通勤时长
-    breakHours: 2,            // 午休时长
+    workDaysPerWeek: '5',     // 每周工作天数
+    annualLeave: '5',         // 年假天数
+    publicHolidays: '11',     // 法定节假日
+    workHours: '10',          // 工作时长
+    commuteHours: '2',        // 通勤时长
+    breakHours: '2',          // 午休时长
     workEnvironment: '1.0',   // 工作环境系数
     heterogeneity: '1.0',     // 异性环境系数
     teamwork: '1.0',          // 同事环境系数
@@ -31,7 +31,7 @@ const SalaryCalculator = () => {
 
   const calculateWorkingDays = useCallback(() => {
     const weeksPerYear = 52;
-    const totalWorkDays = weeksPerYear * formData.workDaysPerWeek;
+    const totalWorkDays = weeksPerYear * Number(formData.workDaysPerWeek); // 确保转换为数字
     const totalLeaves = Number(formData.annualLeave) + Number(formData.publicHolidays);
     return Math.max(totalWorkDays - totalLeaves, 0);
   }, [formData.workDaysPerWeek, formData.annualLeave, formData.publicHolidays]);
@@ -43,15 +43,23 @@ const SalaryCalculator = () => {
   }, [formData.annualSalary, calculateWorkingDays]);
 
   const handleInputChange = (name: string, value: string) => {
+    console.log(`Input change: ${name} = ${value}`); // 调试日志
+    
     if (name in inputLimits) {
       const numValue = Number(value);
       if (!isNaN(numValue)) {
         const limits = inputLimits[name as keyof typeof inputLimits];
         const clampedValue = Math.max(limits.min, Math.min(limits.max, numValue));
-        setFormData(prev => ({
-          ...prev,
-          [name]: clampedValue.toString()
-        }));
+        console.log(`Clamped value for ${name}: ${clampedValue}`); // 调试日志
+        
+        setFormData(prev => {
+          const newState = {
+            ...prev,
+            [name]: clampedValue.toString() // 所有数值都转为字符串
+          };
+          console.log(`New form state for ${name}:`, newState[name as keyof typeof prev]); // 修复类型错误
+          return newState;
+        });
         return;
       }
     }
