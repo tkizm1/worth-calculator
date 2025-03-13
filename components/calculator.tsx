@@ -273,9 +273,9 @@ const SalaryCalculator = () => {
               value={formData.heterogeneity}
               onChange={handleInputChange}
               options={[
-                { label: '没有好看的', value: '0.9' },
+                { label: '没有好看的', value: '0.95' },
                 { label: '好看的不多不少', value: '1.0' },
-                { label: '很多好看的', value: '1.1' },
+                { label: '很多好看的', value: '1.05' },
               ]}
             />
 
