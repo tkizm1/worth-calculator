@@ -105,15 +105,15 @@ const SalaryCalculator = () => {
     options: Array<{ label: string; value: string; }>;
   }) => (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
       <div className="grid grid-cols-4 gap-2">
         {options.map((option) => (
           <button
             key={option.value}
             className={`px-3 py-2 rounded-md text-sm transition-colors
               ${value === option.value 
-                ? 'bg-blue-100 text-blue-700 font-medium' 
-                : 'bg-gray-50 hover:bg-gray-100'}`}
+                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 font-medium' 
+                : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300'}`}
             onClick={() => onChange(name, option.value)}
             type="button"
           >
@@ -125,24 +125,24 @@ const SalaryCalculator = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-8">
+    <div className="max-w-4xl mx-auto p-4 space-y-8 text-gray-900 dark:text-white">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
         </h1>
         {/* GitHub 链接和访问量计数 */}
-        <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
+        <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
           <a 
             href="https://github.com/zippland/worth-calculator" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-1.5 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
           >
             <Github className="w-4 h-4" />
             <span className="hidden sm:inline">Star on</span>
             <span>GitHub</span>
           </a>
-          <div className="w-px h-4 bg-gray-300"></div>
+          <div className="w-px h-4 bg-gray-300 dark:bg-gray-700"></div>
           <a 
             href="https://hits.seeyoufarm.com"
             target="_blank"
@@ -159,90 +159,90 @@ const SalaryCalculator = () => {
       </div>
       
 
-      <div className="bg-white rounded-xl shadow-xl shadow-gray-200/50">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30">
         <div className="p-6 space-y-8">
           {/* 薪资与工作时间 section */}
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">年薪（元）</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">年薪（元）</label>
               <div className="flex items-center gap-2 mt-1">
-                <Wallet className="w-4 h-4 text-gray-500" />
+                <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 <input
                   type="number"
                   value={formData.annualSalary}
                   onChange={(e) => handleInputChange('annualSalary', e.target.value)}
                   placeholder="税前年薪"
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">每周工作天数</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">每周工作天数</label>
                 <input
                   type="number"
                   min="1"
                   max="7"
                   value={formData.workDaysPerWeek}
                   onChange={(e) => handleInputChange('workDaysPerWeek', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">年假天数</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">年假天数</label>
                 <input
                   type="number"
                   value={formData.annualLeave}
                   onChange={(e) => handleInputChange('annualLeave', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">法定节假日</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">法定节假日</label>
                 <input
                   type="number"
                   value={formData.publicHolidays}
                   onChange={(e) => handleInputChange('publicHolidays', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">日工作时长/h</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">日工作时长/h</label>
                 <input
                   type="number"
                   min="1"
                   max="24"
                   value={formData.workHours}
                   onChange={(e) => handleInputChange('workHours', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">通勤时长/h</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">通勤时长/h</label>
                 <input
                   type="number"
                   value={formData.commuteHours}
                   onChange={(e) => handleInputChange('commuteHours', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">午休时长/h</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">午休时长/h</label>
                 <input
                   type="number"
                   value={formData.breakHours}
                   onChange={(e) => handleInputChange('breakHours', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gray-200 my-6"></div>
+          <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>
 
           {/* 环境系数 */}
           <div className="space-y-4">
@@ -319,18 +319,18 @@ const SalaryCalculator = () => {
       </div>
 
       {/* 结果卡片优化 */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 shadow-inner">
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-inner">
         <div className="grid grid-cols-3 gap-8">
           <div>
-            <div className="text-sm font-medium text-gray-500">年工作天数</div>
-            <div className="text-2xl font-semibold mt-1">{calculateWorkingDays()}天</div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">年工作天数</div>
+            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">{calculateWorkingDays()}天</div>
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-500">平均日薪</div>
-            <div className="text-2xl font-semibold mt-1">¥{calculateDailySalary().toFixed(2)}</div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">平均日薪</div>
+            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">¥{calculateDailySalary().toFixed(2)}</div>
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-500">工作性价比</div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">工作性价比</div>
             <div className={`text-2xl font-semibold mt-1 ${getValueAssessment().color}`}>
               {value.toFixed(2)}
               <span className="text-base ml-2">({getValueAssessment().text})</span>
