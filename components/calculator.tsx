@@ -3,16 +3,6 @@
 import React, { useState, useCallback } from 'react';
 import { Wallet, Github} from 'lucide-react'; // 保留需要的组件
 
-const inputLimits = {
-  annualSalary: { min: 0, max: Infinity },
-  workDaysPerWeek: { min: 1, max: 7 },
-  annualLeave: { min: 0, max: 365 },
-  publicHolidays: { min: 0, max: 365 },
-  workHours: { min: 1, max: 24 },
-  commuteHours: { min: 0, max: 24 },
-  breakHours: { min: 0, max: 24 }
-};
-
 const SalaryCalculator = () => {
   const [formData, setFormData] = useState({
     annualSalary: '',         // 年薪
@@ -43,27 +33,7 @@ const SalaryCalculator = () => {
   }, [formData.annualSalary, calculateWorkingDays]);
 
   const handleInputChange = (name: string, value: string) => {
-    console.log(`Input change: ${name} = ${value}`); // 调试日志
-    
-    if (name in inputLimits) {
-      const numValue = Number(value);
-      if (!isNaN(numValue)) {
-        const limits = inputLimits[name as keyof typeof inputLimits];
-        const clampedValue = Math.max(limits.min, Math.min(limits.max, numValue));
-        console.log(`Clamped value for ${name}: ${clampedValue}`); // 调试日志
-        
-        setFormData(prev => {
-          const newState = {
-            ...prev,
-            [name]: clampedValue.toString() // 所有数值都转为字符串
-          };
-          console.log(`New form state for ${name}:`, newState[name as keyof typeof prev]); // 修复类型错误
-          return newState;
-        });
-        return;
-      }
-    }
-    
+    // 直接设置值，不进行任何验证
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -182,8 +152,6 @@ const SalaryCalculator = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">每周工作天数</label>
                 <input
                   type="number"
-                  min="1"
-                  max="7"
                   value={formData.workDaysPerWeek}
                   onChange={(e) => handleInputChange('workDaysPerWeek', e.target.value)}
                   className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
@@ -211,8 +179,6 @@ const SalaryCalculator = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">日工作时长/h</label>
                 <input
                   type="number"
-                  min="1"
-                  max="24"
                   value={formData.workHours}
                   onChange={(e) => handleInputChange('workHours', e.target.value)}
                   className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
