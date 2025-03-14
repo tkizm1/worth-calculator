@@ -12,6 +12,7 @@ const SalaryCalculator = () => {
     workHours: '10',          // 工作时长
     commuteHours: '2',        // 通勤时长
     breakHours: '2',          // 午休时长
+    fishTime: '0',            // 摸鱼时长
     workEnvironment: '1.0',   // 工作环境系数
     heterogeneity: '1.0',     // 异性环境系数
     teamwork: '1.0',          // 同事环境系数
@@ -47,6 +48,7 @@ const SalaryCalculator = () => {
     const workHours = Number(formData.workHours);
     const commuteHours = Number(formData.commuteHours);
     const breakHours = Number(formData.breakHours);
+    const fishTime = Number(formData.fishTime);
     
     const environmentFactor = Number(formData.workEnvironment) * 
                             Number(formData.heterogeneity) * 
@@ -54,7 +56,7 @@ const SalaryCalculator = () => {
                             Number(formData.cityFactor);
     
     return (dailySalary * environmentFactor) / 
-           (35 * (workHours + commuteHours - 0.5 * breakHours) * Number(formData.education));
+           (35 * (workHours + commuteHours - 0.5 * breakHours - 0.5 * fishTime) * Number(formData.education));
   };
 
   const value = calculateValue();
@@ -202,6 +204,18 @@ const SalaryCalculator = () => {
                   type="number"
                   value={formData.breakHours}
                   onChange={(e) => handleInputChange('breakHours', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">摸鱼时长/h</label>
+                <input
+                  type="number"
+                  value={formData.fishTime}
+                  onChange={(e) => handleInputChange('fishTime', e.target.value)}
                   className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
