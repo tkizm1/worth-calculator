@@ -2,13 +2,13 @@
 
 > 🤔 "这b班到底值不值得上？" —— 打工人日常疑惑
 
+在线体验：[https://worth-calculator.vercel.app/](https://worth-calculator.vercel.app/)
+
 ## 这是什么？
 
 一个帮你计算当前工作"值不值得"的在线工具，基于网络上流传的一张神图：
 
 ![工作性价比计算公式](./public/formula.png)
-
-在线体验：[https://worth-calculator.vercel.app/](https://worth-calculator.vercel.app/)
 
 ## 能算什么？
 
@@ -30,10 +30,10 @@
 ## 计算标准
 
 结果评判标准：
-- 😱 低于0.8：很惨
-- 😐 0.8-1.5：一般
-- 😎 1.5-2.0：很爽
-- 🤩 高于2.0：爽到爆炸
+- 😱 低于1.0：很惨
+- 😐 1.0-1.8：一般
+- 😎 1.8-2.5：很爽
+- 🤩 高于2.5：爽到爆炸
 
 ## 关于项目
 
