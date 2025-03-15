@@ -34,7 +34,7 @@ export default function RootLayout({
           <div className="max-w-5xl mx-auto px-4">
             <div className="flex flex-col items-center">
               <a 
-                href="https://city-compare.vercel.app/" 
+                href="https://citycompare.zippland.com/" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center text-base"
