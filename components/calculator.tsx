@@ -207,14 +207,16 @@ const SalaryCalculator = () => {
           {/* 薪资与工作时间 section */}
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">年薪（元）</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {formData.country === 'china' ? '年薪（元）' : '年薪（当地货币）'}
+              </label>
               <div className="flex items-center gap-2 mt-1">
                 <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 <input
                   type="number"
                   value={formData.annualSalary}
                   onChange={(e) => handleInputChange('annualSalary', e.target.value)}
-                  placeholder="税前年薪"
+                  placeholder={formData.country === 'china' ? "税前年薪" : "使用当地货币"}
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
@@ -459,7 +461,9 @@ const SalaryCalculator = () => {
           </div>
           <div>
             <div className="text-sm font-medium text-gray-500 dark:text-gray-400">平均日薪</div>
-            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">¥{calculateDailySalary().toFixed(2)}</div>
+            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
+              {formData.country === 'china' ? '¥' : '$'}{calculateDailySalary().toFixed(2)}
+            </div>
           </div>
           <div>
             <div className="text-sm font-medium text-gray-500 dark:text-gray-400">工作性价比</div>
