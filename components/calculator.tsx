@@ -96,50 +96,28 @@ const SalaryCalculator = () => {
     const workYears = Number(formData.workYears);
     let experienceSalaryMultiplier = 1.0;
     
-    // 根据不同工作类型设置薪资增长预期
-    // 不同类型工作的涨薪节奏和幅度不同
-    if (formData.jobStability === 'private') {
-      // 私企薪资增长较快，但不稳定
-      if (workYears === 0) experienceSalaryMultiplier = 1.0;         // 应届生基准值
-      else if (workYears === 1) experienceSalaryMultiplier = 1.5;     // 1年：涨幅较大
-      else if (workYears <= 3) experienceSalaryMultiplier = 2.2;      // 1-3年：快速增长
-      else if (workYears <= 5) experienceSalaryMultiplier = 2.7;      // 3-5年：继续增长
-      else if (workYears <= 8) experienceSalaryMultiplier = 3.2;      // 5-8年：增长放缓
-      else if (workYears <= 10) experienceSalaryMultiplier = 3.6;     // 8-12年：增长更慢
-      else experienceSalaryMultiplier = 3.9;                          // 12年以上：接近天花板
-    } 
-    else if (formData.jobStability === 'foreign') {
-      // 外企薪资增长较平稳，没那么高
-      if (workYears === 0) experienceSalaryMultiplier = 1.0;         // 应届生基准值
-      else if (workYears === 1) experienceSalaryMultiplier = 1.4;     // 1年：中等增长
-      else if (workYears <= 3) experienceSalaryMultiplier = 1.9;      // 1-3年：稳定增长
-      else if (workYears <= 5) experienceSalaryMultiplier = 2.4;      // 3-5年：持续增长
-      else if (workYears <= 8) experienceSalaryMultiplier = 2.8;      // 5-8年：增长放缓
-      else if (workYears <= 10) experienceSalaryMultiplier = 3.1;     // 8-12年：缓慢增长
-      else experienceSalaryMultiplier = 3.3;                          // 12年以上：趋于稳定
-    }
-    else if (formData.jobStability === 'state') {
-      // 央/国企薪资增长很慢
-      if (workYears === 0) experienceSalaryMultiplier = 1.0;         // 应届生基准值
-      else if (workYears === 1) experienceSalaryMultiplier = 1.2;     // 1年：小幅增长
-      else if (workYears <= 3) experienceSalaryMultiplier = 1.5;      // 1-3年：缓慢增长
-      else if (workYears <= 5) experienceSalaryMultiplier = 1.8;      // 3-5年：稳定增长
-      else if (workYears <= 8) experienceSalaryMultiplier = 2.1;      // 5-8年：增长放缓
-      else if (workYears <= 10) experienceSalaryMultiplier = 2.3;     // 8-12年：微小增长
-      else experienceSalaryMultiplier = 2.5;                          // 12年以上：几乎到顶
-    }
-    else if (formData.jobStability === 'government') {
-      // 体制内几乎没有大幅涨薪
-      if (workYears === 0) experienceSalaryMultiplier = 1.0;         // 应届生基准值
-      else if (workYears === 1) experienceSalaryMultiplier = 1.1;     // 1年：最小增长
-      else if (workYears <= 3) experienceSalaryMultiplier = 1.3;      // 1-3年：微小增长
-      else if (workYears <= 5) experienceSalaryMultiplier = 1.5;      // 3-5年：小幅增长
-      else if (workYears <= 8) experienceSalaryMultiplier = 1.7;      // 5-8年：缓慢增长
-      else if (workYears <= 10) experienceSalaryMultiplier = 1.8;     // 8-12年：几乎停滞
-      else experienceSalaryMultiplier = 2.0;                          // 12年以上：上限很低
+    // 基准薪资增长曲线（适用于私企）
+    let baseSalaryMultiplier = 1.0;
+    if (workYears === 0) baseSalaryMultiplier = 1.0;         // 应届生基准值
+    else if (workYears === 1) baseSalaryMultiplier = 1.5;    // 1年：1.50-2.00，取中间值
+    else if (workYears <= 3) baseSalaryMultiplier = 2.2;     // 2-3年：2.20-2.50，取中间值
+    else if (workYears <= 5) baseSalaryMultiplier = 2.7;     // 4-5年：2.70-3.00，取中间值
+    else if (workYears <= 8) baseSalaryMultiplier = 3.2;     // 6-8年：3.20-3.50，取中间值
+    else if (workYears <= 10) baseSalaryMultiplier = 3.6;    // 9-10年：3.60-3.80，取中间值
+    else baseSalaryMultiplier = 3.9;                         // 11-13年：3.90-4.20，取中间值
+    
+    // 工作单位类型对涨薪幅度的影响系数
+    let salaryGrowthFactor = 1.0;  // 私企基准
+    if (formData.jobStability === 'foreign') {
+      salaryGrowthFactor = 0.8;    // 外企涨薪幅度为私企的80%
+    } else if (formData.jobStability === 'state') {
+      salaryGrowthFactor = 0.5;    // 央/国企涨薪幅度为私企的50%
+    } else if (formData.jobStability === 'government') {
+      salaryGrowthFactor = 0.3;    // 体制内涨薪幅度为私企的30%
     }
     
-    // 因为前面已经根据工作类型设置了不同的薪资增长曲线，所以不需要再用stabilityFactor调整
+    // 根据公式: 1 + (对应幅度-1) * 工作单位系数，计算最终薪资倍数
+    experienceSalaryMultiplier = 1 + (baseSalaryMultiplier - 1) * salaryGrowthFactor;
     
     // 薪资满意度应该受到经验薪资倍数的影响
     // 相同薪资，对于高经验者来说价值更低，对应的计算公式需要考虑经验倍数
