@@ -30,10 +30,15 @@ const SalaryCalculator = () => {
     workEnvironment: '1.0',   // 工作环境系数
     leadership: '1.0',        // 领导/老板系数
     teamwork: '1.0',          // 同事环境系数
-    education: '1.6',         // 学历系数
+    degreeType: 'bachelor',   // 学位类型，改为本科
+    schoolType: 'elite',      // 学校类型
+    bachelorType: 'elite',    // 新增：本科背景类型
+    education: '1.2',         // 学历系数，修改为对应本科985/211的系数
     cityFactor: '1.0',        // 城市系数，默认为三线城市
     shuttle: '1.0',           // 班车系数
-    canteen: '1.0'            // 食堂系数
+    canteen: '1.0',           // 食堂系数
+    workYears: '0',           // 新增：工作年限
+    jobStability: 'private'   // 新增：工作稳定度/类型
   });
 
   const calculateWorkingDays = useCallback(() => {
@@ -87,8 +92,39 @@ const SalaryCalculator = () => {
                             Number(formData.cityFactor) *
                             canteenFactor;
     
+    // 根据工作年限计算经验薪资倍数
+    const workYears = Number(formData.workYears);
+    let experienceSalaryMultiplier = 1.0;
+    
+    // 根据用户提供的数据设置不同年限的薪资期望倍数
+    if (workYears === 0) experienceSalaryMultiplier = 1.0;         // 应届生基准值
+    else if (workYears === 1) experienceSalaryMultiplier = 1.75;    // 1年：1.50-2.00，取中间值
+    else if (workYears <= 3) experienceSalaryMultiplier = 2.35;     // 2-3年：2.20-2.50，取中间值
+    else if (workYears <= 5) experienceSalaryMultiplier = 2.85;     // 4-5年：2.70-3.00，取中间值
+    else if (workYears <= 8) experienceSalaryMultiplier = 3.35;     // 6-8年：3.20-3.50，取中间值
+    else if (workYears <= 10) experienceSalaryMultiplier = 3.70;    // 9-10年：3.60-3.80，取中间值
+    else experienceSalaryMultiplier = 4.05;                         // 11-13年：3.90-4.20，取中间值
+    
+    // 工作稳定度调整系数
+    let stabilityFactor = 1.0;
+    if (formData.jobStability === 'government') {
+      // 体制内工作稳定性高，薪资期望降低30%
+      stabilityFactor = 0.7;
+    } else if (formData.jobStability === 'state') {
+      // 央国企工作稳定性较高，薪资期望降低20%
+      stabilityFactor = 0.8;
+    } else if (formData.jobStability === 'foreign') {
+      // 外企福利较好，薪资期望略降10%
+      stabilityFactor = 0.9;
+    }
+    
+    // 对于体制内和央企，调整经验薪资倍数
+    experienceSalaryMultiplier = experienceSalaryMultiplier * stabilityFactor;
+    
+    // 薪资满意度应该受到经验薪资倍数的影响
+    // 相同薪资，对于高经验者来说价值更低，对应的计算公式需要考虑经验倍数
     return (dailySalary * environmentFactor) / 
-           (35 * (workHours + effectiveCommuteHours - 0.5 * restTime) * Number(formData.education));
+           (35 * (workHours + effectiveCommuteHours - 0.5 * restTime) * Number(formData.education) * experienceSalaryMultiplier);
   };
 
   const value = calculateValue();
@@ -127,6 +163,61 @@ const SalaryCalculator = () => {
       </div>
     </div>
   );
+
+  // 根据学位类型和学校类型计算教育系数
+  const calculateEducationFactor = useCallback(() => {
+    const degreeType = formData.degreeType;
+    const schoolType = formData.schoolType;
+    const bachelorType = formData.bachelorType;
+    
+    // 使用更简单的方式计算系数，避免复杂的索引类型问题
+    let factor = 1.0; // 默认值
+    
+    // 专科及以下固定为0.8
+    if (degreeType === 'belowBachelor') {
+      factor = 0.8;
+    } 
+    // 本科学历
+    else if (degreeType === 'bachelor') {
+      if (schoolType === 'secondTier') factor = 0.9;       // 二本三本
+      else if (schoolType === 'firstTier') factor = 1.0;   // 双非/QS100/USnews50
+      else if (schoolType === 'elite') factor = 1.2;       // 985/211/QS30/USnews20
+    } 
+    // 硕士学历 - 考虑本科背景
+    else if (degreeType === 'masters') {
+      // 基础系数
+      let baseCoefficient = 0;
+      if (schoolType === 'secondTier') baseCoefficient = 1.1;       // 二本三本硕士
+      else if (schoolType === 'firstTier') baseCoefficient = 1.2;   // 双非/QS100/USnews50硕士
+      else if (schoolType === 'elite') baseCoefficient = 1.4;       // 985/211/QS30/USnews20硕士
+      
+      // 本科背景加成
+      let bachelorBonus = 0;
+      if (bachelorType === 'secondTier') bachelorBonus = 0;         // 二本三本本科背景不加成
+      else if (bachelorType === 'firstTier') bachelorBonus = 0.05;  // 双非背景小幅加成
+      else if (bachelorType === 'elite') bachelorBonus = 0.1;       // 985/211背景较大加成
+      
+      factor = baseCoefficient + bachelorBonus;
+    } 
+    // 博士学历
+    else if (degreeType === 'phd') {
+      if (schoolType === 'secondTier') factor = 1.6;       // 二本三本博士
+      else if (schoolType === 'firstTier') factor = 1.8;   // 双非/QS100/USnews50博士
+      else if (schoolType === 'elite') factor = 2.0;       // 985/211/QS30/USnews20博士
+    }
+    
+    // 更新education字段
+    if (formData.education !== String(factor)) {
+      handleInputChange('education', String(factor));
+    }
+    
+    return factor;
+  }, [formData.degreeType, formData.schoolType, formData.bachelorType, formData.education, handleInputChange]);
+  
+  // 在组件初始化和学历选择变化时计算教育系数
+  useEffect(() => {
+    calculateEducationFactor();
+  }, [formData.degreeType, formData.schoolType, calculateEducationFactor]);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-8 text-gray-900 dark:text-white">
@@ -353,16 +444,30 @@ const SalaryCalculator = () => {
 
           {/* 环境系数 */}
           <div className="space-y-4">
+            {/* 添加工作类型RadioGroup */}
+            <RadioGroup
+              label="工作类型"
+              name="jobStability"
+              value={formData.jobStability}
+              onChange={handleInputChange}
+              options={[
+                { label: '私企', value: 'private' },
+                { label: '外企', value: 'foreign' },
+                { label: '央/国企', value: 'state' },
+                { label: '体制内/事业单位', value: 'government' },
+              ]}
+            />
+            
             <RadioGroup
               label="工作环境"
               name="workEnvironment"
               value={formData.workEnvironment}
               onChange={handleInputChange}
               options={[
-                { label: '偏僻地区的工厂/工地/户外', value: '0.8' },
+                { label: '偏僻的工厂/工地/户外', value: '0.8' },
                 { label: '工厂/工地/户外', value: '0.9' },
                 { label: '普通环境', value: '1.0' },
-                { label: 'CBD/体制内', value: '1.1' },
+                { label: 'CBD', value: '1.1' },
               ]}
             />
 
@@ -433,21 +538,74 @@ const SalaryCalculator = () => {
               ]}
             />
 
-            <RadioGroup
-              label="个人学历"
-              name="education"
-              value={formData.education}
-              onChange={handleInputChange}
-              options={[
-                { label: '专科及以下', value: '0.8' },
-                { label: '普通本科', value: '1.0' },
-                { label: '92本科', value: '1.2' },
-                { label: '普/授课硕', value: '1.4' },
-                { label: '92/研究硕', value: '1.6' },
-                { label: '普通博士', value: '1.8' },
-                { label: '名校博士', value: '2.0' },
-              ]}
-            />
+            {/* 学历和工作年限 */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">个人学历水平</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">学位类型</label>
+                    <select
+                      value={formData.degreeType}
+                      onChange={(e) => handleInputChange('degreeType', e.target.value)}
+                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    >
+                      <option value="belowBachelor">专科及以下</option>
+                      <option value="bachelor">本科</option>
+                      <option value="masters">硕士</option>
+                      <option value="phd">博士</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">学校类型</label>
+                    <select
+                      value={formData.schoolType}
+                      onChange={(e) => handleInputChange('schoolType', e.target.value)}
+                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                      disabled={formData.degreeType === 'belowBachelor'}
+                    >
+                      <option value="secondTier">二本三本</option>
+                      <option value="firstTier">双非/ QS100/ USnews50</option>
+                      <option value="elite">985211/ QS30/ USnews20</option>
+                    </select>
+                  </div>
+                </div>
+                
+                {/* 硕士显示本科背景选项 */}
+                {formData.degreeType === 'masters' && (
+                  <div className="mt-4">
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">本科背景</label>
+                    <select
+                      value={formData.bachelorType}
+                      onChange={(e) => handleInputChange('bachelorType', e.target.value)}
+                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    >
+                      <option value="secondTier">二本三本</option>
+                      <option value="firstTier">双非/ QS100/ USnews50</option>
+                      <option value="elite">985/211/ QS30/ USnews20</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* 工作年限选择 */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">工作年限</label>
+                <select
+                  value={formData.workYears}
+                  onChange={(e) => handleInputChange('workYears', e.target.value)}
+                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                >
+                  <option value="0">应届生</option>
+                  <option value="1">1年以内</option>
+                  <option value="2">1-3年</option>
+                  <option value="4">3-5年</option>
+                  <option value="6">5-8年</option>
+                  <option value="10">8-12年</option>
+                  <option value="15">12年以上</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>
