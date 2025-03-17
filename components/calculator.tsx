@@ -1,9 +1,20 @@
 "use client";
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Wallet, Github} from 'lucide-react'; // 保留需要的组件
 
 const SalaryCalculator = () => {
+  // 添加自动重定向逻辑
+  useEffect(() => {
+    // 在所有环境中执行重定向
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname !== 'jobworth.zippland.com' && hostname !== 'localhost' && !hostname.includes('127.0.0.1')) {
+        window.location.href = 'https://jobworth.zippland.com' + window.location.pathname;
+      }
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     annualSalary: '',         // 年薪
     pppFactor: '4.19',        // 购买力平价转换因子，默认为中国大陆
@@ -123,24 +134,6 @@ const SalaryCalculator = () => {
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
         </h1>
-        
-        {/* 添加域名信息 */}
-        <div className="flex justify-center items-center">
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 text-xs font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
-            </svg>
-            <span>国内域名：</span>
-            <a 
-              href="https://jobworth.zippland.com/" 
-              className="font-bold hover:underline"
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              jobworth.zippland.com
-            </a>
-          </span>
-        </div>
         
         {/* GitHub 链接和访问量计数 */}
         <div className="flex flex-col items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
