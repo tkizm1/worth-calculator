@@ -6,32 +6,43 @@ import { Wallet, Github} from 'lucide-react'; // 保留需要的组件
 const SalaryCalculator = () => {
   const [formData, setFormData] = useState({
     annualSalary: '',         // 年薪
+    pppFactor: '4.19',        // 购买力平价转换因子，默认为中国大陆
+    country: 'china',         // 国家/地区，默认为中国
     workDaysPerWeek: '5',     // 每周工作天数
+    wfhDaysPerWeek: '0',      // 每周居家办公天数
     annualLeave: '5',         // 年假天数
-    publicHolidays: '11',     // 法定节假日
+    paidSickLeave: '3',       // 带薪病假天数
+    publicHolidays: '13',     // 法定节假日
     workHours: '10',          // 工作时长
     commuteHours: '2',        // 通勤时长
-    breakHours: '2',          // 午休时长
-    fishTime: '0',            // 摸鱼时长
+    restTime: '2',            // 休息时间（午休+摸鱼）
     workEnvironment: '1.0',   // 工作环境系数
-    heterogeneity: '1.0',     // 异性环境系数
+    leadership: '1.0',        // 领导/老板系数
     teamwork: '1.0',          // 同事环境系数
     education: '1.6',         // 学历系数
-    cityFactor: '1.0'         // 城市系数，默认为三线城市
+    cityFactor: '1.0',        // 城市系数，默认为三线城市
+    shuttle: '1.0',           // 班车系数
+    canteen: '1.0'            // 食堂系数
   });
 
   const calculateWorkingDays = useCallback(() => {
     const weeksPerYear = 52;
     const totalWorkDays = weeksPerYear * Number(formData.workDaysPerWeek); // 确保转换为数字
-    const totalLeaves = Number(formData.annualLeave) + Number(formData.publicHolidays);
+    const totalLeaves = Number(formData.annualLeave) + Number(formData.publicHolidays) + Number(formData.paidSickLeave);
     return Math.max(totalWorkDays - totalLeaves, 0);
-  }, [formData.workDaysPerWeek, formData.annualLeave, formData.publicHolidays]);
+  }, [formData.workDaysPerWeek, formData.annualLeave, formData.publicHolidays, formData.paidSickLeave]);
 
   const calculateDailySalary = useCallback(() => {
     if (!formData.annualSalary) return 0;
     const workingDays = calculateWorkingDays();
-    return Number(formData.annualSalary) / workingDays; // 除 0 不管, Infinity(爽到爆炸)!
-  }, [formData.annualSalary, calculateWorkingDays]);
+    
+    // 应用PPP转换因子标准化薪资
+    // 中国地区直接使用默认值4.19，其他地区使用用户输入的PPP
+    const pppFactor = formData.country === 'china' ? 4.19 : (Number(formData.pppFactor) || 4.19);
+    const standardizedSalary = Number(formData.annualSalary) * (4.19 / pppFactor);
+    
+    return standardizedSalary / workingDays; // 除 0 不管, Infinity(爽到爆炸)!
+  }, [formData.annualSalary, formData.pppFactor, formData.country, calculateWorkingDays]);
 
   const handleInputChange = (name: string, value: string) => {
     // 直接设置值，不进行任何验证
@@ -47,16 +58,26 @@ const SalaryCalculator = () => {
     const dailySalary = calculateDailySalary();
     const workHours = Number(formData.workHours);
     const commuteHours = Number(formData.commuteHours);
-    const breakHours = Number(formData.breakHours);
-    const fishTime = Number(formData.fishTime);
+    const restTime = Number(formData.restTime);
     
+    const workDaysPerWeek = Number(formData.workDaysPerWeek);
+    const wfhDaysPerWeek = Math.min(Number(formData.wfhDaysPerWeek), workDaysPerWeek);
+    const officeDaysRatio = (workDaysPerWeek - wfhDaysPerWeek) / workDaysPerWeek;
+    
+    // 通勤时间按办公室工作比例计算，并考虑班车因素
+    const shuttleFactor = Number(formData.shuttle);
+    const effectiveCommuteHours = commuteHours * officeDaysRatio * shuttleFactor;
+    
+    // 工作环境因素，包含食堂
+    const canteenFactor = Number(formData.canteen);
     const environmentFactor = Number(formData.workEnvironment) * 
-                            Number(formData.heterogeneity) * 
+                            Number(formData.leadership) * 
                             Number(formData.teamwork) *
-                            Number(formData.cityFactor);
+                            Number(formData.cityFactor) *
+                            canteenFactor;
     
     return (dailySalary * environmentFactor) / 
-           (35 * (workHours + commuteHours - 0.5 * breakHours - 0.5 * fishTime) * Number(formData.education));
+           (35 * (workHours + effectiveCommuteHours - 0.5 * restTime) * Number(formData.education));
   };
 
   const value = calculateValue();
@@ -185,11 +206,56 @@ const SalaryCalculator = () => {
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
+              <div className="flex items-center mt-2">
+                <input
+                  id="non-china"
+                  type="checkbox"
+                  checked={formData.country !== 'china'}
+                  onChange={(e) => handleInputChange('country', e.target.checked ? 'other' : 'china')}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="non-china" className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                  非中国地区薪资
+                </label>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {formData.country === 'other' && (
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  购买力平价(PPP)转换因子
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group">
+                    ?
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 -mt-20 -ml-24 w-64">
+                      PPP转换因子是将各国货币购买力标准化的指标。例如中国为4.19，表示1美元在美国的购买力等同于4.19元人民币在中国的购买力。
+                    </span>
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.pppFactor}
+                  onChange={(e) => handleInputChange('pppFactor', e.target.value)}
+                  placeholder="请输入购买力平价转换因子"
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  常见地区：中国大陆:4.19, 日本:102.59, 美国:1.00, 新加坡:0.84
+                  <a 
+                    href="https://zh.wikipedia.org/wiki/%E8%B4%AD%E4%B9%B0%E5%8A%9B%E5%B9%B3%E4%BB%B7%E8%BD%AC%E6%8D%A2%E5%9B%A0%E5%AD%90" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="ml-1 text-blue-500 hover:underline"
+                  >
+                    查看更多
+                  </a>
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">每周工作天数</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">每周工作天数/d</label>
                 <input
                   type="number"
                   value={formData.workDaysPerWeek}
@@ -198,7 +264,19 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">年假天数</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">每周WFH天数/d</label>
+                <input
+                  type="number"
+                  value={formData.wfhDaysPerWeek}
+                  onChange={(e) => handleInputChange('wfhDaysPerWeek', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">年假天数/d</label>
                 <input
                   type="number"
                   value={formData.annualLeave}
@@ -207,7 +285,7 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">法定节假日</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">法定节假日/d</label>
                 <input
                   type="number"
                   value={formData.publicHolidays}
@@ -215,6 +293,18 @@ const SalaryCalculator = () => {
                   className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">带薪病假/d</label>
+                <input
+                  type="number"
+                  value={formData.paidSickLeave}
+                  onChange={(e) => handleInputChange('paidSickLeave', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">日工作时长/h</label>
                 <input
@@ -224,9 +314,6 @@ const SalaryCalculator = () => {
                   className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">通勤时长/h</label>
                 <input
@@ -237,23 +324,11 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">午休时长/h</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">午休&摸鱼/h</label>
                 <input
                   type="number"
-                  value={formData.breakHours}
-                  onChange={(e) => handleInputChange('breakHours', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">摸鱼时长/h</label>
-                <input
-                  type="number"
-                  value={formData.fishTime}
-                  onChange={(e) => handleInputChange('fishTime', e.target.value)}
+                  value={formData.restTime}
+                  onChange={(e) => handleInputChange('restTime', e.target.value)}
                   className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
@@ -294,14 +369,15 @@ const SalaryCalculator = () => {
             />
 
             <RadioGroup
-              label="交友环境"
-              name="heterogeneity"
-              value={formData.heterogeneity}
+              label="领导/老板"
+              name="leadership"
+              value={formData.leadership}
               onChange={handleInputChange}
               options={[
-                { label: '没有好看的', value: '0.95' },
-                { label: '好看的不多不少', value: '1.0' },
-                { label: '很多好看的', value: '1.05' },
+                { label: '事多脾气差', value: '0.8' },
+                { label: '管理严格', value: '0.9' },
+                { label: '中规中矩', value: '1.0' },
+                { label: '善解人意', value: '1.1' },
               ]}
             />
 
@@ -314,6 +390,32 @@ const SalaryCalculator = () => {
                 { label: '脑残同事较多', value: '0.95' },
                 { label: '都是普通同事', value: '1.0' },
                 { label: '优秀同事较多', value: '1.05' },
+              ]}
+            />
+
+            <RadioGroup
+              label="班车服务"
+              name="shuttle"
+              value={formData.shuttle}
+              onChange={handleInputChange}
+              options={[
+                { label: '无班车', value: '1.0' },
+                { label: '有班车但不方便', value: '0.9' },
+                { label: '有便利班车', value: '0.7' },
+                { label: '班车直达小区', value: '0.5' },
+              ]}
+            />
+
+            <RadioGroup
+              label="食堂情况"
+              name="canteen"
+              value={formData.canteen}
+              onChange={handleInputChange}
+              options={[
+                { label: '无食堂/很难吃', value: '0.95' },
+                { label: '有食堂但一般', value: '1.0' },
+                { label: '食堂不错', value: '1.05' },
+                { label: '食堂超赞', value: '1.1' },
               ]}
             />
 
