@@ -61,6 +61,18 @@ const SalaryCalculator = () => {
     return standardizedSalary / workingDays; // 除 0 不管, Infinity(爽到爆炸)!
   }, [formData.annualSalary, formData.pppFactor, formData.country, calculateWorkingDays]);
 
+  // 新增：获取显示用的日薪（转回原始货币）
+  const getDisplaySalary = useCallback(() => {
+    const dailySalaryInCNY = calculateDailySalary();
+    if (formData.country === 'china') {
+      return dailySalaryInCNY.toFixed(2);
+    } else {
+      // 非中国地区，转回本地货币
+      const pppFactor = Number(formData.pppFactor) || 4.19;
+      return (dailySalaryInCNY * pppFactor / 4.19).toFixed(2);
+    }
+  }, [calculateDailySalary, formData.country, formData.pppFactor]);
+
   const handleInputChange = useCallback((name: string, value: string) => {
     // 直接设置值，不进行任何验证
     setFormData(prev => ({
@@ -654,7 +666,7 @@ const SalaryCalculator = () => {
           <div>
             <div className="text-sm font-medium text-gray-500 dark:text-gray-400">平均日薪</div>
             <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
-              {formData.country === 'china' ? '¥' : '$'}{calculateDailySalary().toFixed(2)}
+              {formData.country === 'china' ? '¥' : '$'}{getDisplaySalary()}
             </div>
           </div>
           <div>
