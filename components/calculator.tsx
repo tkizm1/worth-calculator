@@ -129,10 +129,13 @@ const SalaryCalculator = () => {
   
   const getValueAssessment = () => {
     if (!formData.annualSalary) return { text: "请输入年薪", color: "text-gray-500" };
-    if (value < 1.0) return { text: "很惨", color: "text-red-500" };
+    if (value < 0.6) return { text: "惨绝人寰", color: "text-pink-800" };
+    if (value < 1.0) return { text: "略惨", color: "text-red-500" };
     if (value <= 1.8) return { text: "一般", color: "text-yellow-500" };
-    if (value <= 2.5) return { text: "很爽", color: "text-green-500" };
-    return { text: "爽到爆炸", color: "text-purple-500" };
+    if (value <= 2.5) return { text: "还不错", color: "text-blue-500" };
+    if (value <= 3.0) return { text: "很爽", color: "text-green-500" };
+    if (value <= 3.5) return { text: "爽到爆炸", color: "text-purple-500" };
+    return { text: "人生巅峰", color: "text-amber-500" };
   };
 
   const RadioGroup = ({ label, name, value, onChange, options }: {
@@ -233,16 +236,16 @@ const SalaryCalculator = () => {
         <div className="flex flex-col items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           {/* 第一排: GitHub、Email、小红书 */}
           <div className="flex items-center justify-center gap-4">
-            <a 
-              href="https://github.com/zippland/worth-calculator" 
-              target="_blank" 
-              rel="noopener noreferrer"
+          <a 
+            href="https://github.com/zippland/worth-calculator" 
+            target="_blank" 
+            rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
-            >
-              <Github className="w-4 h-4" />
-              <span className="hidden sm:inline">Star on</span>
-              <span>GitHub</span>
-            </a>
+          >
+            <Github className="w-4 h-4" />
+            <span className="hidden sm:inline">Star on</span>
+            <span>GitHub</span>
+          </a>
             
             <div className="w-px h-4 bg-gray-300 dark:bg-gray-700"></div>
             <a 
