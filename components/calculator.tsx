@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { Wallet, Github} from 'lucide-react'; // 保留需要的组件
+import Image from 'next/image';
 
 const SalaryCalculator = () => {
   // 添加自动重定向逻辑
@@ -60,13 +61,13 @@ const SalaryCalculator = () => {
     return standardizedSalary / workingDays; // 除 0 不管, Infinity(爽到爆炸)!
   }, [formData.annualSalary, formData.pppFactor, formData.country, calculateWorkingDays]);
 
-  const handleInputChange = (name: string, value: string) => {
+  const handleInputChange = useCallback((name: string, value: string) => {
     // 直接设置值，不进行任何验证
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }, []);
 
   const calculateValue = () => {
     if (!formData.annualSalary) return 0;
@@ -289,10 +290,13 @@ const SalaryCalculator = () => {
             rel="noopener noreferrer"
             className="flex items-center gap-1.5"
           >
-            <img 
+            <Image 
               src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FYourUsername%2Fworth-calculator&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=visits&edge_flat=true"
               alt="访问量"
-              className="h-5"
+              width={100}
+              height={20}
+              className="h-5 w-auto"
+              unoptimized
             />
           </a>
         </div>
@@ -430,7 +434,7 @@ const SalaryCalculator = () => {
                   <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
                     ?
                     <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      工时：是指"下班时间-上班时间"的总时间，包括吃饭、午休、加班等（不含通勤）。
+                      工时：是指&quot;下班时间-上班时间&quot;的总时间，包括吃饭、午休、加班等（不含通勤）。
                     </span>
                   </span>
                 </label>
