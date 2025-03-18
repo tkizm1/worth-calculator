@@ -335,9 +335,9 @@ const SalaryCalculator = () => {
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   购买力平价(PPP)转换因子
-                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group">
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
                     ?
-                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 -mt-20 -ml-24 w-64">
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
                       PPP转换因子是将各国货币购买力标准化的指标。例如中国为4.19，表示1美元在美国的购买力等同于4.19元人民币在中国的购买力。
                     </span>
                   </span>
@@ -375,7 +375,15 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">每周WFH天数/d</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  周wfh天数/d
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                    ?
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                      WFH指居家办公(Work From Home)，这里填写的是前面工作天数中有多少天是在家办公的。
+                    </span>
+                  </span>
+                </label>
                 <input
                   type="number"
                   value={formData.wfhDaysPerWeek}
@@ -396,7 +404,7 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">法定节假日/d</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">法定假日/d</label>
                 <input
                   type="number"
                   value={formData.publicHolidays}
@@ -417,7 +425,15 @@ const SalaryCalculator = () => {
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">日工作时长/h</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  工时/h
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                    ?
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                      工时：是指"下班时间-上班时间"的总时间，包括吃饭、午休、加班等（不含通勤）。
+                    </span>
+                  </span>
+                </label>
                 <input
                   type="number"
                   value={formData.workHours}
@@ -426,7 +442,15 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">通勤时长/h</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  通勤/h
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                    ?
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                      通勤时长是指上下班往返的总时间，即家到公司和公司回家的时间总和。
+                    </span>
+                  </span>
+                </label>
                 <input
                   type="number"
                   value={formData.commuteHours}
