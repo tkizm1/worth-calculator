@@ -175,7 +175,7 @@ const SalaryCalculator = () => {
     // 使用更简单的方式计算系数，避免复杂的索引类型问题
     let factor = 1.0; // 默认值
     
-    // 专科及以下固定为0.8
+    // 专科及以下固定为0.5
     if (degreeType === 'belowBachelor') {
       factor = 0.5;
     } 
