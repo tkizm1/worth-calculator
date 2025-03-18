@@ -22,7 +22,7 @@ const SalaryCalculator = () => {
     workDaysPerWeek: '5',     // 每周工作天数
     wfhDaysPerWeek: '0',      // 每周居家办公天数
     annualLeave: '5',         // 年假天数
-    paidSickLeave: '3',       // 带薪病假天数
+    paidSickLeave: '12',       // 带薪病假天数
     publicHolidays: '13',     // 法定节假日
     workHours: '10',          // 工作时长
     commuteHours: '2',        // 通勤时长
@@ -152,7 +152,11 @@ const SalaryCalculator = () => {
               ${value === option.value 
                 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 font-medium' 
                 : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300'}`}
-            onClick={() => onChange(name, option.value)}
+            onClick={(e) => {
+              e.preventDefault(); // 阻止默认行为
+              e.stopPropagation(); // 阻止事件冒泡
+              onChange(name, option.value);
+            }}
             type="button"
           >
             {option.label}
@@ -173,34 +177,35 @@ const SalaryCalculator = () => {
     
     // 专科及以下固定为0.8
     if (degreeType === 'belowBachelor') {
-      factor = 0.8;
+      factor = 0.5;
     } 
     // 本科学历
     else if (degreeType === 'bachelor') {
-      if (schoolType === 'secondTier') factor = 0.9;       // 二本三本
+      if (schoolType === 'secondTier') factor = 0.7;       // 二本三本
       else if (schoolType === 'firstTier') factor = 1.0;   // 双非/QS100/USnews50
       else if (schoolType === 'elite') factor = 1.2;       // 985/211/QS30/USnews20
     } 
     // 硕士学历 - 考虑本科背景
     else if (degreeType === 'masters') {
-      // 基础系数
-      let baseCoefficient = 0;
-      if (schoolType === 'secondTier') baseCoefficient = 1.1;       // 二本三本硕士
-      else if (schoolType === 'firstTier') baseCoefficient = 1.2;   // 双非/QS100/USnews50硕士
-      else if (schoolType === 'elite') baseCoefficient = 1.4;       // 985/211/QS30/USnews20硕士
+      // 先获取本科背景的基础系数
+      let bachelorBaseCoefficient = 0;
+      if (bachelorType === 'secondTier') bachelorBaseCoefficient = 0.7;       // 二本三本
+      else if (bachelorType === 'firstTier') bachelorBaseCoefficient = 1.0;   // 双非/QS100/USnews50
+      else if (bachelorType === 'elite') bachelorBaseCoefficient = 1.2;       // 985/211/QS30/USnews20
       
-      // 本科背景加成
-      let bachelorBonus = 0;
-      if (bachelorType === 'secondTier') bachelorBonus = 0;         // 二本三本本科背景不加成
-      else if (bachelorType === 'firstTier') bachelorBonus = 0.05;  // 双非背景小幅加成
-      else if (bachelorType === 'elite') bachelorBonus = 0.1;       // 985/211背景较大加成
+      // 再计算硕士学校的加成系数
+      let mastersBonus = 0;
+      if (schoolType === 'secondTier') mastersBonus = 0.2;       // 二本三本硕士
+      else if (schoolType === 'firstTier') mastersBonus = 0.3;   // 双非/QS100/USnews50硕士
+      else if (schoolType === 'elite') mastersBonus = 0.5;       // 985/211/QS30/USnews20硕士
       
-      factor = baseCoefficient + bachelorBonus;
+      // 最终学历系数 = 本科基础 + 硕士加成
+      factor = bachelorBaseCoefficient + mastersBonus;
     } 
     // 博士学历
     else if (degreeType === 'phd') {
       if (schoolType === 'secondTier') factor = 1.6;       // 二本三本博士
-      else if (schoolType === 'firstTier') factor = 1.8;   // 双非/QS100/USnews50博士
+      else if (schoolType === 'firstTier') factor = 1.9;   // 双非/QS100/USnews50博士
       else if (schoolType === 'elite') factor = 2.0;       // 985/211/QS30/USnews20博士
     }
     
