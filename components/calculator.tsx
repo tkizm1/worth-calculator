@@ -295,7 +295,7 @@ const SalaryCalculator = () => {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
-          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.1.1</span>
+          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.1.2</span>
         </h1>
         
         {/* GitHub 链接和访问量计数 */}
@@ -644,7 +644,7 @@ const SalaryCalculator = () => {
               onChange={handleInputChange}
               options={[
                 { label: '无食堂/很难吃', value: '1.0' },
-                { label: '食堂一般', value: '105' },
+                { label: '食堂一般', value: '1.05' },
                 { label: '食堂不错', value: '1.1' },
                 { label: '食堂超赞', value: '1.15' },
               ]}
