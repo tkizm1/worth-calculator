@@ -36,6 +36,7 @@ const SalaryCalculator = () => {
     bachelorType: 'elite',    // 新增：本科背景类型
     education: '1.2',         // 学历系数，修改为对应本科985/211的系数
     cityFactor: '1.0',        // 城市系数，默认为三线城市
+    homeTown: 'no',          // 新增：是否在家乡工作，默认不在
     shuttle: '1.0',           // 班车系数
     canteen: '1.0',           // 食堂系数
     workYears: '0',           // 新增：工作年限
@@ -97,13 +98,16 @@ const SalaryCalculator = () => {
     const shuttleFactor = Number(formData.shuttle);
     const effectiveCommuteHours = commuteHours * officeDaysRatio * shuttleFactor;
     
-    // 工作环境因素，包含食堂
+    // 工作环境因素，包含食堂和家乡因素
     const canteenFactor = Number(formData.canteen);
+    // 在家乡工作有额外加成
+    const homeTownFactor = formData.homeTown === 'yes' ? 1.4 : 1.0;
     const environmentFactor = Number(formData.workEnvironment) * 
                             Number(formData.leadership) * 
                             Number(formData.teamwork) *
                             Number(formData.cityFactor) *
-                            canteenFactor;
+                            canteenFactor *
+                            homeTownFactor;
     
     // 根据工作年限计算经验薪资倍数
     const workYears = Number(formData.workYears);
@@ -243,6 +247,7 @@ const SalaryCalculator = () => {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
+          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.0.1</span>
         </h1>
         
         {/* GitHub 链接和访问量计数 */}
@@ -321,7 +326,7 @@ const SalaryCalculator = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {formData.country === 'china' ? '年薪（元）' : '年薪（当地货币）'}
+                {formData.country === 'china' ? '年薪总包（元）' : '年薪总包（当地货币）'}
               </label>
               <div className="flex items-center gap-2 mt-1">
                 <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -492,7 +497,7 @@ const SalaryCalculator = () => {
           <div className="space-y-4">
             {/* 添加工作类型RadioGroup */}
             <RadioGroup
-              label="工作类型"
+              label="工作类型（按工作稳定度选择）"
               name="jobStability"
               value={formData.jobStability}
               onChange={handleInputChange}
@@ -500,7 +505,7 @@ const SalaryCalculator = () => {
                 { label: '私企', value: 'private' },
                 { label: '外企', value: 'foreign' },
                 { label: '央/国企', value: 'state' },
-                { label: '体制内/事业单位', value: 'government' },
+                { label: '体制/事业单位', value: 'government' },
               ]}
             />
             
@@ -512,19 +517,19 @@ const SalaryCalculator = () => {
               options={[
                 { label: '偏僻的工厂/工地/户外', value: '0.8' },
                 { label: '工厂/工地/户外', value: '0.9' },
-                { label: '普通环境', value: '1.0' },
+                { label: '普通', value: '1.0' },
                 { label: 'CBD', value: '1.1' },
               ]}
             />
 
             <RadioGroup
-              label="所在城市"
+              label="所在城市（按生活成本选择）"
               name="cityFactor"
               value={formData.cityFactor}
               onChange={handleInputChange}
               options={[
                 { label: '一线城市', value: '0.70' },
-                { label: '新一线城市', value: '0.80' },
+                { label: '新一线', value: '0.80' },
                 { label: '二线城市', value: '1.0' },
                 { label: '三线城市', value: '1.10' },
                 { label: '四线城市', value: '1.25' },
@@ -534,15 +539,27 @@ const SalaryCalculator = () => {
             />
 
             <RadioGroup
+              label="是否在家乡工作"
+              name="homeTown"
+              value={formData.homeTown}
+              onChange={handleInputChange}
+              options={[
+                { label: '不在家乡', value: 'no' },
+                { label: '在家乡', value: 'yes' },
+              ]}
+            />
+
+            <RadioGroup
               label="领导/老板"
               name="leadership"
               value={formData.leadership}
               onChange={handleInputChange}
               options={[
-                { label: '事多脾气差', value: '0.8' },
+                { label: '对我不爽', value: '0.7' },
                 { label: '管理严格', value: '0.9' },
                 { label: '中规中矩', value: '1.0' },
                 { label: '善解人意', value: '1.1' },
+                { label: '我是嫡系', value: '1.3' },
               ]}
             />
 
@@ -552,35 +569,36 @@ const SalaryCalculator = () => {
               value={formData.teamwork}
               onChange={handleInputChange}
               options={[
-                { label: '脑残同事较多', value: '0.95' },
-                { label: '都是普通同事', value: '1.0' },
-                { label: '优秀同事较多', value: '1.05' },
+                { label: '都是傻逼', value: '0.9' },
+                { label: '萍水相逢', value: '1.0' },
+                { label: '和和睦睦', value: '1.1' },
+                { label: '私交甚好', value: '1.2' },
               ]}
             />
 
             <RadioGroup
-              label="班车服务"
+              label="班车服务（加分项）"
               name="shuttle"
               value={formData.shuttle}
               onChange={handleInputChange}
               options={[
                 { label: '无班车', value: '1.0' },
-                { label: '有班车但不方便', value: '0.9' },
-                { label: '有便利班车', value: '0.7' },
-                { label: '班车直达小区', value: '0.5' },
+                { label: '班车不便', value: '0.9' },
+                { label: '便利班车', value: '0.7' },
+                { label: '班车直达', value: '0.5' },
               ]}
             />
 
             <RadioGroup
-              label="食堂情况"
+              label="食堂情况（加分项）"
               name="canteen"
               value={formData.canteen}
               onChange={handleInputChange}
               options={[
-                { label: '无食堂/很难吃', value: '0.95' },
-                { label: '有食堂但一般', value: '1.0' },
-                { label: '食堂不错', value: '1.05' },
-                { label: '食堂超赞', value: '1.1' },
+                { label: '无食堂/很难吃', value: '1.0' },
+                { label: '食堂一般', value: '105' },
+                { label: '食堂不错', value: '1.1' },
+                { label: '食堂超赞', value: '1.15' },
               ]}
             />
 
@@ -643,11 +661,11 @@ const SalaryCalculator = () => {
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 >
                   <option value="0">应届生</option>
-                  <option value="1">1年以内</option>
-                  <option value="2">1-3年</option>
-                  <option value="4">3-5年</option>
-                  <option value="6">5-8年</option>
-                  <option value="10">8-12年</option>
+                  <option value="1">1-3年</option>
+                  <option value="2">3-5年</option>
+                  <option value="4">5-8年</option>
+                  <option value="6">8-10年</option>
+                  <option value="10">10-12年</option>
                   <option value="15">12年以上</option>
                 </select>
               </div>
