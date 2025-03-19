@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Wallet, Github} from 'lucide-react'; // 保留需要的组件
 import Image from 'next/image';
 
 const SalaryCalculator = () => {
+  // 添加滚动位置保存的引用
+  const scrollPositionRef = useRef(0);
+  
   // 添加自动重定向逻辑
   useEffect(() => {
     // 在所有环境中执行重定向
@@ -43,6 +46,35 @@ const SalaryCalculator = () => {
     jobStability: 'private'   // 新增：工作稳定度/类型
   });
 
+  // 添加滚动位置保存和恢复逻辑
+  useEffect(() => {
+    const handleBeforeStateChange = () => {
+      // 保存当前滚动位置
+      if (typeof window !== 'undefined') {
+        scrollPositionRef.current = window.scrollY;
+      }
+    };
+
+    const handleAfterStateChange = () => {
+      // 恢复滚动位置
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          window.scrollTo(0, scrollPositionRef.current);
+        }, 0);
+      }
+    };
+
+    // 添加到全局事件
+    window.addEventListener('beforeStateChange', handleBeforeStateChange);
+    window.addEventListener('afterStateChange', handleAfterStateChange);
+
+    return () => {
+      // 清理事件监听器
+      window.removeEventListener('beforeStateChange', handleBeforeStateChange);
+      window.removeEventListener('afterStateChange', handleAfterStateChange);
+    };
+  }, []);
+
   const calculateWorkingDays = useCallback(() => {
     const weeksPerYear = 52;
     const totalWorkDays = weeksPerYear * Number(formData.workDaysPerWeek); // 确保转换为数字
@@ -75,11 +107,23 @@ const SalaryCalculator = () => {
   }, [calculateDailySalary, formData.country, formData.pppFactor]);
 
   const handleInputChange = useCallback((name: string, value: string) => {
+    // 触发自定义事件，保存滚动位置
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('beforeStateChange'));
+    }
+    
     // 直接设置值，不进行任何验证
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    // 在状态更新后，触发恢复滚动位置事件
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('afterStateChange'));
+      }
+    }, 0);
   }, []);
 
   const calculateValue = () => {
@@ -195,13 +239,13 @@ const SalaryCalculator = () => {
     // 使用更简单的方式计算系数，避免复杂的索引类型问题
     let factor = 1.0; // 默认值
     
-    // 专科及以下固定为0.5
+    // 专科及以下固定为0.8
     if (degreeType === 'belowBachelor') {
-      factor = 0.5;
+      factor = 0.8;
     } 
     // 本科学历
     else if (degreeType === 'bachelor') {
-      if (schoolType === 'secondTier') factor = 0.7;       // 二本三本
+      if (schoolType === 'secondTier') factor = 0.9;       // 二本三本
       else if (schoolType === 'firstTier') factor = 1.0;   // 双非/QS100/USnews50
       else if (schoolType === 'elite') factor = 1.2;       // 985/211/QS30/USnews20
     } 
@@ -209,15 +253,15 @@ const SalaryCalculator = () => {
     else if (degreeType === 'masters') {
       // 先获取本科背景的基础系数
       let bachelorBaseCoefficient = 0;
-      if (bachelorType === 'secondTier') bachelorBaseCoefficient = 0.7;       // 二本三本
+      if (bachelorType === 'secondTier') bachelorBaseCoefficient = 0.9;       // 二本三本
       else if (bachelorType === 'firstTier') bachelorBaseCoefficient = 1.0;   // 双非/QS100/USnews50
       else if (bachelorType === 'elite') bachelorBaseCoefficient = 1.2;       // 985/211/QS30/USnews20
       
       // 再计算硕士学校的加成系数
       let mastersBonus = 0;
-      if (schoolType === 'secondTier') mastersBonus = 0.2;       // 二本三本硕士
-      else if (schoolType === 'firstTier') mastersBonus = 0.3;   // 双非/QS100/USnews50硕士
-      else if (schoolType === 'elite') mastersBonus = 0.5;       // 985/211/QS30/USnews20硕士
+      if (schoolType === 'secondTier') mastersBonus = 0.4;       // 二本三本硕士
+      else if (schoolType === 'firstTier') mastersBonus = 0.5;   // 双非/QS100/USnews50硕士
+      else if (schoolType === 'elite') mastersBonus = 0.6;       // 985/211/QS30/USnews20硕士
       
       // 最终学历系数 = 本科基础 + 硕士加成
       factor = bachelorBaseCoefficient + mastersBonus;
@@ -225,17 +269,21 @@ const SalaryCalculator = () => {
     // 博士学历
     else if (degreeType === 'phd') {
       if (schoolType === 'secondTier') factor = 1.6;       // 二本三本博士
-      else if (schoolType === 'firstTier') factor = 1.9;   // 双非/QS100/USnews50博士
+      else if (schoolType === 'firstTier') factor = 1.8;   // 双非/QS100/USnews50博士
       else if (schoolType === 'elite') factor = 2.0;       // 985/211/QS30/USnews20博士
     }
     
     // 更新education字段
     if (formData.education !== String(factor)) {
-      handleInputChange('education', String(factor));
+      // 这里不使用handleInputChange以避免触发滚动保存/恢复逻辑
+      setFormData(prev => ({
+        ...prev,
+        education: String(factor)
+      }));
     }
     
     return factor;
-  }, [formData.degreeType, formData.schoolType, formData.bachelorType, formData.education, handleInputChange]);
+  }, [formData.degreeType, formData.schoolType, formData.bachelorType, formData.education]);
   
   // 在组件初始化和学历选择变化时计算教育系数
   useEffect(() => {
@@ -247,7 +295,7 @@ const SalaryCalculator = () => {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
-          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.0.1</span>
+          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.1.1</span>
         </h1>
         
         {/* GitHub 链接和访问量计数 */}
@@ -497,7 +545,7 @@ const SalaryCalculator = () => {
           <div className="space-y-4">
             {/* 添加工作类型RadioGroup */}
             <RadioGroup
-              label="工作类型（按工作稳定度选择）"
+              label="工作类型（按裁员风险选择）"
               name="jobStability"
               value={formData.jobStability}
               onChange={handleInputChange}
