@@ -438,10 +438,18 @@ const SalaryCalculator = () => {
       
       content.appendChild(ratingArea);
       
-      // 版权信息
+      // 版权信息 - 修改为两行显示
       const footer = document.createElement('div');
-      footer.className = 'text-center text-sm text-gray-500 pt-2';
-      footer.textContent = '由"这b班上得值不值·测算版"自动生成 | jobworth.zippland.com';
+      footer.className = 'text-center text-sm text-gray-500 pt-2 flex flex-col gap-1';
+      
+      const line1 = document.createElement('div');
+      line1.textContent = '由"这b班上得值不值·测算版"自动生成';
+      
+      const line2 = document.createElement('div');
+      line2.textContent = 'jobworth.zippland.com';
+      
+      footer.appendChild(line1);
+      footer.appendChild(line2);
       
       // 组装卡片
       cardContent.appendChild(title);
