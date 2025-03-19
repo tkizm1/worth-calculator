@@ -694,8 +694,17 @@ const SalaryCalculator = () => {
                       disabled={formData.degreeType === 'belowBachelor'}
                     >
                       <option value="secondTier">二本三本</option>
-                      <option value="firstTier">双非/ QS100/ USnews50</option>
-                      <option value="elite">985211/ QS30/ USnews20</option>
+                      {formData.degreeType === 'bachelor' ? (
+                        <>
+                          <option value="firstTier">双非/ QS200/ USnews80</option>
+                          <option value="elite">985211/ QS50/ USnews30</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="firstTier">双非/ QS100/ USnews50</option>
+                          <option value="elite">985211/ QS30/ USnews20</option>
+                        </>
+                      )}
                     </select>
                   </div>
                 </div>
@@ -710,8 +719,8 @@ const SalaryCalculator = () => {
                       className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                     >
                       <option value="secondTier">二本三本</option>
-                      <option value="firstTier">双非/ QS100/ USnews50</option>
-                      <option value="elite">985/211/ QS30/ USnews20</option>
+                      <option value="firstTier">双非/ QS200/ USnews80</option>
+                      <option value="elite">985211/ QS50/ USnews30</option>
                     </select>
                   </div>
                 )}
