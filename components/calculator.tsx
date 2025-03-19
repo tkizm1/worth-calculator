@@ -134,9 +134,23 @@ const SalaryCalculator = () => {
     const commuteHours = Number(formData.commuteHours);
     const restTime = Number(formData.restTime);
     
-    const workDaysPerWeek = Number(formData.workDaysPerWeek);
-    const wfhDaysPerWeek = Math.min(Number(formData.wfhDaysPerWeek), workDaysPerWeek);
-    const officeDaysRatio = (workDaysPerWeek - wfhDaysPerWeek) / workDaysPerWeek;
+    // 确保正确转换为数字，使用parseFloat可以更可靠地处理字符串转数字
+    const workDaysPerWeek = parseFloat(formData.workDaysPerWeek) || 5;
+    
+    // 允许wfhDaysPerWeek为空字符串，计算时才处理为0
+    const wfhInput = formData.wfhDaysPerWeek.trim();
+    const wfhDaysPerWeek = wfhInput === '' ? 0 : Math.min(parseFloat(wfhInput) || 0, workDaysPerWeek);
+    
+    // 确保有办公室工作天数时才计算比例，否则设为0
+    const officeDaysRatio = workDaysPerWeek > 0 ? (workDaysPerWeek - wfhDaysPerWeek) / workDaysPerWeek : 0;
+    
+    // 在计算结果中添加一个小的日志输出，以便调试
+    console.log('WFH计算:', { 
+      workDaysPerWeek, 
+      wfhDaysPerWeek, 
+      officeDaysRatio, 
+      effectiveCommute: commuteHours * officeDaysRatio 
+    });
     
     // 通勤时间按办公室工作比例计算，并考虑班车因素
     const shuttleFactor = Number(formData.shuttle);
@@ -295,7 +309,7 @@ const SalaryCalculator = () => {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
-          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.1.2</span>
+          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.2.1</span>
         </h1>
         
         {/* GitHub 链接和访问量计数 */}
@@ -455,6 +469,9 @@ const SalaryCalculator = () => {
                 </label>
                 <input
                   type="number"
+                  min="0"
+                  max={formData.workDaysPerWeek}
+                  step="1"
                   value={formData.wfhDaysPerWeek}
                   onChange={(e) => handleInputChange('wfhDaysPerWeek', e.target.value)}
                   className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
