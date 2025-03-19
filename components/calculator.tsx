@@ -309,7 +309,7 @@ const SalaryCalculator = () => {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
-          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.3.2</span>
+          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.4.1</span>
         </h1>
         
         {/* GitHub 链接和访问量计数 */}
@@ -562,15 +562,15 @@ const SalaryCalculator = () => {
           <div className="space-y-4">
             {/* 添加工作类型RadioGroup */}
             <RadioGroup
-              label="工作类型（按裁员风险选择）"
+              label="合同类型"
               name="jobStability"
               value={formData.jobStability}
               onChange={handleInputChange}
               options={[
-                { label: '私企', value: 'private' },
-                { label: '外企', value: 'foreign' },
-                { label: '央/国企', value: 'state' },
-                { label: '体制/事业单位', value: 'government' },
+                { label: '私企续签', value: 'private' },
+                { label: '外企续签', value: 'foreign' },
+                { label: '长期雇佣', value: 'state' },
+                { label: '永久编制', value: 'government' },
               ]}
             />
             
@@ -582,7 +582,7 @@ const SalaryCalculator = () => {
               options={[
                 { label: '偏僻的工厂/工地/户外', value: '0.8' },
                 { label: '工厂/工地/户外', value: '0.9' },
-                { label: '普通', value: '1.0' },
+                { label: '普通环境', value: '1.0' },
                 { label: 'CBD', value: '1.1' },
               ]}
             />
