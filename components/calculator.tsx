@@ -204,12 +204,12 @@ const SalaryCalculator = () => {
   
   const getValueAssessment = () => {
     if (!formData.annualSalary) return { text: "请输入年薪", color: "text-gray-500" };
-    if (value < 0.4) return { text: "惨绝人寰", color: "text-pink-800" };
-    if (value < 0.9) return { text: "略惨", color: "text-red-500" };
-    if (value <= 1.5) return { text: "一般", color: "text-orange-500" };
+    if (value < 0.6) return { text: "惨绝人寰", color: "text-pink-800" };
+    if (value < 1.0) return { text: "略惨", color: "text-red-500" };
+    if (value <= 1.8) return { text: "一般", color: "text-orange-500" };
     if (value <= 2.5) return { text: "还不错", color: "text-blue-500" };
-    if (value <= 3.2) return { text: "很爽", color: "text-green-500" };
-    if (value <= 4.0) return { text: "爽到爆炸", color: "text-purple-500" };
+    if (value <= 3.0) return { text: "很爽", color: "text-green-500" };
+    if (value <= 3.5) return { text: "爽到爆炸", color: "text-purple-500" };
     return { text: "人生巅峰", color: "text-yellow-400" };
   };
 
