@@ -14,8 +14,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "worth-calculator",
-  description: "worth-calculator",
+  title: "这b班上得值不值",
+  description: "这b班上得值不值",
   verification: {
     google: "_OQGiIpYz87USAsgJV2C07-JJhQ8myV_4GoM1kDjFic",
   },
