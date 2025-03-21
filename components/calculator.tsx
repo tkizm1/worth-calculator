@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Wallet, Github, Share2, FileText } from 'lucide-react'; // 保留需要的组件
+import { Wallet, Github, FileText } from 'lucide-react'; // 移除未使用的Share2
 import Image from 'next/image';
 import Link from 'next/link'; // 导入Link组件用于导航
 
@@ -814,7 +814,7 @@ const SalaryCalculator = () => {
               'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'}`}
           >
             <FileText className="w-4 h-4" />
-            查看我的工作性价比报告
+            查看性价比报告
           </Link>
         </div>
       </div>

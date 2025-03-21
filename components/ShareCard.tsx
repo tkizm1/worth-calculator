@@ -459,11 +459,6 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
     setFadeIn(true);
   }, []);
 
-  // 计算有效工作时间
-  const effectiveWorkTime = parseFloat(props.workHours) + 
-                            parseFloat(props.commuteHours) - 
-                            0.5 * parseFloat(props.restTime);
-  
   // 生成个性化评价
   const personalizedComments = generatePersonalizedComments(props);
   
@@ -569,7 +564,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         
         {/* 底部信息 */}
         <div className="mt-10 text-center text-gray-500 dark:text-gray-400 space-y-1">
-          <div>由"这b班上得值不值·测算版"精心定制</div>
+          <div>由&quot;这b班上得值不值·测算版&quot;精心定制</div>
           <div>jobworth.zippland.com</div>
         </div>
       </div>
