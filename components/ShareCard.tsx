@@ -463,6 +463,7 @@ const generatePersonalizedComments = (props: ShareCardProps) => {
 
 const ShareCard: React.FC<ShareCardProps> = (props) => {
   const reportRef = useRef<HTMLDivElement>(null);
+  const simpleReportRef = useRef<HTMLDivElement>(null); // 添加简化版报告的引用
   const [isDownloading, setIsDownloading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
   
@@ -474,20 +475,20 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
   // 生成个性化评价
   const personalizedComments = generatePersonalizedComments(props);
   
-  // 处理下载图片
+  // 处理下载图片 - 使用简化版报告
   const handleDownload = async () => {
-    if (!reportRef.current || isDownloading) return;
+    if (!simpleReportRef.current || isDownloading) return;
     
     try {
       setIsDownloading(true);
       
-      // 获取报告元素
-      const element = reportRef.current;
+      // 获取简化版报告元素
+      const element = simpleReportRef.current;
       
       // 使用html2canvas生成图片
       const canvas = await html2canvas(element, {
         scale: 2,
-        backgroundColor: null,
+        backgroundColor: '#FFFFFF',
         useCORS: true,
         allowTaint: true,
         logging: false,
@@ -530,39 +531,39 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         </Link>
       </div>
       
-      <div ref={reportRef} className="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-10">
+      <div ref={reportRef} className="w-full max-w-4xl bg-white rounded-xl shadow-xl p-6 md:p-10">
         {/* 标题 */}
         <div className="mb-10 text-center">
           <div className="text-6xl mb-4">{getEmoji(parseFloat(props.value))}</div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
             你的工作性价比报告
           </h1>
           <div className="flex justify-center items-center gap-3">
             <span className="text-2xl font-bold px-3 py-1 rounded-lg" style={{ color: getColorFromClassName(props.assessmentColor), backgroundColor: `${getColorFromClassName(props.assessmentColor)}20` }}>
               {props.value}
             </span>
-            <span className="text-lg text-gray-700 dark:text-gray-300">{props.assessment}</span>
+            <span className="text-lg text-gray-700">{props.assessment}</span>
           </div>
         </div>
         
         {/* 性价比评语卡片 */}
         <div className="space-y-8">
           {personalizedComments.map((comment, index) => (
-            <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl p-6 shadow-md transition-all hover:shadow-lg">
+            <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 shadow-md transition-all hover:shadow-lg">
               <div className="flex items-start gap-4">
                 <div className="text-4xl flex-shrink-0">{comment.emoji}</div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">{comment.title}</h3>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">{comment.content}</p>
+                  <h3 className="text-xl font-bold mb-2 text-gray-800">{comment.title}</h3>
+                  <p className="text-gray-700 leading-relaxed mb-4">{comment.content}</p>
                   
                   {/* 用户选项详情 */}
                   {comment.details && comment.details.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                    <div className="mt-3 pt-3 border-t border-gray-200">
                       <div className="grid grid-cols-2 gap-2">
                         {comment.details.map((detail, i) => (
                           <div key={i} className="flex flex-col">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">{detail.label}</span>
-                            <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{detail.value}</span>
+                            <span className="text-xs text-gray-500">{detail.label}</span>
+                            <span className="text-sm font-medium text-gray-800">{detail.value}</span>
                           </div>
                         ))}
                       </div>
@@ -575,7 +576,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         </div>
         
         {/* 底部信息 */}
-        <div className="mt-10 text-center text-gray-500 dark:text-gray-400 space-y-1">
+        <div className="mt-10 text-center text-gray-500 space-y-1">
           <div>由&quot;这b班上得值不值·测算版&quot;精心定制</div>
           <div>jobworth.zippland.com</div>
         </div>
@@ -591,6 +592,160 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
           <Download className="w-5 h-5" />
           {isDownloading ? '生成中...' : '下载报告'}
         </button>
+      </div>
+      
+      {/* 简化版报告，仅用于下载，在页面中隐藏 */}
+      <div className="fixed top-0 left-0 opacity-0 pointer-events-none">
+        <div ref={simpleReportRef} className="w-[800px] bg-white p-8" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+          <div className="border border-gray-200 rounded-lg p-6">
+            {/* 报告标题 */}
+            <div className="text-center mb-6">
+              <h1 className="text-2xl font-bold">工作性价比报告</h1>
+              <div className="mt-2 text-lg">
+                <span className="font-semibold px-2 py-1 rounded" style={{ backgroundColor: `${getColorFromClassName(props.assessmentColor)}20`, color: getColorFromClassName(props.assessmentColor) }}>
+                  {props.value} - {props.assessment}
+                </span>
+              </div>
+            </div>
+            
+            {/* 数据表格 */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* 基础信息 */}
+              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2">
+                <h2 className="font-bold text-gray-800">基础信息</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-2 col-span-2">
+                <div>
+                  <div className="text-sm text-gray-600">工作城市</div>
+                  <div className="font-medium">{getCityName(props.cityFactor)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">是否家乡</div>
+                  <div className="font-medium">{props.homeTown === 'yes' ? '是' : '否'}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">日薪</div>
+                  <div className="font-medium">{props.isYuan ? '¥' : '$'}{props.dailySalary}/天</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">年工作天数</div>
+                  <div className="font-medium">{props.workDaysPerYear} 天</div>
+                </div>
+              </div>
+              
+              {/* 工作时间 */}
+              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2 mt-4">
+                <h2 className="font-bold text-gray-800">工作时间</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-2 col-span-2">
+                <div>
+                  <div className="text-sm text-gray-600">每天工作</div>
+                  <div className="font-medium">{props.workHours} 小时</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">每天通勤</div>
+                  <div className="font-medium">{props.commuteHours} 小时</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">午休与休息</div>
+                  <div className="font-medium">{props.restTime} 小时</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">每周工作天数</div>
+                  <div className="font-medium">{props.workDaysPerWeek} 天</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">远程办公</div>
+                  <div className="font-medium">{props.wfhDaysPerWeek}/{props.workDaysPerWeek} 天/周</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">班车服务</div>
+                  <div className="font-medium">{getShuttleDesc(props.shuttle)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">年假</div>
+                  <div className="font-medium">{props.annualLeave} 天/年</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">带薪病假</div>
+                  <div className="font-medium">{props.paidSickLeave} 天/年</div>
+                </div>
+              </div>
+              
+              {/* 工作环境 */}
+              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2 mt-4">
+                <h2 className="font-bold text-gray-800">工作环境</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-2 col-span-2">
+                <div>
+                  <div className="text-sm text-gray-600">办公环境</div>
+                  <div className="font-medium">{getWorkEnvironmentDesc(props.workEnvironment)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">领导关系</div>
+                  <div className="font-medium">{getLeadershipDesc(props.leadership)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">同事关系</div>
+                  <div className="font-medium">{getTeamworkDesc(props.teamwork)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">食堂情况</div>
+                  <div className="font-medium">{getCanteenDesc(props.canteen)}</div>
+                </div>
+              </div>
+              
+              {/* 教育背景 */}
+              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2 mt-4">
+                <h2 className="font-bold text-gray-800">教育与工作经验</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-2 col-span-2">
+                <div>
+                  <div className="text-sm text-gray-600">最高学历</div>
+                  <div className="font-medium">{getDegreeDesc(props.degreeType)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">学校类型</div>
+                  <div className="font-medium">{getSchoolTypeDesc(props.schoolType, props.degreeType)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">工作年限</div>
+                  <div className="font-medium">{getWorkYearsDesc(props.workYears)}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">合同类型</div>
+                  <div className="font-medium">{getJobStabilityDesc(props.jobStability)}</div>
+                </div>
+              </div>
+              
+              {/* 结论 */}
+              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2 mt-4">
+                <h2 className="font-bold text-gray-800">最终评估</h2>
+              </div>
+              <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center mb-2">
+                  <div className="text-3xl mr-2">{getEmoji(parseFloat(props.value))}</div>
+                  <div className="text-xl font-bold" style={{ color: getColorFromClassName(props.assessmentColor) }}>
+                    {props.value} - {props.assessment}
+                  </div>
+                </div>
+                <p className="text-gray-700">
+                  {parseFloat(props.value) < 1.0 
+                    ? "当前工作性价比较低，建议积累经验后考虑寻找新机会。" 
+                    : parseFloat(props.value) <= 2.0 
+                      ? "工作性价比处于中等水平，有发展潜力。" 
+                      : "高性价比工作，值得珍惜和长期发展。"
+                  }
+                </p>
+              </div>
+            </div>
+            
+            {/* 页脚 */}
+            <div className="mt-6 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
+              <div>jobworth.zippland.com</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
