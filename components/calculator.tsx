@@ -313,7 +313,7 @@ const SalaryCalculator = () => {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
-          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v3.5.1</span>
+          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v4.1.1</span>
         </h1>
         
         {/* GitHub 链接和访问量计数 */}
