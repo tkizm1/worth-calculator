@@ -211,11 +211,11 @@ const generatePersonalizedComments = (props: ShareCardProps) => {
     if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
       cityComment = `虽然生活成本较高，但丰富的机会和广阔的平台能够助你更快成长。`;
     } else if (props.cityFactor === '1.0' || props.cityFactor === '1.10') {
-      cityComment = `节奏虽然没有一线城市那么快，但依然提供了不错的发展空间。这里的生活压力适中，让你能找到工作与生活之间的平衡。`;
+      cityComment = `生活节奏虽然没有一线城市那么快，但依然提供了不错的发展空间。这里的生活压力适中，让你能找到工作与生活之间的平衡。`;
     } else {
       cityComment = `你享受着低成本高质量的生活。虽然机会相对较少，但悠闲的生活节奏和较低的压力让你能更从容地面对人生。`;
     }
-    cityComment += " 在异乡工作一定要照顾好自己，按时吃饭，多注意休息。你一个人去得那么远。";
+    cityComment += " 要照顾好自己，按时吃饭休息，你一个人去得那么远。";
   }
   comments.push({ 
     title: "城市选择", 
@@ -280,24 +280,24 @@ const generatePersonalizedComments = (props: ShareCardProps) => {
   
   // 更细致的领导关系评价
   if (leadershipRating === '1.3') {
-    environmentComment += " 作为领导的嫡系，你享受着优越的职场待遇和发展机会，但也面临着更高的期望和责任。";
+    environmentComment += " 你享受着作为嫡系的优越待遇和发展机会，但也面临着更高的期望和责任。";
   } else if (leadershipRating === '1.1') {
-    environmentComment += " 你有一位善解人意的领导，他/她能够理解你的工作状态并提供必要的支持，这在职场中非常难得。";
+    environmentComment += " 你的领导能够理解你的工作状态并提供必要的支持，这在职场中非常难得。";
   } else if (leadershipRating === '1.0') {
-    environmentComment += " 你与领导保持着中规中矩的专业关系，各自履行岗位职责，这种关系虽然普通但稳定可靠。";
+    environmentComment += " 你和领导各司其职，这种关系虽然普通但稳定可靠。";
   } else if (leadershipRating === '0.9') {
-    environmentComment += " 你的领导管理风格较为严格，这种严格虽然有时让人压力大，但也能促使你更加专业和自律。";
+    environmentComment += " 你领导的管理风格较为严格，这种严格虽然有时让人压力大，但也能促使你更加专业和自律。";
   } else if (leadershipRating === '0.7') {
     environmentComment += " 你与领导之间的关系有些紧张，这种情况下要学会保持情绪稳定，专注于工作本身，同时提升自己的沟通技巧。";
   }
   
   // 更细致的同事关系评价
   if (teamworkRating === '1.2') {
-    environmentComment += " 与同事们建立了深厚的私人友谊，工作之余还能互相支持和陪伴，这种关系让职场生活更加充实和有意义。";
+    environmentComment += " 你与同事们建立了深厚的私人友谊，工作之余还能互相支持和陪伴，这种关系让职场生活更加充实和有意义。";
   } else if (teamworkRating === '1.1') {
     environmentComment += " 团队氛围和谐友善，同事之间相互尊重和支持，这种积极的人际环境让工作过程更加愉快和高效。";
   } else if (teamworkRating === '1.0') {
-    environmentComment += " 与同事们保持着礼貌而专业的关系，相处和平但不过分亲近，这种关系模式适合专注于工作的职场人士。";
+    environmentComment += " 与同事们相处和平但不过分亲近，这种关系模式适合专注于工作的职场人士。";
   } else if (teamworkRating === '0.9') {
     environmentComment += " 同事关系略显紧张，这种环境虽然不太舒适，但也锻炼了你的独立工作能力和心理承受力。";
   }
