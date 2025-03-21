@@ -278,16 +278,28 @@ const generatePersonalizedComments = (props: ShareCardProps) => {
     environmentComment = "你的工作环境舒适适中，能满足基本需求，为高效工作提供了足够的保障。";
   }
   
-  if (leadershipRating === '1.3' || leadershipRating === '1.1') {
-    environmentComment += " 你与领导的良好关系是职场上的宝贵财富，这不仅能减轻工作压力，还为你的职业发展铺平道路。";
+  // 更细致的领导关系评价
+  if (leadershipRating === '1.3') {
+    environmentComment += " 作为领导的嫡系，你享受着优越的职场待遇和发展机会，但也面临着更高的期望和责任。";
+  } else if (leadershipRating === '1.1') {
+    environmentComment += " 你有一位善解人意的领导，他/她能够理解你的工作状态并提供必要的支持，这在职场中非常难得。";
+  } else if (leadershipRating === '1.0') {
+    environmentComment += " 你与领导保持着中规中矩的专业关系，各自履行岗位职责，这种关系虽然普通但稳定可靠。";
+  } else if (leadershipRating === '0.9') {
+    environmentComment += " 你的领导管理风格较为严格，这种严格虽然有时让人压力大，但也能促使你更加专业和自律。";
   } else if (leadershipRating === '0.7') {
-    environmentComment += " 尽管与领导的关系有些紧张，但这也锻炼了你的情商和处理复杂人际关系的能力。";
+    environmentComment += " 你与领导之间的关系有些紧张，这种情况下要学会保持情绪稳定，专注于工作本身，同时提升自己的沟通技巧。";
   }
   
-  if (teamworkRating === '1.2' || teamworkRating === '1.1') {
-    environmentComment += " 和谐的同事关系让工作更加愉快，这种积极的团队氛围是职场幸福感的重要来源。";
+  // 更细致的同事关系评价
+  if (teamworkRating === '1.2') {
+    environmentComment += " 与同事们建立了深厚的私人友谊，工作之余还能互相支持和陪伴，这种关系让职场生活更加充实和有意义。";
+  } else if (teamworkRating === '1.1') {
+    environmentComment += " 团队氛围和谐友善，同事之间相互尊重和支持，这种积极的人际环境让工作过程更加愉快和高效。";
+  } else if (teamworkRating === '1.0') {
+    environmentComment += " 与同事们保持着礼貌而专业的关系，相处和平但不过分亲近，这种关系模式适合专注于工作的职场人士。";
   } else if (teamworkRating === '0.9') {
-    environmentComment += " 与同事的关系虽然有些紧张，但这也促使你更加专注于个人能力的提升。";
+    environmentComment += " 同事关系略显紧张，这种环境虽然不太舒适，但也锻炼了你的独立工作能力和心理承受力。";
   }
   
   comments.push({ 

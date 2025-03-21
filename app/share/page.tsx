@@ -2,9 +2,10 @@
 
 import { useSearchParams } from 'next/navigation';
 import ShareCard from '@/components/ShareCard';
-import React from 'react';
+import React, { Suspense } from 'react';
 
-export default function SharePage() {
+// 一个包装组件，负责从URL参数获取数据
+function ShareCardWrapper() {
   const searchParams = useSearchParams();
   
   // 从URL参数中获取数据 - 基础数据
@@ -79,5 +80,19 @@ export default function SharePage() {
       workYears={workYears}
       jobStability={jobStability}
     />
+  );
+}
+
+// 加载过程中显示的组件
+function ShareLoading() {
+  return <div className="flex items-center justify-center min-h-screen">正在加载报告...</div>;
+}
+
+// 主页面组件
+export default function SharePage() {
+  return (
+    <Suspense fallback={<ShareLoading />}>
+      <ShareCardWrapper />
+    </Suspense>
   );
 } 
