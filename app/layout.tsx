@@ -53,8 +53,8 @@ export default function RootLayout({
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium mb-0.5">城市生活成本对比器</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">国内主要城市，一起拉通对比，分别要赚多少钱才能保持同样生活水平？</div>
+                  <div className="font-medium mb-0.5">Offer选择/对比工具</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">把不同城市的offer一起拉通对比，分别要赚多少钱才能保持同样生活水平？</div>
                 </div>
               </a>
               <a 
