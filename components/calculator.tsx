@@ -190,9 +190,9 @@ const SalaryCalculator = () => {
     if (formData.jobStability === 'foreign') {
       salaryGrowthFactor = 0.8;    // 外企涨薪幅度为私企的80%
     } else if (formData.jobStability === 'state') {
-      salaryGrowthFactor = 0.5;    // 央/国企涨薪幅度为私企的50%
+      salaryGrowthFactor = 0.3;    // 央/国企涨薪幅度为私企的30%（原先为50%）
     } else if (formData.jobStability === 'government') {
-      salaryGrowthFactor = 0.3;    // 体制内涨薪幅度为私企的30%
+      salaryGrowthFactor = 0.15;   // 体制内涨薪幅度为私企的15%（原先为30%）
     }
     
     // 根据公式: 1 + (对应幅度-1) * 工作单位系数，计算最终薪资倍数
@@ -313,7 +313,7 @@ const SalaryCalculator = () => {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
           这b班上得值不值·测算版
-          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v4.3.1</span>
+          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v4.4.1</span>
         </h1>
         
         {/* GitHub 链接和访问量计数 */}
@@ -463,7 +463,7 @@ const SalaryCalculator = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  周wfh天数/d
+                  周WFH天数/d
                   <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
                     ?
                     <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
@@ -814,7 +814,7 @@ const SalaryCalculator = () => {
               'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'}`}
           >
             <FileText className="w-4 h-4" />
-            查看性价比报告
+            查看我的工作性价比报告
           </Link>
         </div>
       </div>
