@@ -190,9 +190,9 @@ const SalaryCalculator = () => {
     if (formData.jobStability === 'foreign') {
       salaryGrowthFactor = 0.8;    // 外企涨薪幅度为私企的80%
     } else if (formData.jobStability === 'state') {
-      salaryGrowthFactor = 0.3;    // 央/国企涨薪幅度为私企的30%（原先为50%）
+      salaryGrowthFactor = 0.4;    // 央/国企涨薪幅度为私企的30%（原先为50%）
     } else if (formData.jobStability === 'government') {
-      salaryGrowthFactor = 0.15;   // 体制内涨薪幅度为私企的15%（原先为30%）
+      salaryGrowthFactor = 0.2;   // 体制内涨薪幅度为私企的15%（原先为30%）
     }
     
     // 根据公式: 1 + (对应幅度-1) * 工作单位系数，计算最终薪资倍数
