@@ -2,7 +2,7 @@
 
 > 🤔 "这b班到底值不值得上？" —— 打工人日常疑惑
 
-在线体验：[https://jobworth.zippland.com/](https://jobworth.zippland.com/)
+在线体验：[https://worthjob.zippland.com/](https://worthjob.zippland.com/)
 
 ## 这是什么？
 
@@ -19,7 +19,7 @@
 
 ## 怎么用？
 
-1. 打开网站：[https://jobworth.zippland.com/](https://jobworth.zippland.com/)
+1. 打开网站：[https://worthjob.zippland.com/](https://worthjob.zippland.com/)
 2. 填写你的具体情况：
    - 📝 年薪（税前）
    - ⏰ 工作时间安排

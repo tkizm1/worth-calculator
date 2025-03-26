@@ -578,7 +578,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         {/* 底部信息 */}
         <div className="mt-10 text-center text-gray-500 space-y-1">
           <div>由&quot;这b班上得值不值·测算版&quot;精心定制</div>
-          <div>jobworth.zippland.com</div>
+          <div>worthjob.zippland.com</div>
         </div>
       </div>
       
@@ -742,7 +742,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
             
             {/* 页脚 */}
             <div className="mt-6 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
-              <div>jobworth.zippland.com</div>
+              <div>worthjob.zippland.com</div>
             </div>
           </div>
         </div>
