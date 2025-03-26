@@ -361,27 +361,27 @@ const SalaryCalculator = () => {
           <div className="flex items-center gap-2">
             <span className="text-blue-500 dark:text-blue-400 font-medium">
               <span className="animate-pulse">✨</span> 
-              持续更新中，期待您的宝贵建议 
+              已自动跳转，新网址无需科学上网
               <span className="animate-pulse">✨</span>
             </span>
           </div>
           
           {/* 第三排: 访问量 */}
-          <a 
-            href="https://hits.seeyoufarm.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5"
-          >
-            <Image 
-              src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FYourUsername%2Fworth-calculator&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=visits&edge_flat=true"
-              alt="访问量"
-              width={100}
-              height={20}
-              className="h-5 w-auto"
-              unoptimized
-            />
-          </a>
+          <div className="flex items-center justify-center">
+            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span id="busuanzi_container_site_pv" style={{display: 'inline'}}>
+                访问量: <span id="busuanzi_value_site_pv">0</span>
+              </span>
+              <span className="mx-1">|</span>
+              <span id="busuanzi_container_site_uv" style={{display: 'inline'}}>
+                访客数: <span id="busuanzi_value_site_uv">0</span>
+              </span>
+            </span>
+          </div>
         </div>
       </div>
       
