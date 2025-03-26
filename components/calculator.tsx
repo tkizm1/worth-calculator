@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Wallet, Github, FileText } from 'lucide-react'; // 移除未使用的Share2
-import Image from 'next/image';
 import Link from 'next/link'; // 导入Link组件用于导航
 
 const SalaryCalculator = () => {
