@@ -78,6 +78,26 @@ const SalaryCalculator = () => {
     };
   }, []);
 
+  // 添加来源检查，判断是否显示跳转提示
+  const [showRedirectNotice, setShowRedirectNotice] = useState(false);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // 检查是否有referrer，并且不是来自相同域名
+      const referrer = document.referrer;
+      const isFromOtherDomain = referrer && 
+        !referrer.includes('worthjob.zippland.com') && 
+        !referrer.includes('localhost') && 
+        !referrer.includes('127.0.0.1');
+        
+      // 也可以检查URL参数，如果有特定参数也显示提示
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasRedirectParam = urlParams.has('redirected');
+      
+      setShowRedirectNotice(isFromOtherDomain || hasRedirectParam);
+    }
+  }, []);
+
   const calculateWorkingDays = useCallback(() => {
     const weeksPerYear = 52;
     const totalWorkDays = weeksPerYear * Number(formData.workDaysPerWeek); // 确保转换为数字
@@ -358,11 +378,13 @@ const SalaryCalculator = () => {
           
           {/* 第二排: "持续更新中..."和欢迎建议文字 */}
           <div className="flex items-center gap-2">
-            <span className="text-blue-500 dark:text-blue-400 font-medium">
-              <span className="animate-pulse">✨</span> 
-              已自动跳转，新网址无需科学上网
-              <span className="animate-pulse">✨</span>
-            </span>
+            {showRedirectNotice && (
+              <span className="text-blue-500 dark:text-blue-400 font-medium">
+                <span className="animate-pulse">✨</span> 
+                已自动跳转，新网址无需科学上网
+                <span className="animate-pulse">✨</span>
+              </span>
+            )}
           </div>
           
           {/* 第三排: 访问量 */}
