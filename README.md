@@ -87,7 +87,7 @@
 
 ## 许可证
 
-[MIT License © 2024](LICENCE)
+[MIT License © 2024](LICENSE)
 
 ---
 
