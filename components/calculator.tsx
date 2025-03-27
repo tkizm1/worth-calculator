@@ -373,14 +373,59 @@ const SalaryCalculator = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
               <span id="busuanzi_container_site_pv" style={{display: 'inline'}}>
-                新站访问量: <span id="busuanzi_value_site_pv">0</span>
+                访问量: <span id="busuanzi_value_site_pv" className="hidden"></span><span id="adjusted_pv">加载中...</span>
               </span>
               <span className="mx-1">|</span>
               <span id="busuanzi_container_site_uv" style={{display: 'inline'}}>
-                访客数: <span id="busuanzi_value_site_uv">0</span>
+                访客数: <span id="busuanzi_value_site_uv" className="hidden"></span><span id="adjusted_uv">加载中...</span>
               </span>
             </span>
           </div>
+          
+          {/* 添加访问量调整脚本 */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                // 由于seeyoufarm计数器服务停用导致原有200万访问量数据被清零
+                // 手动添加历史访问量数据以保持统计连续性
+                const historicalPV = 1997500; // 历史PV数据
+                const historicalUV = 580000;  // 估算历史UV数据
+                
+                // 检查并添加历史数据
+                const checkAndUpdateStats = () => {
+                  const pvElement = document.getElementById('busuanzi_value_site_pv');
+                  const uvElement = document.getElementById('busuanzi_value_site_uv');
+                  const adjustedPV = document.getElementById('adjusted_pv');
+                  const adjustedUV = document.getElementById('adjusted_uv');
+                  
+                  if (pvElement && pvElement.textContent && pvElement.textContent !== '0') {
+                    const currentPV = parseInt(pvElement.textContent, 10) || 0;
+                    adjustedPV.textContent = (historicalPV + currentPV).toLocaleString();
+                  }
+                  
+                  if (uvElement && uvElement.textContent && uvElement.textContent !== '0') {
+                    const currentUV = parseInt(uvElement.textContent, 10) || 0;
+                    adjustedUV.textContent = (historicalUV + currentUV).toLocaleString();
+                  }
+                  
+                  // 如果尚未加载成功，继续尝试
+                  if (adjustedPV.textContent === '加载中...' || adjustedUV.textContent === '加载中...') {
+                    setTimeout(checkAndUpdateStats, 500);
+                  }
+                };
+                
+                // 页面加载后开始检查
+                window.addEventListener('load', () => {
+                  // 立即显示历史数据
+                  document.getElementById('adjusted_pv').textContent = historicalPV.toLocaleString();
+                  document.getElementById('adjusted_uv').textContent = historicalUV.toLocaleString();
+                  
+                  // 等待不蒜子加载
+                  setTimeout(checkAndUpdateStats, 1000);
+                });
+              `
+            }}
+          />
         </div>
       </div>
       
