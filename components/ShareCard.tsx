@@ -491,7 +491,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         backgroundColor: '#FFFFFF',
         useCORS: true,
         allowTaint: true,
-        logging: false,
+        logging: false
       });
       
       // 转换为图片并下载
@@ -596,11 +596,11 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       
       {/* 简化版报告，仅用于下载，在页面中隐藏 */}
       <div className="fixed top-0 left-0 opacity-0 pointer-events-none">
-        <div ref={simpleReportRef} className="w-[800px] bg-white p-8" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+        <div ref={simpleReportRef} className="w-[800px] bg-white p-8 text-gray-900" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
           <div className="border border-gray-200 rounded-lg p-6">
             {/* 报告标题 */}
             <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold">工作性价比报告</h1>
+              <h1 className="text-2xl font-bold text-black">工作性价比报告</h1>
               <div className="mt-2 text-lg">
                 <span className="font-semibold px-2 py-1 rounded" style={{ backgroundColor: `${getColorFromClassName(props.assessmentColor)}20`, color: getColorFromClassName(props.assessmentColor) }}>
                   {props.value} - {props.assessment}
@@ -617,19 +617,19 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
               <div className="grid grid-cols-2 gap-2 col-span-2">
                 <div>
                   <div className="text-sm text-gray-600">工作城市</div>
-                  <div className="font-medium">{getCityName(props.cityFactor)}</div>
+                  <div className="font-medium text-gray-800">{getCityName(props.cityFactor)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">是否家乡</div>
-                  <div className="font-medium">{props.homeTown === 'yes' ? '是' : '否'}</div>
+                  <div className="font-medium text-gray-800">{props.homeTown === 'yes' ? '是' : '否'}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">日薪</div>
-                  <div className="font-medium">{props.isYuan ? '¥' : '$'}{props.dailySalary}/天</div>
+                  <div className="font-medium text-gray-800">{props.isYuan ? '¥' : '$'}{props.dailySalary}/天</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">年工作天数</div>
-                  <div className="font-medium">{props.workDaysPerYear} 天</div>
+                  <div className="font-medium text-gray-800">{props.workDaysPerYear} 天</div>
                 </div>
               </div>
               
@@ -640,35 +640,35 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
               <div className="grid grid-cols-2 gap-2 col-span-2">
                 <div>
                   <div className="text-sm text-gray-600">每天工作</div>
-                  <div className="font-medium">{props.workHours} 小时</div>
+                  <div className="font-medium text-gray-800">{props.workHours} 小时</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">每天通勤</div>
-                  <div className="font-medium">{props.commuteHours} 小时</div>
+                  <div className="font-medium text-gray-800">{props.commuteHours} 小时</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">午休与休息</div>
-                  <div className="font-medium">{props.restTime} 小时</div>
+                  <div className="font-medium text-gray-800">{props.restTime} 小时</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">每周工作天数</div>
-                  <div className="font-medium">{props.workDaysPerWeek} 天</div>
+                  <div className="font-medium text-gray-800">{props.workDaysPerWeek} 天</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">远程办公</div>
-                  <div className="font-medium">{props.wfhDaysPerWeek}/{props.workDaysPerWeek} 天/周</div>
+                  <div className="font-medium text-gray-800">{props.wfhDaysPerWeek}/{props.workDaysPerWeek} 天/周</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">班车服务</div>
-                  <div className="font-medium">{getShuttleDesc(props.shuttle)}</div>
+                  <div className="font-medium text-gray-800">{getShuttleDesc(props.shuttle)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">年假</div>
-                  <div className="font-medium">{props.annualLeave} 天/年</div>
+                  <div className="font-medium text-gray-800">{props.annualLeave} 天/年</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">带薪病假</div>
-                  <div className="font-medium">{props.paidSickLeave} 天/年</div>
+                  <div className="font-medium text-gray-800">{props.paidSickLeave} 天/年</div>
                 </div>
               </div>
               
@@ -679,19 +679,19 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
               <div className="grid grid-cols-2 gap-2 col-span-2">
                 <div>
                   <div className="text-sm text-gray-600">办公环境</div>
-                  <div className="font-medium">{getWorkEnvironmentDesc(props.workEnvironment)}</div>
+                  <div className="font-medium text-gray-800">{getWorkEnvironmentDesc(props.workEnvironment)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">领导关系</div>
-                  <div className="font-medium">{getLeadershipDesc(props.leadership)}</div>
+                  <div className="font-medium text-gray-800">{getLeadershipDesc(props.leadership)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">同事关系</div>
-                  <div className="font-medium">{getTeamworkDesc(props.teamwork)}</div>
+                  <div className="font-medium text-gray-800">{getTeamworkDesc(props.teamwork)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">食堂情况</div>
-                  <div className="font-medium">{getCanteenDesc(props.canteen)}</div>
+                  <div className="font-medium text-gray-800">{getCanteenDesc(props.canteen)}</div>
                 </div>
               </div>
               
@@ -702,19 +702,19 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
               <div className="grid grid-cols-2 gap-2 col-span-2">
                 <div>
                   <div className="text-sm text-gray-600">最高学历</div>
-                  <div className="font-medium">{getDegreeDesc(props.degreeType)}</div>
+                  <div className="font-medium text-gray-800">{getDegreeDesc(props.degreeType)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">学校类型</div>
-                  <div className="font-medium">{getSchoolTypeDesc(props.schoolType, props.degreeType)}</div>
+                  <div className="font-medium text-gray-800">{getSchoolTypeDesc(props.schoolType, props.degreeType)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">工作年限</div>
-                  <div className="font-medium">{getWorkYearsDesc(props.workYears)}</div>
+                  <div className="font-medium text-gray-800">{getWorkYearsDesc(props.workYears)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-600">合同类型</div>
-                  <div className="font-medium">{getJobStabilityDesc(props.jobStability)}</div>
+                  <div className="font-medium text-gray-800">{getJobStabilityDesc(props.jobStability)}</div>
                 </div>
               </div>
               
