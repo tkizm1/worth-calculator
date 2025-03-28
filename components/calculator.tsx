@@ -8,23 +8,13 @@ const SalaryCalculator = () => {
   // 添加滚动位置保存的引用
   const scrollPositionRef = useRef(0);
   
-  // 添加状态跟踪是否是重定向过来的
-  const [isRedirected, setIsRedirected] = useState(false);
-  
   // 添加自动重定向逻辑
   useEffect(() => {
     // 在所有环境中执行重定向
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
       if (hostname !== 'worthjob.zippland.com' && hostname !== 'localhost' && !hostname.includes('127.0.0.1')) {
-        // 标记为重定向访问
-        sessionStorage.setItem('redirected', 'true');
         window.location.href = 'https://worthjob.zippland.com' + window.location.pathname;
-      } else {
-        // 检查是否是从重定向过来的
-        setIsRedirected(sessionStorage.getItem('redirected') === 'true');
-        // 使用后清除，避免刷新页面后还显示
-        sessionStorage.removeItem('redirected');
       }
     }
   }, []);
@@ -368,13 +358,11 @@ const SalaryCalculator = () => {
           
           {/* 第二排: "持续更新中..."和欢迎建议文字 */}
           <div className="flex items-center gap-2">
-            {isRedirected && (
-              <span className="text-blue-500 dark:text-blue-400 font-medium">
-                <span className="animate-pulse">✨</span> 
-                已自动跳转至新网址，无需VPN即可访问
-                <span className="animate-pulse">✨</span>
-              </span>
-            )}
+            <span className="text-blue-500 dark:text-blue-400 font-medium">
+              <span className="animate-pulse">✨</span> 
+              已自动跳转，新网址无需科学上网
+              <span className="animate-pulse">✨</span>
+            </span>
           </div>
           
           {/* 第三排: 访问量 */}
