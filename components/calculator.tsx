@@ -370,6 +370,299 @@ const countryNamesEn: Record<string, string> = {
   'ZW': 'Zimbabwe'
 };
 
+// 为日语界面添加国家名称
+const countryNamesJp: Record<string, string> = {
+  'AF': 'アフガニスタン',
+  'AL': 'アルバニア',
+  'DZ': 'アルジェリア',
+  'AO': 'アンゴラ',
+  'AR': 'アルゼンチン',
+  'AM': 'アルメニア',
+  'AU': 'オーストラリア',
+  'AT': 'オーストリア',
+  'AZ': 'アゼルバイジャン',
+  'BI': 'ブルンジ',
+  'BE': 'ベルギー',
+  'BJ': 'ベナン',
+  'BF': 'ブルキナファソ',
+  'BD': 'バングラデシュ',
+  'BG': 'ブルガリア',
+  'BH': 'バーレーン',
+  'BS': 'バハマ',
+  'BA': 'ボスニア・ヘルツェゴビナ',
+  'BY': 'ベラルーシ',
+  'BZ': 'ベリーズ',
+  'BO': 'ボリビア',
+  'BR': 'ブラジル',
+  'BB': 'バルバドス',
+  'BN': 'ブルネイ',
+  'BT': 'ブータン',
+  'BW': 'ボツワナ',
+  'CF': '中央アフリカ共和国',
+  'CA': 'カナダ',
+  'CH': 'スイス',
+  'CL': 'チリ',
+  'CN': '中国',
+  'CI': 'コートジボワール',
+  'CM': 'カメルーン',
+  'CD': 'コンゴ民主共和国',
+  'CG': 'コンゴ共和国',
+  'CO': 'コロンビア',
+  'KM': 'コモロ',
+  'CV': 'カーボベルデ',
+  'CR': 'コスタリカ',
+  'CY': 'キプロス',
+  'CZ': 'チェコ共和国',
+  'DE': 'ドイツ',
+  'DJ': 'ジブチ',
+  'DM': 'ドミニカ国',
+  'DK': 'デンマーク',
+  'DO': 'ドミニカ共和国',
+  'EC': 'エクアドル',
+  'EG': 'エジプト',
+  'ES': 'スペイン',
+  'EE': 'エストニア',
+  'ET': 'エチオピア',
+  'FI': 'フィンランド',
+  'FJ': 'フィジー',
+  'FR': 'フランス',
+  'GA': 'ガボン',
+  'GB': 'イギリス',
+  'GE': 'ジョージア',
+  'GH': 'ガーナ',
+  'GN': 'ギニア',
+  'GM': 'ガンビア',
+  'GW': 'ギニアビサウ',
+  'GQ': '赤道ギニア',
+  'GR': 'ギリシャ',
+  'GD': 'グレナダ',
+  'GT': 'グアテマラ',
+  'GY': 'ガイアナ',
+  'HK': '香港特別行政区',
+  'HN': 'ホンジュラス',
+  'HR': 'クロアチア',
+  'HT': 'ハイチ',
+  'HU': 'ハンガリー',
+  'ID': 'インドネシア',
+  'IN': 'インド',
+  'IE': 'アイルランド',
+  'IR': 'イラン',
+  'IQ': 'イラク',
+  'IS': 'アイスランド',
+  'IL': 'イスラエル',
+  'IT': 'イタリア',
+  'JM': 'ジャマイカ',
+  'JO': 'ヨルダン',
+  'JP': '日本',
+  'KZ': 'カザフスタン',
+  'KE': 'ケニア',
+  'KG': 'キルギス',
+  'KH': 'カンボジア',
+  'KI': 'キリバス',
+  'KN': 'セントクリストファー・ネイビス',
+  'KR': '韓国',
+  'LA': 'ラオス',
+  'LB': 'レバノン',
+  'LR': 'リベリア',
+  'LY': 'リビア',
+  'LC': 'セントルシア',
+  'LK': 'スリランカ',
+  'LS': 'レソト',
+  'LT': 'リトアニア',
+  'LU': 'ルクセンブルク',
+  'LV': 'ラトビア',
+  'MO': 'マカオ特別行政区',
+  'MA': 'モロッコ',
+  'MD': 'モルドバ',
+  'MG': 'マダガスカル',
+  'MV': 'モルディブ',
+  'MX': 'メキシコ',
+  'MK': '北マケドニア',
+  'ML': 'マリ',
+  'MT': 'マルタ',
+  'MM': 'ミャンマー',
+  'ME': 'モンテネグロ',
+  'MN': 'モンゴル',
+  'MZ': 'モザンビーク',
+  'MR': 'モーリタニア',
+  'MU': 'モーリシャス',
+  'MW': 'マラウイ',
+  'MY': 'マレーシア',
+  'NA': 'ナミビア',
+  'NE': 'ニジェール',
+  'NG': 'ナイジェリア',
+  'NI': 'ニカラグア',
+  'NL': 'オランダ',
+  'NO': 'ノルウェー',
+  'NP': 'ネパール',
+  'NZ': 'ニュージーランド',
+  'PK': 'パキスタン',
+  'PA': 'パナマ',
+  'PE': 'ペルー',
+  'PH': 'フィリピン',
+  'PG': 'パプアニューギニア',
+  'PL': 'ポーランド',
+  'PR': 'プエルトリコ',
+  'PT': 'ポルトガル',
+  'PY': 'パラグアイ',
+  'PS': 'パレスチナ',
+  'QA': 'カタール',
+  'RO': 'ルーマニア',
+  'RU': 'ロシア',
+  'RW': 'ルワンダ',
+  'SA': 'サウジアラビア',
+  'SD': 'スーダン',
+  'SN': 'セネガル',
+  'SG': 'シンガポール',
+  'SB': 'ソロモン諸島',
+  'SL': 'シエラレオネ',
+  'SV': 'エルサルバドル',
+  'SO': 'ソマリア',
+  'RS': 'セルビア',
+  'ST': 'サントメ・プリンシペ',
+  'SR': 'スリナム',
+  'SK': 'スロバキア',
+  'SI': 'スロベニア',
+  'SE': 'スウェーデン',
+  'SZ': 'エスワティニ',
+  'SC': 'セーシェル',
+  'TC': 'タークス・カイコス諸島',
+  'TD': 'チャド',
+  'TG': 'トーゴ',
+  'TH': 'タイ',
+  'TJ': 'タジキスタン',
+  'TL': '東ティモール',
+  'TT': 'トリニダード・トバゴ',
+  'TN': 'チュニジア',
+  'TR': 'トルコ',
+  'TV': 'ツバル',
+  'TZ': 'タンザニア',
+  'UG': 'ウガンダ',
+  'UA': 'ウクライナ',
+  'UY': 'ウルグアイ',
+  'US': 'アメリカ合衆国',
+  'UZ': 'ウズベキスタン',
+  'VC': 'セントビンセント・グレナディーン',
+  'VN': 'ベトナム',
+  'VU': 'バヌアツ',
+  'XK': 'コソボ',
+  'ZA': '南アフリカ',
+  'ZM': 'ザンビア',
+  'ZW': 'ジンバブエ'
+};
+
+// 添加各国货币符号映射
+const currencySymbols: Record<string, string> = {
+  'AF': '؋', // 阿富汗尼
+  'AL': 'L', // 阿尔巴尼亚列克
+  'DZ': 'د.ج', // 阿尔及利亚第纳尔
+  'AO': 'Kz', // 安哥拉宽扎
+  'AR': '$', // 阿根廷比索
+  'AM': '֏', // 亚美尼亚德拉姆
+  'AU': 'A$', // 澳大利亚元
+  'AT': '€', // 欧元
+  'AZ': '₼', // 阿塞拜疆马纳特
+  'BI': 'FBu', // 布隆迪法郎
+  'BE': '€', // 欧元
+  'BJ': 'CFA', // 西非法郎
+  'BF': 'CFA', // 西非法郎
+  'BD': '৳', // 孟加拉塔卡
+  'BG': 'лв', // 保加利亚列弗
+  'BH': '.د.ب', // 巴林第纳尔
+  'BS': 'B$', // 巴哈马元
+  'BA': 'KM', // 波黑可兑换马克
+  'BY': 'Br', // 白俄罗斯卢布
+  'BZ': 'BZ$', // 伯利兹元
+  'BO': 'Bs', // 玻利维亚诺
+  'BR': 'R$', // 巴西雷亚尔
+  'BB': 'Bds$', // 巴巴多斯元
+  'BN': 'B$', // 文莱元
+  'BT': 'Nu.', // 不丹努扎姆
+  'BW': 'P', // 博茨瓦纳普拉
+  'CA': 'C$', // 加拿大元
+  'CH': 'CHF', // 瑞士法郎
+  'CL': 'CLP$', // 智利比索
+  'CN': '¥', // 人民币
+  'CI': 'CFA', // 西非法郎
+  'CM': 'FCFA', // 中非法郎
+  'CD': 'FC', // 刚果法郎
+  'CG': 'FCFA', // 中非法郎
+  'CO': 'Col$', // 哥伦比亚比索
+  'CR': '₡', // 哥斯达黎加科朗
+  'CY': '€', // 欧元
+  'CZ': 'Kč', // 捷克克朗
+  'DE': '€', // 欧元
+  'DK': 'kr', // 丹麦克朗
+  'DO': 'RD$', // 多米尼加比索
+  'EC': '$', // 美元（厄瓜多尔使用美元）
+  'EG': 'E£', // 埃及镑
+  'ES': '€', // 欧元
+  'EE': '€', // 欧元
+  'ET': 'Br', // 埃塞俄比亚比尔
+  'FI': '€', // 欧元
+  'FJ': 'FJ$', // 斐济元
+  'FR': '€', // 欧元
+  'GB': '£', // 英镑
+  'GE': '₾', // 格鲁吉亚拉里
+  'GH': '₵', // 加纳塞地
+  'GR': '€', // 欧元
+  'GT': 'Q', // 危地马拉格查尔
+  'HK': 'HK$', // 港元
+  'HN': 'L', // 洪都拉斯伦皮拉
+  'HR': '€', // 欧元（克罗地亚自2023年加入欧元区）
+  'HU': 'Ft', // 匈牙利福林
+  'ID': 'Rp', // 印尼盾
+  'IN': '₹', // 印度卢比
+  'IE': '€', // 欧元
+  'IR': '﷼', // 伊朗里亚尔
+  'IQ': 'ع.د', // 伊拉克第纳尔
+  'IS': 'kr', // 冰岛克朗
+  'IL': '₪', // 以色列新谢克尔
+  'IT': '€', // 欧元
+  'JM': 'J$', // 牙买加元
+  'JO': 'JD', // 约旦第纳尔
+  'JP': '¥', // 日元
+  'KE': 'KSh', // 肯尼亚先令
+  'KR': '₩', // 韩元
+  'KW': 'د.ك', // 科威特第纳尔
+  'LB': 'L£', // 黎巴嫩镑
+  'LK': 'Rs', // 斯里兰卡卢比
+  'LT': '€', // 欧元
+  'LU': '€', // 欧元
+  'LV': '€', // 欧元
+  'MA': 'د.م.', // 摩洛哥迪拉姆
+  'MX': 'Mex$', // 墨西哥比索
+  'MY': 'RM', // 马来西亚林吉特
+  'NG': '₦', // 尼日利亚奈拉
+  'NL': '€', // 欧元
+  'NO': 'kr', // 挪威克朗
+  'NP': 'रू', // 尼泊尔卢比
+  'NZ': 'NZ$', // 新西兰元
+  'PK': '₨', // 巴基斯坦卢比
+  'PA': 'B/.', // 巴拿马巴波亚
+  'PE': 'S/.', // 秘鲁索尔
+  'PH': '₱', // 菲律宾比索
+  'PL': 'zł', // 波兰兹罗提
+  'PT': '€', // 欧元
+  'QA': 'ر.ق', // 卡塔尔里亚尔
+  'RO': 'lei', // 罗马尼亚列伊
+  'RU': '₽', // 俄罗斯卢布
+  'SA': 'ر.س', // 沙特里亚尔
+  'SG': 'S$', // 新加坡元
+  'SK': '€', // 欧元
+  'SI': '€', // 欧元
+  'SE': 'kr', // 瑞典克朗
+  'TH': '฿', // 泰铢
+  'TR': '₺', // 土耳其里拉
+  'TW': 'NT$', // 新台币
+  'UA': '₴', // 乌克兰格里夫纳
+  'US': '$', // 美元
+  'UY': '$U', // 乌拉圭比索
+  'VN': '₫', // 越南盾
+  'ZA': 'R', // 南非兰特
+  // 默认其他国家使用美元符号
+};
+
 // 定义表单数据接口
 interface FormData {
   salary: string;
@@ -677,6 +970,18 @@ const SalaryCalculator = () => {
     if (value <= 4.0) return { text: t('rating_excellent'), color: "text-purple-500" };
     return { text: t('rating_perfect'), color: "text-yellow-400" };
   };
+  
+  // 获取评级的翻译键，用于分享链接
+  const getValueAssessmentKey = () => {
+    if (!formData.salary) return 'rating_enter_salary';
+    if (value < 0.6) return 'rating_terrible';
+    if (value < 1.0) return 'rating_poor';
+    if (value <= 1.8) return 'rating_average';
+    if (value <= 2.5) return 'rating_good';
+    if (value <= 3.2) return 'rating_great';
+    if (value <= 4.0) return 'rating_excellent';
+    return 'rating_perfect';
+  };
 
   const RadioGroup = ({ label, name, value, onChange, options }: {
     label: string;
@@ -774,8 +1079,16 @@ const SalaryCalculator = () => {
     if (language === 'en') {
       return countryNamesEn[countryCode] || pppFactors[countryCode]?.name || 'Unknown';
     }
+    if (language === 'ja') {
+      return countryNamesJp[countryCode] || pppFactors[countryCode]?.name || '不明';
+    }
     return pppFactors[countryCode]?.name || 'Unknown';
   }, [language]);
+
+  // 获取当前选择国家的货币符号
+  const getCurrencySymbol = useCallback((countryCode: string) => {
+    return currencySymbols[countryCode] || '$'; // 如果没有找到对应货币符号，默认使用美元符号
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
@@ -795,7 +1108,7 @@ const SalaryCalculator = () => {
         </div>
         
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('version')}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v5.1.0</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
@@ -1192,7 +1505,7 @@ const SalaryCalculator = () => {
           <div>
             <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('average_daily_salary')}</div>
             <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
-              {selectedCountry !== 'CN' ? '$' : '¥'}{getDisplaySalary()}
+              {getCurrencySymbol(selectedCountry)}{getDisplaySalary()}
             </div>
           </div>
           <div>
@@ -1211,7 +1524,7 @@ const SalaryCalculator = () => {
               pathname: '/share',
               query: {
                 value: value.toFixed(2),
-                assessment: getValueAssessment().text,
+                assessment: getValueAssessmentKey(),
                 assessmentColor: getValueAssessment().color,
                 cityFactor: formData.cityFactor,
                 workHours: formData.workHours,
@@ -1238,7 +1551,8 @@ const SalaryCalculator = () => {
                 jobStability: formData.jobStability,
                 bachelorType: formData.bachelorType,
                 countryCode: selectedCountry,
-                countryName: getCountryName(selectedCountry)
+                countryName: getCountryName(selectedCountry),
+                currencySymbol: getCurrencySymbol(selectedCountry)
               }
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors

@@ -21,6 +21,7 @@ interface ShareCardProps {
   workDaysPerYear: string;
   countryCode: string;
   countryName: string;
+  currencySymbol: string;
   
   // 详细工作信息
   workDaysPerWeek: string;
@@ -48,6 +49,12 @@ interface ShareCardProps {
 
 // 将中文评级转换为翻译键
 const getAssessmentKey = (assessment: string): string => {
+  // 如果已经是翻译键，直接返回
+  if (assessment.startsWith('rating_')) {
+    return assessment;
+  }
+  
+  // 否则，将中文评级转换为翻译键
   switch (assessment) {
     case '惨绝人寰': return 'rating_terrible';
     case '略惨': return 'rating_poor';
@@ -466,7 +473,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       content: salaryComment, 
       emoji: "💰",
       details: [
-        { label: t('share_daily_salary'), value: `${isYuan ? '¥' : '$'}${dailySalary}/${t('share_day')}` },
+        { label: t('share_daily_salary'), value: `${props.currencySymbol}${dailySalary}/${t('share_day')}` },
         { label: t('share_working_days_per_year'), value: `${props.workDaysPerYear} ${t('share_days')}` }
       ]
     });
@@ -651,7 +658,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
                     </div>
                     <div className="bg-gray-50 p-3 rounded-lg">
                       <div className="text-sm text-gray-500">{t('share_daily_salary')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{props.isYuan === 'true' ? '¥' : '$'}{props.dailySalary}/{t('share_day')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{props.currencySymbol}{props.dailySalary}/{t('share_day')}</div>
                     </div>
                     <div className="bg-gray-50 p-3 rounded-lg">
                       <div className="text-sm text-gray-500">{t('share_working_days_per_year')}</div>

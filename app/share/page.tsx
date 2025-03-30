@@ -23,6 +23,7 @@ function ShareCardWrapper() {
   const workDaysPerYear = searchParams.get('workDaysPerYear') || '250';
   const countryCode = searchParams.get('countryCode') || 'CN';
   const countryName = searchParams.get('countryName') || '中国';
+  const currencySymbol = searchParams.get('currencySymbol') || '¥';
   
   // 额外参数 - 详细工作信息
   const workDaysPerWeek = searchParams.get('workDaysPerWeek') || '5';
@@ -63,6 +64,7 @@ function ShareCardWrapper() {
         workDaysPerYear={workDaysPerYear}
         countryCode={countryCode}
         countryName={countryName}
+        currencySymbol={currencySymbol}
         
         // 详细工作信息
         workDaysPerWeek={workDaysPerWeek}
