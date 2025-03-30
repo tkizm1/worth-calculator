@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { LanguageProvider } from "@/components/LanguageContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -14,8 +15,17 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "这b班上得值不值",
-  description: "这b班上得值不值",
+  title: {
+    default: "这b班上得值不值",
+    template: "%s | 这b班上得值不值"
+  },
+  alternates: {
+    languages: {
+      "en-US": "/en",
+      "zh-CN": "/",
+    },
+  },
+  description: "这b班上得值不值 - 计算你的工作性价比 | Is This Job Worth It? - Calculate your job's value",
   verification: {
     google: "_OQGiIpYz87USAsgJV2C07-JJhQ8myV_4GoM1kDjFic",
   },
@@ -36,7 +46,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
         <div className="pb-8"></div>
         <footer className="w-full py-4 border-t bg-white/90 dark:bg-gray-900/80 dark:border-gray-800/50">
           <div className="max-w-5xl mx-auto px-4">

@@ -3,6 +3,8 @@
 import { useSearchParams } from 'next/navigation';
 import ShareCard from '@/components/ShareCard';
 import React, { Suspense } from 'react';
+import { LanguageProvider } from '@/components/LanguageContext';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 // 一个包装组件，负责从URL参数获取数据
 function ShareCardWrapper() {
@@ -17,8 +19,10 @@ function ShareCardWrapper() {
   const commuteHours = searchParams.get('commuteHours') || '2';
   const restTime = searchParams.get('restTime') || '2';
   const dailySalary = searchParams.get('dailySalary') || '0';
-  const isYuan = searchParams.get('isYuan') === 'true';
+  const isYuan = searchParams.get('isYuan') || 'true';
   const workDaysPerYear = searchParams.get('workDaysPerYear') || '250';
+  const countryCode = searchParams.get('countryCode') || 'CN';
+  const countryName = searchParams.get('countryName') || '中国';
   
   // 额外参数 - 详细工作信息
   const workDaysPerWeek = searchParams.get('workDaysPerWeek') || '5';
@@ -44,55 +48,73 @@ function ShareCardWrapper() {
   const jobStability = searchParams.get('jobStability') || 'private';
   
   return (
-    <ShareCard
-      // 基础数据
-      value={value}
-      assessment={assessment}
-      assessmentColor={assessmentColor}
-      cityFactor={cityFactor}
-      workHours={workHours}
-      commuteHours={commuteHours}
-      restTime={restTime}
-      dailySalary={dailySalary}
-      isYuan={isYuan}
-      workDaysPerYear={workDaysPerYear}
-      
-      // 详细工作信息
-      workDaysPerWeek={workDaysPerWeek}
-      wfhDaysPerWeek={wfhDaysPerWeek}
-      annualLeave={annualLeave}
-      paidSickLeave={paidSickLeave}
-      publicHolidays={publicHolidays}
-      
-      // 工作环境
-      workEnvironment={workEnvironment}
-      leadership={leadership}
-      teamwork={teamwork}
-      homeTown={homeTown}
-      shuttle={shuttle}
-      canteen={canteen}
-      
-      // 学历和工作经验
-      degreeType={degreeType}
-      schoolType={schoolType}
-      bachelorType={bachelorType}
-      education={education}
-      workYears={workYears}
-      jobStability={jobStability}
-    />
+    <div>
+      <ShareCard
+        // 基础数据
+        value={value}
+        assessment={assessment}
+        assessmentColor={assessmentColor}
+        cityFactor={cityFactor}
+        workHours={workHours}
+        commuteHours={commuteHours}
+        restTime={restTime}
+        dailySalary={dailySalary}
+        isYuan={isYuan}
+        workDaysPerYear={workDaysPerYear}
+        countryCode={countryCode}
+        countryName={countryName}
+        
+        // 详细工作信息
+        workDaysPerWeek={workDaysPerWeek}
+        wfhDaysPerWeek={wfhDaysPerWeek}
+        annualLeave={annualLeave}
+        paidSickLeave={paidSickLeave}
+        publicHolidays={publicHolidays}
+        
+        // 工作环境
+        workEnvironment={workEnvironment}
+        leadership={leadership}
+        teamwork={teamwork}
+        homeTown={homeTown}
+        shuttle={shuttle}
+        canteen={canteen}
+        
+        // 学历和工作经验
+        degreeType={degreeType}
+        schoolType={schoolType}
+        bachelorType={bachelorType}
+        education={education}
+        workYears={workYears}
+        jobStability={jobStability}
+      />
+    </div>
   );
 }
 
 // 加载过程中显示的组件
 function ShareLoading() {
-  return <div className="flex items-center justify-center min-h-screen">正在加载报告...</div>;
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="mb-2">正在加载报告...</div>
+      <div>Loading report...</div>
+    </div>
+  );
 }
 
 // 主页面组件
 export default function SharePage() {
   return (
-    <Suspense fallback={<ShareLoading />}>
-      <ShareCardWrapper />
-    </Suspense>
+    <LanguageProvider>
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center mb-4">
+            <LanguageSwitcher />
+          </div>
+          <Suspense fallback={<ShareLoading />}>
+            <ShareCardWrapper />
+          </Suspense>
+        </div>
+      </main>
+    </LanguageProvider>
   );
 } 

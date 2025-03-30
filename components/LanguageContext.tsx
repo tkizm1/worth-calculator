@@ -1,0 +1,511 @@
+"use client";
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+// 定义语言类型
+export type Language = 'zh' | 'en';
+
+// 创建上下文接口
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (language: Language) => void;
+  t: (key: string) => string;
+}
+
+// 创建默认上下文
+const defaultContext: LanguageContextType = {
+  language: 'zh',
+  setLanguage: () => {},
+  t: (key: string) => key,
+};
+
+// 创建上下文
+const LanguageContext = createContext<LanguageContextType>(defaultContext);
+
+// 翻译数据
+const translations: Record<Language, Record<string, string>> = {
+  zh: {
+    // 标题和导航
+    'title': '这b班上得值不值·测算版',
+    'version': 'v5.0.0',
+    'github': 'GitHub',
+    'email': 'Email',
+    'xiaohongshu': '小红书',
+    'redirect_notice': '已自动跳转，新网址无需科学上网',
+    'visits': '访问量',
+    'visitors': '访客数',
+    
+    // 表单标签
+    'annual_salary_cny': '年薪总包（元）',
+    'annual_salary_foreign': '年薪总包（当地货币）',
+    'salary_placeholder_cny': '税前年薪',
+    'salary_placeholder_foreign': '使用当地货币',
+    'non_china_salary': '非中国地区薪资',
+    'ppp_factor': '购买力平价(PPP)转换因子',
+    'ppp_tooltip': 'PPP转换因子是将各国货币购买力标准化的指标。例如中国为4.19，表示1美元在美国的购买力等同于4.19元人民币在中国的购买力。',
+    'ppp_placeholder': '请输入购买力平价转换因子',
+    'ppp_common_regions': '常见地区：中国大陆:4.19, 日本:102.59, 美国:1.00, 新加坡:0.84',
+    'view_more': '查看更多',
+    'country_selection': '工作国家/地区',
+    'selected_ppp': '当前PPP值',
+    'work_days_per_week': '每周工作天数/d',
+    'wfh_days_per_week': '周WFH天数/d',
+    'wfh_tooltip': 'WFH指居家办公(Work From Home)，这里填写的是前面工作天数中有多少天是在家办公的。',
+    'annual_leave': '年假天数/d',
+    'public_holidays': '法定假日/d',
+    'paid_sick_leave': '带薪病假/d',
+    'work_hours': '工时/h',
+    'work_hours_tooltip': '工时：是指"下班时间-上班时间"的总时间，包括吃饭、午休、加班等（不含通勤）。',
+    'commute_hours': '通勤/h',
+    'commute_tooltip': '通勤时长是指上下班往返的总时间，即家到公司和公司回家的时间总和。',
+    'rest_time': '休息&摸鱼',
+    
+    // 环境系数
+    'job_stability': '合同类型',
+    'job_private': '私企续签',
+    'job_foreign': '外企续签',
+    'job_state': '长期雇佣',
+    'job_government': '永久编制',
+    'work_environment': '工作环境',
+    'env_remote': '偏僻的工厂/工地/户外',
+    'env_factory': '工厂/工地/户外',
+    'env_normal': '普通环境',
+    'env_cbd': 'CBD',
+    'city_factor': '所在城市（按生活成本选择）',
+    'city_tier1': '一线城市',
+    'city_newtier1': '新一线',
+    'city_tier2': '二线城市',
+    'city_tier3': '三线城市',
+    'city_tier4': '四线城市',
+    'city_county': '县城',
+    'city_town': '乡镇',
+    'hometown': '是否在家乡工作',
+    'not_hometown': '不在家乡',
+    'is_hometown': '在家乡',
+    'leadership': '领导/老板',
+    'leader_bad': '对我不爽',
+    'leader_strict': '管理严格',
+    'leader_normal': '中规中矩',
+    'leader_good': '善解人意',
+    'leader_favorite': '我是嫡系',
+    'teamwork': '同事环境',
+    'team_bad': '都是傻逼',
+    'team_normal': '萍水相逢',
+    'team_good': '和和睦睦',
+    'team_excellent': '私交甚好',
+    'shuttle': '班车服务（加分项）',
+    'shuttle_none': '无班车',
+    'shuttle_inconvenient': '班车不便',
+    'shuttle_convenient': '便利班车',
+    'shuttle_direct': '班车直达',
+    'canteen': '食堂情况（加分项）',
+    'canteen_none': '无食堂/很难吃',
+    'canteen_average': '食堂一般',
+    'canteen_good': '食堂不错',
+    'canteen_excellent': '食堂超赞',
+    
+    // 教育和工作经验
+    'education_level': '个人学历水平',
+    'degree_type': '学位类型',
+    'below_bachelor': '专科及以下',
+    'bachelor': '本科',
+    'masters': '硕士',
+    'phd': '博士',
+    'school_type': '学校类型',
+    'school_second_tier': '二本三本',
+    'school_first_tier_bachelor': '双非/ QS200/ USnews80',
+    'school_elite_bachelor': '985211/ QS50/ USnews30',
+    'school_first_tier_higher': '双非/ QS100/ USnews50',
+    'school_elite_higher': '985211/ QS30/ USnews20',
+    'bachelor_background': '本科背景',
+    'work_years': '工作年限',
+    'fresh_graduate': '应届生',
+    'years_1_3': '1-3年',
+    'years_3_5': '3-5年',
+    'years_5_8': '5-8年',
+    'years_8_10': '8-10年',
+    'years_10_12': '10-12年',
+    'years_above_12': '12年以上',
+    
+    // 结果
+    'working_days_per_year': '年工作天数',
+    'days_unit': '天',
+    'average_daily_salary': '平均日薪',
+    'job_value': '工作性价比',
+    'view_report': '查看我的工作性价比报告',
+    
+    // ShareCard组件
+    'share_back_to_calculator': '返回计算器',
+    'share_your_job_worth_report': '你的工作性价比报告',
+    'share_job_worth_report': '工作性价比报告',
+    'share_custom_made': '由"这b班上得值不值·测算版"精心定制',
+    'share_generating': '生成中...',
+    'share_download_report': '下载报告',
+    'share_basic_info': '基础信息',
+    'share_work_city': '工作城市',
+    'share_is_hometown': '是否家乡',
+    'share_yes': '是',
+    'share_no': '否',
+    'share_daily_salary': '日薪',
+    'share_day': '天',
+    'share_days': '天',
+    'share_work_hours_title': '工作时间',
+    'share_hours': '小时',
+    'share_daily_work_hours': '每天工作',
+    'share_daily_commute_hours': '每天通勤',
+    'share_rest_time': '午休与休息',
+    'share_weekly_work_days': '每周工作天数',
+    'share_remote_work': '远程办公',
+    'share_days_per_week': '天/周',
+    'share_shuttle_service': '班车服务',
+    'share_annual_leave': '年假',
+    'share_paid_sick_leave': '带薪病假',
+    'share_days_per_year': '天/年',
+    'share_work_environment_title': '工作环境',
+    'share_office_environment': '办公环境',
+    'share_leadership_relation': '领导关系',
+    'share_colleague_relationship': '同事关系',
+    'share_canteen_quality': '食堂情况',
+    'share_education_and_experience': '教育与工作经验',
+    'share_highest_degree': '最高学历',
+    'share_school_type_label': '学校类型',
+    'share_work_years_label': '工作年限',
+    'share_contract_type_label': '合同类型',
+    'share_final_assessment': '最终评估',
+    'share_low_value_assessment_1': '这份工作对你来说简直是一场噩梦，每一天都是艰难的挑战。',
+    'share_low_value_assessment_2': '这份工作让你疲惫不堪，但或许是通往更好未来的必经之路。',
+    'share_medium_value_assessment_1': '这份工作平平淡淡，既没有太多惊喜，也没有太多失望。',
+    'share_medium_value_assessment_2': '这份工作给你带来了不少成就感，是一份令人满意的选择。',
+    'share_high_value_assessment_1': '这份工作几乎满足了你的所有期望，每天都充满干劲。',
+    'share_high_value_assessment_2': '这份工作简直是为你量身定做的，既有挑战又有回报，令你心满意足。',
+    'share_high_value_assessment_3': '恭喜你找到了人生中的理想工作，这样的机会可遇而不可求！',
+    'share_working_days_per_year': '年工作天数',
+    
+    'share_hometown_comment': '在家乡工作，让你既能追求事业，又能照顾家人，平衡感满满。家的温暖和熟悉的环境给你带来额外的安全感和幸福感。',
+    'share_tier1_city_comment': '虽然生活成本较高，但丰富的机会和广阔的平台能够助你更快成长。',
+    'share_tier2_city_comment': '生活节奏虽然没有一线城市那么快，但依然提供了不错的发展空间。这里的生活压力适中，让你能找到工作与生活之间的平衡。',
+    'share_tier3_city_comment': '你享受着低成本高质量的生活。虽然机会相对较少，但悠闲的生活节奏和较低的压力让你能更从容地面对人生。要照顾好自己，按时吃饭休息，你一个人去得那么远。',
+    
+    'share_commute_short': '你的通勤时间很短，让你每天都能多出宝贵的时间用于自我提升或休息。',
+    'share_commute_medium': '你的通勤时间适中，不会让你感到太大压力，也可以利用这段时间听书或补觉。',
+    'share_commute_long': '你长时间的通勤占用了大量宝贵时间，会对身心健康造成一定影响，建议考虑搬家或换工作以改善。',
+    'share_wfh_high': '而且你有大量居家办公的机会，进一步减轻了通勤负担，提高了工作生活质量。',
+    'share_wfh_medium': '你的部分居家办公安排也为你节省了不少通勤时间。',
+    'share_shuttle_service_good': '公司提供的便利班车服务是一个不小的福利，让你的通勤更轻松愉快。',
+    
+    'share_cbd_environment': '在CBD的办公环境既专业又现代化，提供了良好的职业形象和便利的工作条件。',
+    'share_factory_environment': '在工厂/户外环境工作确实有些挑战，但也培养了你的坚韧品质和适应能力。',
+    'share_normal_environment': '你的工作环境舒适适中，能满足基本需求，为高效工作提供了足够的保障。',
+    'share_leadership_excellent': '你享受着作为嫡系的优越待遇和发展机会，但也面临着更高的期望和责任。',
+    'share_leadership_good': '你的领导能够理解你的工作状态并提供必要的支持，这在职场中非常难得。',
+    'share_leadership_normal': '你和领导各司其职，这种关系虽然普通但稳定可靠。',
+    'share_leadership_strict': '你领导的管理风格较为严格，这种严格虽然有时让人压力大，但也能促使你更加专业和自律。',
+    'share_leadership_bad': '你与领导之间的关系有些紧张，这种情况下要学会保持情绪稳定，专注于工作本身，同时提升自己的沟通技巧。',
+    'share_teamwork_excellent': '你与同事们建立了深厚的私人友谊，工作之余还能互相支持和陪伴，这种关系让职场生活更加充实和有意义。',
+    'share_teamwork_good': '团队氛围和谐友善，同事之间相互尊重和支持，这种积极的人际环境让工作过程更加愉快和高效。',
+    'share_teamwork_normal': '与同事们相处和平但不过分亲近，这种关系模式适合专注于工作的职场人士。',
+    'share_teamwork_bad': '同事关系略显紧张，这种环境虽然不太舒适，但也锻炼了你的独立工作能力和心理承受力。',
+    
+    'share_workhours_balanced': '你的工作强度适中，有足够的时间照顾个人生活，保持着良好的工作生活平衡。',
+    'share_workhours_long': '你的工作时间略长，但仍在可接受范围内。注意合理安排休息时间，避免长期疲劳。',
+    'share_workhours_excessive': '你的工作时间过长，长期如此可能影响健康和生活质量。建议寻找方法提高效率或与上级商量调整工作安排。',
+    'share_rest_adequate': '你有充足的休息和午休时间，这有助于恢复精力，提高下午的工作效率。',
+    'share_rest_insufficient': '你的休息时间较少，记得定期起身活动，防止久坐带来的健康问题。',
+    'share_leave_abundant': '丰富的年假让你有充分的时间休整和旅行，这对维持长期工作动力非常重要。',
+    'share_leave_limited': '你的年假较少，可以考虑更有效地规划和利用这些宝贵的休假时间。',
+    
+    'share_phd_comment': '博士学历是你职场的一张重要名片，为你打开了许多高端研究和专业岗位的大门。',
+    'share_masters_comment': '硕士学历在当今就业市场仍有一定优势，证明了你的学习能力和专业素养。',
+    'share_bachelor_comment': '本科学历为你的职业生涯奠定了坚实基础，结合实际经验，你能在各个领域找到发展机会。',
+    'share_below_bachelor_comment': '专科及以下学历虽然在某些领域可能面临挑战，但实践经验和专业技能同样能帮你赢得认可。',
+    'share_fresh_graduate_comment': '作为应届生，你充满朝气和学习热情，有无限的可能性去探索和成长。',
+    'share_experienced_comment': '多年的工作经验是你最宝贵的财富，让你在职场中更加从容和自信。',
+    'share_mid_career_comment': '几年的工作经验让你更加了解行业和自己的优势，职业发展正处于上升期。',
+    'share_government_job_comment': '体制内的工作稳定性高，让你无需过多担忧失业风险，可以更从容地规划未来。',
+    'share_private_job_comment': '私企的工作虽然有一定风险，但也提供了更多成长和收入提升的机会。',
+    
+    'share_salary_high_cny': '你的日薪处于较高水平，财务状况良好，能够满足日常生活和一定的休闲娱乐需求。',
+    'share_salary_medium_cny': '你的日薪处于中等水平，足以应对基本生活需求，但可能需要更细致的预算规划。',
+    'share_salary_low_cny': '你的日薪较低，可能需要精打细算来管理财务，同时寻找提升收入的机会。',
+    'share_salary_high_foreign': '你的日薪处于较高水平，财务状况良好，能够满足日常生活和一定的休闲娱乐需求。',
+    'share_salary_medium_foreign': '你的日薪处于中等水平，足以应对基本生活需求，但可能需要更细致的预算规划。',
+    'share_salary_low_foreign': '你的日薪较低，可能需要精打细算来管理财务，同时寻找提升收入的机会。',
+    'share_high_cost_city': '在高生活成本的城市，你的薪资需要更精明地管理才能达到理想的生活质量。',
+    'share_low_cost_city': '在低生活成本的地区，你的薪资能够带来更高的生活质量和更多的储蓄机会。',
+    
+    'share_value_low': '虽然目前的工作性价比较低，但这可能是积累经验的必经阶段。记住每份工作都有其价值，努力汲取经验，为下一步发展打好基础。',
+    'share_value_medium': '你的工作性价比处于中等水平，有优点也有不足。可以专注于现有优势，同时寻找提升不足方面的方法，让工作体验更加全面。',
+    'share_value_high': '恭喜你拥有高性价比的工作！这样的机会难得，要珍惜现在的环境，继续发挥自己的优势，享受工作带来的成就感和满足感。',
+    'share_summary_advice': '综合建议',
+    
+    // 评价
+    'rating_enter_salary': '请输入年薪',
+    'rating_terrible': '惨绝人寰',
+    'rating_poor': '略惨',
+    'rating_average': '一般',
+    'rating_good': '还不错',
+    'rating_great': '很爽',
+    'rating_excellent': '爽到爆炸',
+    'rating_perfect': '人生巅峰',
+    'share_country': '工作国家/地区',
+  },
+  en: {
+    // Title and navigation
+    'title': 'Is This Job Worth It?',
+    'version': 'v5.0.0',
+    'github': 'GitHub',
+    'email': 'Email',
+    'xiaohongshu': 'Rednote',
+    'redirect_notice': 'Redirected automatically to new domain',
+    'visits': 'Visits',
+    'visitors': 'Visitors',
+    
+    // Form labels
+    'annual_salary_cny': 'Annual Salary (CNY)',
+    'annual_salary_foreign': 'Annual Salary (Local Currency)',
+    'salary_placeholder_cny': 'Pre-tax annual salary',
+    'salary_placeholder_foreign': 'Use local currency',
+    'non_china_salary': 'Non-China Salary',
+    'ppp_factor': 'Purchasing Power Parity Factor',
+    'ppp_tooltip': 'PPP factor standardizes purchasing power across countries. For example, China\'s 4.19 means that 1 USD in US has the same purchasing power as 4.19 CNY in China.',
+    'ppp_placeholder': 'Enter PPP conversion factor',
+    'ppp_common_regions': 'Common regions: China:4.19, Japan:102.59, US:1.00, Singapore:0.84',
+    'view_more': 'View more',
+    'country_selection': 'Work Country/Region',
+    'selected_ppp': 'Current PPP value',
+    'work_days_per_week': 'Workdays/week',
+    'wfh_days_per_week': 'WFH days/week',
+    'wfh_tooltip': 'WFH means Work From Home. Enter how many of your weekly workdays are spent working from home.',
+    'annual_leave': 'Annual leave /d',
+    'public_holidays': 'Public holidays',
+    'paid_sick_leave': 'Paid sick days',
+    'work_hours': 'Work hours /h',
+    'work_hours_tooltip': 'Work hours: total time from start to end of workday, including meals, breaks, and overtime (excluding commute).',
+    'commute_hours': 'Commute hours',
+    'commute_tooltip': 'Commute time refers to the total round-trip time between home and office.',
+    'rest_time': 'Breaks & slacking/h',
+    
+    // Environment factors
+    'job_stability': 'Contract Type',
+    'job_private': 'Private Company',
+    'job_foreign': 'Foreign Company',
+    'job_state': 'State-Owned Enterprise',
+    'job_government': 'Government Position',
+    'work_environment': 'Work Environment',
+    'env_remote': 'Remote Factory/ Site/ Outdoor',
+    'env_factory': 'Factory/ Site/ Outdoor',
+    'env_normal': 'Standard Office',
+    'env_cbd': 'CBD Office',
+    'city_factor': 'City (by Cost of Living)',
+    'city_tier1': 'Major Metropolis',
+    'city_newtier1': 'Emerging Major City',
+    'city_tier2': 'Regional Center',
+    'city_tier3': 'Medium-sized City',
+    'city_tier4': 'Small City',
+    'city_county': 'County',
+    'city_town': 'Township',
+    'hometown': 'Working in Hometown?',
+    'not_hometown': 'Not Hometown',
+    'is_hometown': 'In Hometown',
+    'leadership': 'Manager/Boss',
+    'leader_bad': 'Difficult Relationship',
+    'leader_strict': 'Strict Management',
+    'leader_normal': 'Professional & Neutral',
+    'leader_good': 'Supportive Leadership',
+    'leader_favorite': 'Inner Circle Member',
+    'teamwork': 'Team Environment',
+    'team_bad': 'Toxic Environment',
+    'team_normal': 'Professional Colleagues',
+    'team_good': 'Collaborative Team',
+    'team_excellent': 'Close-knit Team',
+    'shuttle': 'Shuttle Service (Bonus)',
+    'shuttle_none': 'No Shuttle',
+    'shuttle_inconvenient': 'Inconvenient Shuttle',
+    'shuttle_convenient': 'Convenient Shuttle',
+    'shuttle_direct': 'Direct Route Shuttle',
+    'canteen': 'Canteen Quality (Bonus)',
+    'canteen_none': 'No Canteen/Poor Quality',
+    'canteen_average': 'Average Quality',
+    'canteen_good': 'Good Quality',
+    'canteen_excellent': 'Excellent Quality',
+    
+    // Education and work experience
+    'education_level': 'Education Level',
+    'degree_type': 'Degree Type',
+    'below_bachelor': 'Below Bachelor\'s',
+    'bachelor': 'Bachelor\'s',
+    'masters': 'Master\'s',
+    'phd': 'PhD',
+    'school_type': 'University Type',
+    'school_second_tier': 'Standard University',
+    'school_first_tier_bachelor': 'Top University/QS200/USnews80',
+    'school_elite_bachelor': 'Elite University/QS50/USnews30',
+    'school_first_tier_higher': 'Top Grad School/QS100/USnews50',
+    'school_elite_higher': 'Elite Grad School/QS30/USnews20',
+    'bachelor_background': 'Bachelor Background',
+    'work_years': 'Work Experience',
+    'fresh_graduate': 'Fresh Graduate',
+    'years_1_3': '1-3 years',
+    'years_3_5': '3-5 years',
+    'years_5_8': '5-8 years',
+    'years_8_10': '8-10 years',
+    'years_10_12': '10-12 years',
+    'years_above_12': '12+ years',
+    
+    // Results
+    'working_days_per_year': 'Working days/year',
+    'days_unit': 'days',
+    'average_daily_salary': 'Average daily salary',
+    'job_value': 'Job Value Rating',
+    'view_report': 'View my job worth report',
+    
+    // ShareCard Component
+    'share_back_to_calculator': 'Back to Calculator',
+    'share_your_job_worth_report': 'Your Job Worth Report',
+    'share_job_worth_report': 'Job Worth Report',
+    'share_custom_made': 'Custom made by "Is This Job Worth It?"',
+    'share_generating': 'Generating...',
+    'share_download_report': 'Download Report',
+    'share_basic_info': 'Basic Information',
+    'share_work_city': 'Work City',
+    'share_is_hometown': 'Hometown',
+    'share_yes': 'Yes',
+    'share_no': 'No',
+    'share_daily_salary': 'Daily Salary',
+    'share_day': 'day',
+    'share_days': 'days',
+    'share_work_hours_title': 'Work Hours',
+    'share_hours': 'hours',
+    'share_daily_work_hours': 'Daily Work',
+    'share_daily_commute_hours': 'Daily Commute',
+    'share_rest_time': 'Breaks & Rest',
+    'share_weekly_work_days': 'Weekly Workdays',
+    'share_remote_work': 'Remote Work',
+    'share_days_per_week': 'days/week',
+    'share_shuttle_service': 'Shuttle Service',
+    'share_annual_leave': 'Annual Leave',
+    'share_paid_sick_leave': 'Paid Sick Leave',
+    'share_days_per_year': 'days/year',
+    'share_work_environment_title': 'Work Environment',
+    'share_office_environment': 'Office Environment',
+    'share_leadership_relation': 'Leadership',
+    'share_colleague_relationship': 'Colleague Relations',
+    'share_canteen_quality': 'Canteen',
+    'share_education_and_experience': 'Education & Experience',
+    'share_highest_degree': 'Highest Degree',
+    'share_school_type_label': 'School Type',
+    'share_work_years_label': 'Work Years',
+    'share_contract_type_label': 'Contract Type',
+    'share_final_assessment': 'Final Assessment',
+    'share_low_value_assessment_1': 'This job feels like a daily struggle, with challenges that outweigh the benefits.',
+    'share_low_value_assessment_2': 'This job is quite demanding, but might be a stepping stone to better opportunities.',
+    'share_medium_value_assessment_1': 'This job is balanced - not particularly exciting but stable and manageable.',
+    'share_medium_value_assessment_2': 'This job offers good satisfaction and rewards that match your efforts.',
+    'share_high_value_assessment_1': 'This job meets most of your expectations, providing meaningful work and fair compensation.',
+    'share_high_value_assessment_2': 'This job seems tailor-made for you, offering both challenge and reward in perfect measure.',
+    'share_high_value_assessment_3': "You've found an exceptional job opportunity that offers extraordinary value and satisfaction!",
+    'share_working_days_per_year': 'Working days/year',
+    
+    'share_hometown_comment': 'Working in your hometown allows you to build your career while maintaining family connections - a valuable balance that contributes to overall life satisfaction.',
+    'share_tier1_city_comment': 'While living costs are high, the abundant opportunities and professional networks in major cities can accelerate your career growth.',
+    'share_tier2_city_comment': 'This regional center offers a good balance - decent career opportunities with more manageable living costs and work pressure compared to major cities.',
+    'share_tier3_city_comment': 'You enjoy a good quality of life with lower living costs. While career opportunities may be more limited, the relaxed pace and lower pressure are significant advantages.',
+    
+    'share_commute_short': 'Your short commute time gives you more precious time each day for personal development or relaxation.',
+    'share_commute_medium': 'Your moderate commute is manageable and can be used productively for reading or podcasts.',
+    'share_commute_long': 'Your lengthy commute consumes significant time that affects work-life balance. Consider relocation or negotiating flexible arrangements if possible.',
+    'share_wfh_high': 'Your substantial work-from-home arrangement significantly reduces commuting burden and improves quality of life.',
+    'share_wfh_medium': 'Your partial work-from-home arrangement helps save valuable commuting time.',
+    'share_shuttle_service_good': 'The company shuttle service is a valuable benefit that makes your commute more comfortable and stress-free.',
+    
+    'share_cbd_environment': 'The CBD office environment offers professional surroundings and convenient access to business services and networking opportunities.',
+    'share_factory_environment': 'Working in an industrial or outdoor setting presents unique challenges but also develops resilience and practical problem-solving skills.',
+    'share_normal_environment': 'Your work environment provides the standard amenities needed for productive work without unnecessary distractions.',
+    'share_leadership_excellent': "Being part of leadership's inner circle offers advantages in terms of opportunities and influence, though it comes with higher expectations.",
+    'share_leadership_good': 'Your supportive leadership recognizes your contributions and provides the guidance needed for success - a valuable workplace asset.',
+    'share_leadership_normal': 'Your professional relationship with leadership is straightforward and functional - clear expectations without unnecessary complications.',
+    'share_leadership_strict': 'Working under strict management can be challenging but often develops discipline and attention to detail that serve you well professionally.',
+    'share_leadership_bad': 'The tension with leadership creates challenges, requiring careful communication and focusing on deliverables rather than relationships.',
+    'share_teamwork_excellent': 'The strong personal connections with colleagues creates a supportive network that enhances both work satisfaction and effectiveness.',
+    'share_teamwork_good': 'Your collaborative team environment fosters mutual support and effective communication, making daily work more pleasant and productive.',
+    'share_teamwork_normal': 'Maintaining professional but not overly personal relationships with colleagues allows you to focus on your work while having adequate support.',
+    'share_teamwork_bad': 'The challenging team dynamics require adaptability and self-reliance, which can develop valuable independence and resilience.',
+    
+    'share_workhours_balanced': 'Your balanced work schedule allows sufficient time for personal life, contributing to sustainable long-term performance.',
+    'share_workhours_long': 'Your extended work hours are manageable but require attention to maintaining energy and preventing burnout.',
+    'share_workhours_excessive': 'Your work hours are unsustainably long and may impact wellbeing and performance over time. Consider discussing workload adjustments.',
+    'share_rest_adequate': 'Your generous break time helps maintain energy levels and productivity throughout the workday.',
+    'share_rest_insufficient': 'Your limited break time suggests a need for incorporating short movement breaks to maintain health and focus.',
+    'share_leave_abundant': 'Your generous leave allowance provides ample time for rejuvenation and personal pursuits - essential for sustained motivation.',
+    'share_leave_limited': 'With limited leave time, strategic planning of your days off becomes important for maximizing their restorative benefit.',
+    
+    'share_phd_comment': 'Your doctoral qualification opens doors to specialized positions and demonstrates advanced research and analytical capabilities.',
+    'share_masters_comment': "Your master's degree demonstrates advanced knowledge and commitment that remains valuable in today's competitive job market.",
+    'share_bachelor_comment': "Your bachelor's degree provides a solid foundation that, combined with practical experience, enables diverse career opportunities.",
+    'share_below_bachelor_comment': "While formal education below bachelor's level may present challenges in some fields, practical skills and experience can be equally valuable assets.",
+    'share_fresh_graduate_comment': 'As a recent graduate, your fresh perspective and current knowledge are assets, balanced by the unlimited potential for growth and learning.',
+    'share_experienced_comment': 'Your substantial work experience provides valuable context and judgment that enhance your effectiveness and confidence.',
+    'share_mid_career_comment': 'With several years of experience, you understand both your industry and personal strengths, positioning you for strategic career development.',
+    'share_government_job_comment': 'The stability of public sector employment reduces career uncertainty, allowing more confident long-term planning.',
+    'share_private_job_comment': 'While private sector employment carries some uncertainty, it often provides accelerated growth and compensation opportunities.',
+    
+    'share_salary_high_cny': 'Your daily compensation is competitive, providing financial security and flexibility for both necessities and discretionary spending.',
+    'share_salary_medium_cny': 'Your compensation meets basic needs comfortably but requires thoughtful budgeting for optimal financial health.',
+    'share_salary_low_cny': 'Your current compensation level necessitates careful financial management while you explore opportunities for income growth.',
+    'share_salary_high_foreign': 'Your daily compensation is competitive, providing financial security and flexibility for both necessities and discretionary spending.',
+    'share_salary_medium_foreign': 'Your compensation meets basic needs comfortably but requires thoughtful budgeting for optimal financial health.',
+    'share_salary_low_foreign': 'Your current compensation level necessitates careful financial management while you explore opportunities for income growth.',
+    'share_high_cost_city': 'In a high-cost location, careful financial planning helps maximize the value of your compensation.',
+    'share_low_cost_city': 'In a lower-cost area, your compensation provides enhanced purchasing power and potential for savings.',
+    
+    'share_value_low': 'While the current position shows limited value, it may provide necessary experience for future growth. Extract learning from every aspect while preparing for your next career move.',
+    'share_value_medium': 'Your job offers balanced value with both strengths and areas for improvement. Focus on leveraging the positive aspects while developing strategies to address the challenges.',
+    'share_value_high': "You've found a high-value position worth maintaining and developing. Continue building on your strengths and appreciate the satisfaction this role provides.",
+    'share_summary_advice': 'Overall Recommendation',
+    
+    // Ratings
+    'rating_enter_salary': 'Please enter salary',
+    'rating_terrible': 'Dismal',
+    'rating_poor': 'Poor',
+    'rating_average': 'Average',
+    'rating_good': 'Good',
+    'rating_great': 'Great',
+    'rating_excellent': 'Excellent',
+    'rating_perfect': 'Outstanding',
+    'share_country': 'Work Country/Region',
+  }
+};
+
+// 提供上下文的组件
+export const LanguageProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+  // 从本地存储初始化语言，默认为中文
+  const [language, setLanguageState] = useState<Language>('zh');
+
+  // 首次渲染时检查本地存储的语言设置
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('language') as Language;
+    if (savedLanguage && (savedLanguage === 'zh' || savedLanguage === 'en')) {
+      setLanguageState(savedLanguage);
+    }
+  }, []);
+
+  // 设置语言并保存到本地存储
+  const setLanguage = (newLanguage: Language) => {
+    setLanguageState(newLanguage);
+    localStorage.setItem('language', newLanguage);
+  };
+
+  // 翻译函数
+  const t = (key: string): string => {
+    return translations[language][key] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+// 使用上下文的钩子
+export const useLanguage = () => useContext(LanguageContext); 

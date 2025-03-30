@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ArrowLeft, Download } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import Link from 'next/link';
+import { useLanguage } from './LanguageContext';
 
 // 扩展接口，支持更多属性
 interface ShareCardProps {
@@ -16,8 +17,10 @@ interface ShareCardProps {
   commuteHours: string;
   restTime: string;
   dailySalary: string;
-  isYuan: boolean;
+  isYuan: string;
   workDaysPerYear: string;
+  countryCode: string;
+  countryName: string;
   
   // 详细工作信息
   workDaysPerWeek: string;
@@ -43,6 +46,21 @@ interface ShareCardProps {
   jobStability: string;
 }
 
+// 将中文评级转换为翻译键
+const getAssessmentKey = (assessment: string): string => {
+  switch (assessment) {
+    case '惨绝人寰': return 'rating_terrible';
+    case '略惨': return 'rating_poor';
+    case '一般': return 'rating_average';
+    case '还不错': return 'rating_good';
+    case '很爽': return 'rating_great';
+    case '爽到爆炸': return 'rating_excellent';
+    case '人生巅峰': return 'rating_perfect';
+    case '请输入年薪': return 'rating_enter_salary';
+    default: return assessment;
+  }
+};
+
 // 获取CSS颜色代码
 const getColorFromClassName = (className: string): string => {
   switch(className) {
@@ -58,93 +76,93 @@ const getColorFromClassName = (className: string): string => {
 };
 
 // 获取城市名称
-const getCityName = (cityFactor: string): string => {
-  if (cityFactor === '0.70') return "一线城市";
-  else if (cityFactor === '0.80') return "新一线城市";
-  else if (cityFactor === '1.0') return "二线城市";
-  else if (cityFactor === '1.10') return "三线城市";
-  else if (cityFactor === '1.25') return "四线城市";
-  else if (cityFactor === '1.40') return "县城";
-  else if (cityFactor === '1.50') return "乡镇";
-  return "三线城市"; // 默认值
+const getCityName = (cityFactor: string, t: (key: string) => string): string => {
+  if (cityFactor === '0.70') return t('city_tier1');
+  else if (cityFactor === '0.80') return t('city_newtier1');
+  else if (cityFactor === '1.0') return t('city_tier2');
+  else if (cityFactor === '1.10') return t('city_tier3');
+  else if (cityFactor === '1.25') return t('city_tier4');
+  else if (cityFactor === '1.40') return t('city_county');
+  else if (cityFactor === '1.50') return t('city_town');
+  return t('city_tier3'); // 默认值
 };
 
 // 获取工作环境描述
-const getWorkEnvironmentDesc = (env: string): string => {
-  if (env === '0.8') return "偏僻的工厂/工地/户外";
-  else if (env === '0.9') return "工厂/工地/户外";
-  else if (env === '1.0') return "普通环境";
-  else if (env === '1.1') return "CBD";
-  return "普通环境";
+const getWorkEnvironmentDesc = (env: string, t: (key: string) => string): string => {
+  if (env === '0.8') return t('env_remote');
+  else if (env === '0.9') return t('env_factory');
+  else if (env === '1.0') return t('env_normal');
+  else if (env === '1.1') return t('env_cbd');
+  return t('env_normal');
 };
 
 // 获取领导评价
-const getLeadershipDesc = (rating: string): string => {
-  if (rating === '0.7') return "对我不爽";
-  else if (rating === '0.9') return "管理严格";
-  else if (rating === '1.0') return "中规中矩";
-  else if (rating === '1.1') return "善解人意";
-  else if (rating === '1.3') return "我是嫡系";
-  return "中规中矩";
+const getLeadershipDesc = (rating: string, t: (key: string) => string): string => {
+  if (rating === '0.7') return t('leader_bad');
+  else if (rating === '0.9') return t('leader_strict');
+  else if (rating === '1.0') return t('leader_normal');
+  else if (rating === '1.1') return t('leader_good');
+  else if (rating === '1.3') return t('leader_favorite');
+  return t('leader_normal');
 };
 
 // 获取同事环境评价
-const getTeamworkDesc = (rating: string): string => {
-  if (rating === '0.9') return "都是傻逼";
-  else if (rating === '1.0') return "萍水相逢";
-  else if (rating === '1.1') return "和和睦睦";
-  else if (rating === '1.2') return "私交甚好";
-  return "萍水相逢";
+const getTeamworkDesc = (rating: string, t: (key: string) => string): string => {
+  if (rating === '0.9') return t('team_bad');
+  else if (rating === '1.0') return t('team_normal');
+  else if (rating === '1.1') return t('team_good');
+  else if (rating === '1.2') return t('team_excellent');
+  return t('team_normal');
 };
 
 // 获取班车服务描述
-const getShuttleDesc = (shuttle: string): string => {
-  if (shuttle === '1.0') return "无班车";
-  else if (shuttle === '0.9') return "班车不便";
-  else if (shuttle === '0.7') return "便利班车";
-  else if (shuttle === '0.5') return "班车直达";
-  return "无班车";
+const getShuttleDesc = (shuttle: string, t: (key: string) => string): string => {
+  if (shuttle === '1.0') return t('shuttle_none');
+  else if (shuttle === '0.9') return t('shuttle_inconvenient');
+  else if (shuttle === '0.7') return t('shuttle_convenient');
+  else if (shuttle === '0.5') return t('shuttle_direct');
+  return t('shuttle_none');
 };
 
 // 获取食堂情况描述
-const getCanteenDesc = (canteen: string): string => {
-  if (canteen === '1.0') return "无食堂/很难吃";
-  else if (canteen === '1.05') return "食堂一般";
-  else if (canteen === '1.1') return "食堂不错";
-  else if (canteen === '1.15') return "食堂超赞";
-  return "无食堂/很难吃";
+const getCanteenDesc = (canteen: string, t: (key: string) => string): string => {
+  if (canteen === '1.0') return t('canteen_none');
+  else if (canteen === '1.05') return t('canteen_average');
+  else if (canteen === '1.1') return t('canteen_good');
+  else if (canteen === '1.15') return t('canteen_excellent');
+  return t('canteen_none');
 };
 
 // 获取合同类型描述
-const getJobStabilityDesc = (type: string): string => {
-  if (type === 'private') return "私企续签";
-  else if (type === 'foreign') return "外企续签";
-  else if (type === 'state') return "长期雇佣";
-  else if (type === 'government') return "永久编制";
-  return "私企续签";
+const getJobStabilityDesc = (type: string, t: (key: string) => string): string => {
+  if (type === 'private') return t('job_private');
+  else if (type === 'foreign') return t('job_foreign');
+  else if (type === 'state') return t('job_state');
+  else if (type === 'government') return t('job_government');
+  return t('job_private');
 };
 
 // 获取学历描述
-const getDegreeDesc = (type: string): string => {
-  if (type === 'belowBachelor') return "专科及以下";
-  else if (type === 'bachelor') return "本科";
-  else if (type === 'masters') return "硕士";
-  else if (type === 'phd') return "博士";
-  return "本科";
+const getDegreeDesc = (type: string, t: (key: string) => string): string => {
+  if (type === 'belowBachelor') return t('below_bachelor');
+  else if (type === 'bachelor') return t('bachelor');
+  else if (type === 'masters') return t('masters');
+  else if (type === 'phd') return t('phd');
+  return t('bachelor');
 };
 
 // 获取学校类型描述
-const getSchoolTypeDesc = (type: string, degree: string): string => {
-  if (type === 'secondTier') return "二本三本";
+const getSchoolTypeDesc = (type: string, degree: string, t: (key: string) => string): string => {
+  if (type === 'secondTier') return t('school_second_tier');
   else if (type === 'firstTier') {
-    if (degree === 'bachelor') return "双非/ QS200/ USnews80";
-    return "双非/ QS100/ USnews50";
+    if (degree === 'bachelor') return t('school_first_tier_bachelor');
+    return t('school_first_tier_higher');
   } 
   else if (type === 'elite') {
-    if (degree === 'bachelor') return "985211/ QS50/ USnews30";
-    return "985211/ QS30/ USnews20";
+    if (degree === 'bachelor') return t('school_elite_bachelor');
+    return t('school_elite_higher');
   }
-  return "双非";
+  return t('school_first_tier_bachelor');
 };
 
 // 获取emoji表情
@@ -159,306 +177,15 @@ const getEmoji = (value: number): string => {
 };
 
 // 获取工作年限描述
-const getWorkYearsDesc = (years: string): string => {
-  if (years === '0') return "应届生";
-  else if (years === '1') return "1-3年";
-  else if (years === '2') return "3-5年";
-  else if (years === '4') return "5-8年";
-  else if (years === '6') return "8-10年";
-  else if (years === '10') return "10-12年";
-  else if (years === '15') return "12年以上";
-  return "应届生";
-};
-
-// 根据工作内容和选择生成个性化评价
-const generatePersonalizedComments = (props: ShareCardProps) => {
-  const comments = [];
-  const valueNum = parseFloat(props.value);
-  
-  // 1. 根据总体性价比生成主评价
-  let mainComment = "";
-  if (valueNum < 0.6) {
-    mainComment = "这份工作对你来说简直是一场噩梦，每一天都是艰难的挑战。";
-  } else if (valueNum < 1.0) {
-    mainComment = "这份工作让你疲惫不堪，但或许是通往更好未来的必经之路。";
-  } else if (valueNum <= 1.8) {
-    mainComment = "这份工作平平淡淡，既没有太多惊喜，也没有太多失望。";
-  } else if (valueNum <= 2.5) {
-    mainComment = "这份工作给你带来了不少成就感，是一份令人满意的选择。";
-  } else if (valueNum <= 3.2) {
-    mainComment = "这份工作几乎满足了你的所有期望，每天都充满干劲。";
-  } else if (valueNum <= 4.0) {
-    mainComment = "这份工作简直是为你量身定做的，既有挑战又有回报，令你心满意足。";
-  } else {
-    mainComment = "恭喜你找到了人生中的理想工作，这样的机会可遇而不可求！";
-  }
-  comments.push({ 
-    title: "整体评价", 
-    content: mainComment, 
-    emoji: getEmoji(valueNum),
-    details: [
-      { label: "总体得分", value: `${props.value} (${props.assessment})` }
-    ]
-  });
-  
-  // 2. 工作城市评价
-  const cityName = getCityName(props.cityFactor);
-  const isHomeTown = props.homeTown === 'yes';
-  let cityComment = "";
-  if (isHomeTown) {
-    cityComment = `在家乡工作，让你既能追求事业，又能照顾家人，平衡感满满。家的温暖和熟悉的环境给你带来额外的安全感和幸福感。`;
-  } else {
-    if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
-      cityComment = `虽然生活成本较高，但丰富的机会和广阔的平台能够助你更快成长。`;
-    } else if (props.cityFactor === '1.0' || props.cityFactor === '1.10') {
-      cityComment = `生活节奏虽然没有一线城市那么快，但依然提供了不错的发展空间。这里的生活压力适中，让你能找到工作与生活之间的平衡。`;
-    } else {
-      cityComment = `你享受着低成本高质量的生活。虽然机会相对较少，但悠闲的生活节奏和较低的压力让你能更从容地面对人生。`;
-    }
-    cityComment += " 要照顾好自己，按时吃饭休息，你一个人去得那么远。";
-  }
-  comments.push({ 
-    title: "城市选择", 
-    content: cityComment, 
-    emoji: isHomeTown ? "🏡" : "🌆",
-    details: [
-      { label: "所在城市", value: cityName },
-      { label: "是否家乡", value: isHomeTown ? "是" : "否" }
-    ]
-  });
-  
-  // 3. 通勤与WFH评价
-  const commuteHoursNum = parseFloat(props.commuteHours);
-  const wfhDaysNum = parseFloat(props.wfhDaysPerWeek);
-  const workDaysNum = parseFloat(props.workDaysPerWeek);
-  const wfhRatio = workDaysNum > 0 ? (wfhDaysNum / workDaysNum) : 0;
-  let commuteComment = "";
-  
-  if (commuteHoursNum <= 1) {
-    commuteComment = "你的通勤时间很短，让你每天都能多出宝贵的时间用于自我提升或休息。";
-  } else if (commuteHoursNum <= 2) {
-    commuteComment = "你的通勤时间适中，不会让你感到太大压力，也可以利用这段时间听书或补觉。";
-  } else {
-    commuteComment = "你长时间的通勤占用了大量宝贵时间，会对身心健康造成一定影响，建议考虑搬家或换工作以改善。";
-  }
-  
-  if (wfhRatio >= 0.6) {
-    commuteComment += " 而且你有大量居家办公的机会，进一步减轻了通勤负担，提高了工作生活质量。";
-  } else if (wfhRatio >= 0.2) {
-    commuteComment += " 你的部分居家办公安排也为你节省了不少通勤时间。";
-  }
-  
-  if (props.shuttle === '0.7' || props.shuttle === '0.5') {
-    commuteComment += " 公司提供的便利班车服务是一个不小的福利，让你的通勤更轻松愉快。";
-  }
-  
-  comments.push({ 
-    title: "通勤体验", 
-    content: commuteComment, 
-    emoji: wfhRatio >= 0.5 ? "🏠" : "🚌",
-    details: [
-      { label: "通勤时间", value: `${props.commuteHours} 小时/天` },
-      { label: "远程办公", value: `${props.wfhDaysPerWeek}/${props.workDaysPerWeek} 天/周 (${Math.round(wfhRatio * 100)}%)` },
-      { label: "班车服务", value: getShuttleDesc(props.shuttle) }
-    ]
-  });
-  
-  // 4. 工作环境与人际关系评价
-  const leadershipRating = props.leadership;
-  const teamworkRating = props.teamwork;
-  const workEnvironment = props.workEnvironment;
-  
-  let environmentComment = "";
-  
-  if (workEnvironment === '1.1') {
-    environmentComment = "在CBD的办公环境既专业又现代化，提供了良好的职业形象和便利的工作条件。";
-  } else if (workEnvironment === '0.8' || workEnvironment === '0.9') {
-    environmentComment = "在工厂/户外环境工作确实有些挑战，但也培养了你的坚韧品质和适应能力。";
-  } else {
-    environmentComment = "你的工作环境舒适适中，能满足基本需求，为高效工作提供了足够的保障。";
-  }
-  
-  // 更细致的领导关系评价
-  if (leadershipRating === '1.3') {
-    environmentComment += " 你享受着作为嫡系的优越待遇和发展机会，但也面临着更高的期望和责任。";
-  } else if (leadershipRating === '1.1') {
-    environmentComment += " 你的领导能够理解你的工作状态并提供必要的支持，这在职场中非常难得。";
-  } else if (leadershipRating === '1.0') {
-    environmentComment += " 你和领导各司其职，这种关系虽然普通但稳定可靠。";
-  } else if (leadershipRating === '0.9') {
-    environmentComment += " 你领导的管理风格较为严格，这种严格虽然有时让人压力大，但也能促使你更加专业和自律。";
-  } else if (leadershipRating === '0.7') {
-    environmentComment += " 你与领导之间的关系有些紧张，这种情况下要学会保持情绪稳定，专注于工作本身，同时提升自己的沟通技巧。";
-  }
-  
-  // 更细致的同事关系评价
-  if (teamworkRating === '1.2') {
-    environmentComment += " 你与同事们建立了深厚的私人友谊，工作之余还能互相支持和陪伴，这种关系让职场生活更加充实和有意义。";
-  } else if (teamworkRating === '1.1') {
-    environmentComment += " 团队氛围和谐友善，同事之间相互尊重和支持，这种积极的人际环境让工作过程更加愉快和高效。";
-  } else if (teamworkRating === '1.0') {
-    environmentComment += " 与同事们相处和平但不过分亲近，这种关系模式适合专注于工作的职场人士。";
-  } else if (teamworkRating === '0.9') {
-    environmentComment += " 同事关系略显紧张，这种环境虽然不太舒适，但也锻炼了你的独立工作能力和心理承受力。";
-  }
-  
-  comments.push({ 
-    title: "职场环境", 
-    content: environmentComment, 
-    emoji: "🏢",
-    details: [
-      { label: "办公环境", value: getWorkEnvironmentDesc(workEnvironment) },
-      { label: "领导关系", value: getLeadershipDesc(leadershipRating) },
-      { label: "同事氛围", value: getTeamworkDesc(teamworkRating) },
-      { label: "食堂情况", value: getCanteenDesc(props.canteen) }
-    ]
-  });
-  
-  // 5. 工作时间与强度评价
-  const workHoursNum = parseFloat(props.workHours);
-  const restTimeNum = parseFloat(props.restTime);
-  const effectiveWorkTime = workHoursNum + parseFloat(props.commuteHours) - 0.5 * restTimeNum;
-  
-  let workTimeComment = "";
-  if (effectiveWorkTime <= 8) {
-    workTimeComment = "你的工作强度适中，有足够的时间照顾个人生活，保持着良好的工作生活平衡。";
-  } else if (effectiveWorkTime <= 11) {
-    workTimeComment = "你的工作时间略长，但仍在可接受范围内。注意合理安排休息时间，避免长期疲劳。";
-  } else {
-    workTimeComment = "你的工作时间过长，长期如此可能影响健康和生活质量。建议寻找方法提高效率或与上级商量调整工作安排。";
-  }
-  
-  if (restTimeNum >= 2.5) {
-    workTimeComment += " 你有充足的休息和午休时间，这有助于恢复精力，提高下午的工作效率。";
-  } else if (restTimeNum <= 1) {
-    workTimeComment += " 你的休息时间较少，记得定期起身活动，防止久坐带来的健康问题。";
-  }
-  
-  const annualLeaveNum = parseFloat(props.annualLeave);
-  if (annualLeaveNum >= 15) {
-    workTimeComment += " 丰富的年假让你有充分的时间休整和旅行，这对维持长期工作动力非常重要。";
-  } else if (annualLeaveNum <= 5) {
-    workTimeComment += " 你的年假较少，可以考虑更有效地规划和利用这些宝贵的休假时间。";
-  }
-  
-  const totalLeave = parseFloat(props.annualLeave) + parseFloat(props.publicHolidays) + parseFloat(props.paidSickLeave) * 0.6;
-  
-  comments.push({ 
-    title: "工作节奏", 
-    content: workTimeComment, 
-    emoji: "⏱️",
-    details: [
-      { label: "工作时长", value: `${props.workHours} 小时/天` },
-      { label: "有效工作时间", value: `${effectiveWorkTime.toFixed(1)} 小时/天` },
-      { label: "午休与摸鱼", value: `${props.restTime} 小时/天` },
-      { label: "年假天数", value: `${props.annualLeave} 天/年` },
-      { label: "带薪病假", value: `${props.paidSickLeave} 天/年` },
-      { label: "法定假日", value: `${props.publicHolidays} 天/年` },
-      { label: "总休假时间", value: `${totalLeave.toFixed(1)} 天/年` }
-    ]
-  });
-  
-  // 6. 教育背景与职业发展评价
-  const degreeType = props.degreeType;
-  const workYears = props.workYears;
-  const jobStability = props.jobStability;
-  
-  let careerComment = "";
-  if (degreeType === 'phd') {
-    careerComment = "博士学历是你职场的一张重要名片，为你打开了许多高端研究和专业岗位的大门。";
-  } else if (degreeType === 'masters') {
-    careerComment = "硕士学历在当今就业市场仍有一定优势，证明了你的学习能力和专业素养。";
-  } else if (degreeType === 'bachelor') {
-    careerComment = "本科学历为你的职业生涯奠定了坚实基础，结合实际经验，你能在各个领域找到发展机会。";
-  } else {
-    careerComment = "专科及以下学历虽然在某些领域可能面临挑战，但实践经验和专业技能同样能帮你赢得认可。";
-  }
-  
-  if (workYears === '0') {
-    careerComment += " 作为应届生，你充满朝气和学习热情，有无限的可能性去探索和成长。";
-  } else if (parseInt(workYears) >= 6) {
-    careerComment += " 多年的工作经验是你最宝贵的财富，让你在职场中更加从容和自信。";
-  } else {
-    careerComment += " 几年的工作经验让你更加了解行业和自己的优势，职业发展正处于上升期。";
-  }
-  
-  if (jobStability === 'government') {
-    careerComment += " 体制内的工作稳定性高，让你无需过多担忧失业风险，可以更从容地规划未来。";
-  } else if (jobStability === 'private') {
-    careerComment += " 私企的工作虽然有一定风险，但也提供了更多成长和收入提升的机会。";
-  }
-  
-  comments.push({ 
-    title: "职业发展", 
-    content: careerComment, 
-    emoji: "📚",
-    details: [
-      { label: "最高学历", value: getDegreeDesc(degreeType) },
-      { label: "学校类型", value: getSchoolTypeDesc(props.schoolType, degreeType) },
-      { label: "工作年限", value: getWorkYearsDesc(workYears) },
-      { label: "合同类型", value: getJobStabilityDesc(jobStability) }
-    ]
-  });
-  
-  // 7. 薪资评价
-  const dailySalary = props.dailySalary;
-  const isYuan = props.isYuan;
-  
-  let salaryComment = "";
-  const salaryNumeric = parseFloat(dailySalary);
-  if (isYuan) {
-    if (salaryNumeric >= 1000) {
-      salaryComment = "你的日薪处于较高水平，财务状况良好，能够满足日常生活和一定的休闲娱乐需求。";
-    } else if (salaryNumeric >= 500) {
-      salaryComment = "你的日薪处于中等水平，足以应对基本生活需求，但可能需要更细致的预算规划。";
-    } else {
-      salaryComment = "你的日薪较低，可能需要精打细算来管理财务，同时寻找提升收入的机会。";
-    }
-  } else {
-    if (salaryNumeric >= 150) {
-      salaryComment = "你的日薪处于较高水平，财务状况良好，能够满足日常生活和一定的休闲娱乐需求。";
-    } else if (salaryNumeric >= 80) {
-      salaryComment = "你的日薪处于中等水平，足以应对基本生活需求，但可能需要更细致的预算规划。";
-    } else {
-      salaryComment = "你的日薪较低，可能需要精打细算来管理财务，同时寻找提升收入的机会。";
-    }
-  }
-  
-  // 考虑城市因素
-  if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
-    salaryComment += " 在高生活成本的城市，你的薪资需要更精明地管理才能达到理想的生活质量。";
-  } else if (props.cityFactor === '1.25' || props.cityFactor === '1.40' || props.cityFactor === '1.50') {
-    salaryComment += " 在低生活成本的地区，你的薪资能够带来更高的生活质量和更多的储蓄机会。";
-  }
-  
-  comments.push({ 
-    title: "薪资水平", 
-    content: salaryComment, 
-    emoji: "💰",
-    details: [
-      { label: "日薪", value: `${isYuan ? '¥' : '$'}${dailySalary}/天` },
-      { label: "年工作天数", value: `${props.workDaysPerYear} 天` }
-    ]
-  });
-  
-  // 8. 总结性价比评价
-  let valueComment = "";
-  if (valueNum < 1.0) {
-    valueComment = "虽然目前的工作性价比较低，但这可能是积累经验的必经阶段。记住每份工作都有其价值，努力汲取经验，为下一步发展打好基础。";
-  } else if (valueNum <= 2.0) {
-    valueComment = "你的工作性价比处于中等水平，有优点也有不足。可以专注于现有优势，同时寻找提升不足方面的方法，让工作体验更加全面。";
-  } else {
-    valueComment = "恭喜你拥有高性价比的工作！这样的机会难得，要珍惜现在的环境，继续发挥自己的优势，享受工作带来的成就感和满足感。";
-  }
-  
-  comments.push({ 
-    title: "综合建议", 
-    content: valueComment, 
-    emoji: "💎",
-    details: []
-  });
-  
-  return comments;
+const getWorkYearsDesc = (years: string, t: (key: string) => string): string => {
+  if (years === '0') return t('fresh_graduate');
+  else if (years === '1') return t('years_1_3');
+  else if (years === '2') return t('years_3_5');
+  else if (years === '4') return t('years_5_8');
+  else if (years === '6') return t('years_8_10');
+  else if (years === '10') return t('years_10_12');
+  else if (years === '15') return t('years_above_12');
+  return t('fresh_graduate');
 };
 
 const ShareCard: React.FC<ShareCardProps> = (props) => {
@@ -466,6 +193,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
   const simpleReportRef = useRef<HTMLDivElement>(null); // 添加简化版报告的引用
   const [isDownloading, setIsDownloading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
+  const { t, language } = useLanguage();
   
   // 页面载入动画效果
   useEffect(() => {
@@ -473,7 +201,295 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
   }, []);
 
   // 生成个性化评价
-  const personalizedComments = generatePersonalizedComments(props);
+  const personalizedComments = (() => {
+    const comments = [];
+    const valueNum = parseFloat(props.value);
+    
+    // 1. 根据总体性价比生成主评价
+    let mainComment = "";
+    if (valueNum < 0.6) {
+      mainComment = t('share_low_value_assessment_1');
+    } else if (valueNum < 1.0) {
+      mainComment = t('share_low_value_assessment_2');
+    } else if (valueNum <= 1.8) {
+      mainComment = t('share_medium_value_assessment_1');
+    } else if (valueNum <= 2.5) {
+      mainComment = t('share_medium_value_assessment_2');
+    } else if (valueNum <= 3.2) {
+      mainComment = t('share_high_value_assessment_1');
+    } else if (valueNum <= 4.0) {
+      mainComment = t('share_high_value_assessment_2');
+    } else {
+      mainComment = t('share_high_value_assessment_3');
+    }
+    comments.push({ 
+      title: t('share_final_assessment'), 
+      content: mainComment, 
+      emoji: getEmoji(valueNum),
+      details: [
+        { label: t('share_final_assessment'), value: `${props.value} (${t(getAssessmentKey(props.assessment))})` }
+      ]
+    });
+    
+    // 2. 工作城市评价
+    const cityName = getCityName(props.cityFactor, t);
+    const isHomeTown = props.homeTown === 'yes';
+    let cityComment = "";
+    if (isHomeTown) {
+      cityComment = t('share_hometown_comment');
+    } else {
+      if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
+        cityComment = t('share_tier1_city_comment');
+      } else if (props.cityFactor === '1.0' || props.cityFactor === '1.10') {
+        cityComment = t('share_tier2_city_comment');
+      } else {
+        cityComment = t('share_tier3_city_comment');
+      }
+    }
+    comments.push({ 
+      title: t('share_work_city'), 
+      content: cityComment, 
+      emoji: isHomeTown ? "🏡" : "🌆",
+      details: [
+        { label: t('share_work_city'), value: cityName },
+        { label: t('share_is_hometown'), value: isHomeTown ? t('share_yes') : t('share_no') },
+        { label: t('share_country'), value: props.countryName }
+      ]
+    });
+    
+    // 3. 通勤与WFH评价
+    const commuteHoursNum = parseFloat(props.commuteHours);
+    const wfhDaysNum = parseFloat(props.wfhDaysPerWeek);
+    const workDaysNum = parseFloat(props.workDaysPerWeek);
+    const wfhRatio = workDaysNum > 0 ? (wfhDaysNum / workDaysNum) : 0;
+    
+    let commuteComment = "";
+    
+    if (commuteHoursNum <= 1) {
+      commuteComment = t('share_commute_short');
+    } else if (commuteHoursNum <= 2) {
+      commuteComment = t('share_commute_medium');
+    } else {
+      commuteComment = t('share_commute_long');
+    }
+    
+    if (wfhRatio >= 0.6) {
+      commuteComment += " " + t('share_wfh_high');
+    } else if (wfhRatio >= 0.2) {
+      commuteComment += " " + t('share_wfh_medium');
+    }
+    
+    if (props.shuttle === '0.7' || props.shuttle === '0.5') {
+      commuteComment += " " + t('share_shuttle_service_good');
+    }
+    
+    comments.push({ 
+      title: t('share_daily_commute_hours'), 
+      content: commuteComment, 
+      emoji: wfhRatio >= 0.5 ? "🏠" : "🚌",
+      details: [
+        { label: t('share_daily_commute_hours'), value: `${props.commuteHours} ${t('share_hours')}` },
+        { label: t('share_remote_work'), value: `${props.wfhDaysPerWeek}/${props.workDaysPerWeek} ${t('share_days_per_week')} (${Math.round(wfhRatio * 100)}%)` },
+        { label: t('share_shuttle_service'), value: getShuttleDesc(props.shuttle, t) }
+      ]
+    });
+    
+    // 4. 工作环境与人际关系评价
+    const leadershipRating = props.leadership;
+    const teamworkRating = props.teamwork;
+    const workEnvironment = props.workEnvironment;
+    
+    let environmentComment = "";
+    
+    if (workEnvironment === '1.1') {
+      environmentComment = t('share_cbd_environment');
+    } else if (workEnvironment === '0.8' || workEnvironment === '0.9') {
+      environmentComment = t('share_factory_environment');
+    } else {
+      environmentComment = t('share_normal_environment');
+    }
+    
+    // 更细致的领导关系评价
+    if (leadershipRating === '1.3') {
+      environmentComment += " " + t('share_leadership_excellent');
+    } else if (leadershipRating === '1.1') {
+      environmentComment += " " + t('share_leadership_good');
+    } else if (leadershipRating === '1.0') {
+      environmentComment += " " + t('share_leadership_normal');
+    } else if (leadershipRating === '0.9') {
+      environmentComment += " " + t('share_leadership_strict');
+    } else if (leadershipRating === '0.7') {
+      environmentComment += " " + t('share_leadership_bad');
+    }
+    
+    // 更细致的同事关系评价
+    if (teamworkRating === '1.2') {
+      environmentComment += " " + t('share_teamwork_excellent');
+    } else if (teamworkRating === '1.1') {
+      environmentComment += " " + t('share_teamwork_good');
+    } else if (teamworkRating === '1.0') {
+      environmentComment += " " + t('share_teamwork_normal');
+    } else if (teamworkRating === '0.9') {
+      environmentComment += " " + t('share_teamwork_bad');
+    }
+    
+    comments.push({ 
+      title: t('share_work_environment_title'), 
+      content: environmentComment, 
+      emoji: "🏢",
+      details: [
+        { label: t('share_office_environment'), value: getWorkEnvironmentDesc(workEnvironment, t) },
+        { label: t('share_leadership_relation'), value: getLeadershipDesc(leadershipRating, t) },
+        { label: t('share_colleague_relationship'), value: getTeamworkDesc(teamworkRating, t) },
+        { label: t('share_canteen_quality'), value: getCanteenDesc(props.canteen, t) }
+      ]
+    });
+    
+    // 5. 工作时间与强度评价
+    const workHoursNum = parseFloat(props.workHours);
+    const restTimeNum = parseFloat(props.restTime);
+    const effectiveWorkTime = workHoursNum + parseFloat(props.commuteHours) - 0.5 * restTimeNum;
+    
+    let workTimeComment = "";
+    if (effectiveWorkTime <= 8) {
+      workTimeComment = t('share_workhours_balanced');
+    } else if (effectiveWorkTime <= 11) {
+      workTimeComment = t('share_workhours_long');
+    } else {
+      workTimeComment = t('share_workhours_excessive');
+    }
+    
+    if (restTimeNum >= 2.5) {
+      workTimeComment += " " + t('share_rest_adequate');
+    } else if (restTimeNum <= 1) {
+      workTimeComment += " " + t('share_rest_insufficient');
+    }
+    
+    const annualLeaveNum = parseFloat(props.annualLeave);
+    if (annualLeaveNum >= 15) {
+      workTimeComment += " " + t('share_leave_abundant');
+    } else if (annualLeaveNum <= 5) {
+      workTimeComment += " " + t('share_leave_limited');
+    }
+    
+    const totalLeave = parseFloat(props.annualLeave) + parseFloat(props.publicHolidays) + parseFloat(props.paidSickLeave) * 0.6;
+    
+    comments.push({ 
+      title: t('share_work_hours_title'), 
+      content: workTimeComment, 
+      emoji: "⏱️",
+      details: [
+        { label: t('work_hours'), value: `${props.workHours} ${t('share_hours')}` },
+        { label: t('share_daily_work_hours'), value: `${effectiveWorkTime.toFixed(1)} ${t('share_hours')}` },
+        { label: t('rest_time'), value: `${props.restTime} ${t('share_hours')}` },
+        { label: t('annual_leave'), value: `${props.annualLeave} ${t('share_days_per_year')}` },
+        { label: t('paid_sick_leave'), value: `${props.paidSickLeave} ${t('share_days_per_year')}` },
+        { label: t('public_holidays'), value: `${props.publicHolidays} ${t('share_days_per_year')}` }
+      ]
+    });
+    
+    // 6. 教育背景与职业发展评价
+    const degreeType = props.degreeType;
+    const workYears = props.workYears;
+    const jobStability = props.jobStability;
+    
+    let careerComment = "";
+    if (degreeType === 'phd') {
+      careerComment = t('share_phd_comment');
+    } else if (degreeType === 'masters') {
+      careerComment = t('share_masters_comment');
+    } else if (degreeType === 'bachelor') {
+      careerComment = t('share_bachelor_comment');
+    } else {
+      careerComment = t('share_below_bachelor_comment');
+    }
+    
+    if (workYears === '0') {
+      careerComment += " " + t('share_fresh_graduate_comment');
+    } else if (parseInt(workYears) >= 6) {
+      careerComment += " " + t('share_experienced_comment');
+    } else {
+      careerComment += " " + t('share_mid_career_comment');
+    }
+    
+    if (jobStability === 'government') {
+      careerComment += " " + t('share_government_job_comment');
+    } else if (jobStability === 'private') {
+      careerComment += " " + t('share_private_job_comment');
+    }
+    
+    comments.push({ 
+      title: t('share_education_and_experience'), 
+      content: careerComment, 
+      emoji: "📚",
+      details: [
+        { label: t('share_highest_degree'), value: getDegreeDesc(degreeType, t) },
+        { label: t('share_school_type_label'), value: getSchoolTypeDesc(props.schoolType, degreeType, t) },
+        { label: t('share_work_years_label'), value: getWorkYearsDesc(workYears, t) },
+        { label: t('share_contract_type_label'), value: getJobStabilityDesc(jobStability, t) }
+      ]
+    });
+    
+    // 7. 薪资评价
+    const dailySalary = props.dailySalary;
+    const isYuan = props.isYuan === 'true';
+    
+    let salaryComment = "";
+    const salaryNumeric = parseFloat(dailySalary);
+    if (isYuan) {
+      if (salaryNumeric >= 1000) {
+        salaryComment = t('share_salary_high_cny');
+      } else if (salaryNumeric >= 500) {
+        salaryComment = t('share_salary_medium_cny');
+      } else {
+        salaryComment = t('share_salary_low_cny');
+      }
+    } else {
+      if (salaryNumeric >= 150) {
+        salaryComment = t('share_salary_high_foreign');
+      } else if (salaryNumeric >= 80) {
+        salaryComment = t('share_salary_medium_foreign');
+      } else {
+        salaryComment = t('share_salary_low_foreign');
+      }
+    }
+    
+    // 考虑城市因素
+    if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
+      salaryComment += " " + t('share_high_cost_city');
+    } else if (props.cityFactor === '1.25' || props.cityFactor === '1.40' || props.cityFactor === '1.50') {
+      salaryComment += " " + t('share_low_cost_city');
+    }
+    
+    comments.push({ 
+      title: t('share_daily_salary'), 
+      content: salaryComment, 
+      emoji: "💰",
+      details: [
+        { label: t('share_daily_salary'), value: `${isYuan ? '¥' : '$'}${dailySalary}/${t('share_day')}` },
+        { label: t('share_working_days_per_year'), value: `${props.workDaysPerYear} ${t('share_days')}` }
+      ]
+    });
+    
+    // 8. 总结性价比评价
+    let valueComment = "";
+    if (valueNum < 1.0) {
+      valueComment = t('share_value_low');
+    } else if (valueNum <= 2.0) {
+      valueComment = t('share_value_medium');
+    } else {
+      valueComment = t('share_value_high');
+    }
+    
+    comments.push({ 
+      title: t('share_summary_advice'), 
+      content: valueComment, 
+      emoji: "💎",
+      details: []
+    });
+    
+    return comments;
+  })();
   
   // 处理下载图片 - 使用简化版报告
   const handleDownload = async () => {
@@ -527,7 +543,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       <div className="w-full max-w-4xl mb-6">
         <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
           <ArrowLeft className="w-4 h-4" />
-          <span>返回计算器</span>
+          <span>{t('share_back_to_calculator')}</span>
         </Link>
       </div>
       
@@ -536,13 +552,13 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         <div className="mb-10 text-center">
           <div className="text-6xl mb-4">{getEmoji(parseFloat(props.value))}</div>
           <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-            你的工作性价比报告
+            {t('share_your_job_worth_report')}
           </h1>
           <div className="flex justify-center items-center gap-3">
             <span className="text-2xl font-bold px-3 py-1 rounded-lg" style={{ color: getColorFromClassName(props.assessmentColor), backgroundColor: `${getColorFromClassName(props.assessmentColor)}20` }}>
               {props.value}
             </span>
-            <span className="text-lg text-gray-700">{props.assessment}</span>
+            <span className="text-lg text-gray-700">{t(getAssessmentKey(props.assessment))}</span>
           </div>
         </div>
         
@@ -577,7 +593,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         
         {/* 底部信息 */}
         <div className="mt-10 text-center text-gray-500 space-y-1">
-          <div>由&quot;这b班上得值不值·测算版&quot;精心定制</div>
+          <div>{t('share_custom_made')}</div>
           <div>worthjob.zippland.com</div>
         </div>
       </div>
@@ -590,159 +606,173 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
           className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-colors"
         >
           <Download className="w-5 h-5" />
-          {isDownloading ? '生成中...' : '下载报告'}
+          {isDownloading ? t('share_generating') : t('share_download_report')}
         </button>
       </div>
       
       {/* 简化版报告，仅用于下载，在页面中隐藏 */}
       <div className="fixed top-0 left-0 opacity-0 pointer-events-none">
         <div ref={simpleReportRef} className="w-[800px] bg-white p-8 text-gray-900" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-          <div className="border border-gray-200 rounded-lg p-6">
-            {/* 报告标题 */}
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-black">工作性价比报告</h1>
-              <div className="mt-2 text-lg">
-                <span className="font-semibold px-2 py-1 rounded" style={{ backgroundColor: `${getColorFromClassName(props.assessmentColor)}20`, color: getColorFromClassName(props.assessmentColor) }}>
-                  {props.value} - {props.assessment}
-                </span>
+          <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            {/* 报告头部 - 渐变背景 */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 border-b border-gray-200">
+              <div className="text-center">
+                <div className="text-5xl mb-4">{getEmoji(parseFloat(props.value))}</div>
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">{t('share_job_worth_report')}</h1>
+                <div className="inline-block px-4 py-2 rounded-full bg-white shadow-sm">
+                  <span className="font-semibold text-xl" style={{ color: getColorFromClassName(props.assessmentColor) }}>
+                    {props.value} - {t(getAssessmentKey(props.assessment))}
+                  </span>
+                </div>
               </div>
             </div>
             
-            {/* 数据表格 */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* 基础信息 */}
-              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2">
-                <h2 className="font-bold text-gray-800">基础信息</h2>
-              </div>
-              <div className="grid grid-cols-2 gap-2 col-span-2">
-                <div>
-                  <div className="text-sm text-gray-600">工作城市</div>
-                  <div className="font-medium text-gray-800">{getCityName(props.cityFactor)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">是否家乡</div>
-                  <div className="font-medium text-gray-800">{props.homeTown === 'yes' ? '是' : '否'}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">日薪</div>
-                  <div className="font-medium text-gray-800">{props.isYuan ? '¥' : '$'}{props.dailySalary}/天</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">年工作天数</div>
-                  <div className="font-medium text-gray-800">{props.workDaysPerYear} 天</div>
-                </div>
-              </div>
-              
-              {/* 工作时间 */}
-              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2 mt-4">
-                <h2 className="font-bold text-gray-800">工作时间</h2>
-              </div>
-              <div className="grid grid-cols-2 gap-2 col-span-2">
-                <div>
-                  <div className="text-sm text-gray-600">每天工作</div>
-                  <div className="font-medium text-gray-800">{props.workHours} 小时</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">每天通勤</div>
-                  <div className="font-medium text-gray-800">{props.commuteHours} 小时</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">午休与休息</div>
-                  <div className="font-medium text-gray-800">{props.restTime} 小时</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">每周工作天数</div>
-                  <div className="font-medium text-gray-800">{props.workDaysPerWeek} 天</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">远程办公</div>
-                  <div className="font-medium text-gray-800">{props.wfhDaysPerWeek}/{props.workDaysPerWeek} 天/周</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">班车服务</div>
-                  <div className="font-medium text-gray-800">{getShuttleDesc(props.shuttle)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">年假</div>
-                  <div className="font-medium text-gray-800">{props.annualLeave} 天/年</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">带薪病假</div>
-                  <div className="font-medium text-gray-800">{props.paidSickLeave} 天/年</div>
-                </div>
-              </div>
-              
-              {/* 工作环境 */}
-              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2 mt-4">
-                <h2 className="font-bold text-gray-800">工作环境</h2>
-              </div>
-              <div className="grid grid-cols-2 gap-2 col-span-2">
-                <div>
-                  <div className="text-sm text-gray-600">办公环境</div>
-                  <div className="font-medium text-gray-800">{getWorkEnvironmentDesc(props.workEnvironment)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">领导关系</div>
-                  <div className="font-medium text-gray-800">{getLeadershipDesc(props.leadership)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">同事关系</div>
-                  <div className="font-medium text-gray-800">{getTeamworkDesc(props.teamwork)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">食堂情况</div>
-                  <div className="font-medium text-gray-800">{getCanteenDesc(props.canteen)}</div>
-                </div>
-              </div>
-              
-              {/* 教育背景 */}
-              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2 mt-4">
-                <h2 className="font-bold text-gray-800">教育与工作经验</h2>
-              </div>
-              <div className="grid grid-cols-2 gap-2 col-span-2">
-                <div>
-                  <div className="text-sm text-gray-600">最高学历</div>
-                  <div className="font-medium text-gray-800">{getDegreeDesc(props.degreeType)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">学校类型</div>
-                  <div className="font-medium text-gray-800">{getSchoolTypeDesc(props.schoolType, props.degreeType)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">工作年限</div>
-                  <div className="font-medium text-gray-800">{getWorkYearsDesc(props.workYears)}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">合同类型</div>
-                  <div className="font-medium text-gray-800">{getJobStabilityDesc(props.jobStability)}</div>
-                </div>
-              </div>
-              
-              {/* 结论 */}
-              <div className="col-span-2 border-b border-gray-200 pb-2 mb-2 mt-4">
-                <h2 className="font-bold text-gray-800">最终评估</h2>
-              </div>
-              <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
-                <div className="flex items-center mb-2">
-                  <div className="text-3xl mr-2">{getEmoji(parseFloat(props.value))}</div>
-                  <div className="text-xl font-bold" style={{ color: getColorFromClassName(props.assessmentColor) }}>
-                    {props.value} - {props.assessment}
+            {/* 报告内容 */}
+            <div className="p-6">
+              {/* 数据表格 */}
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                {/* 基础信息 */}
+                <div className="col-span-2 mb-4">
+                  <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
+                    <span className="mr-2">📊</span> {t('share_basic_info')}
+                  </h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_work_city')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{getCityName(props.cityFactor, t)}</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_country')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{props.countryName}</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_is_hometown')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{props.homeTown === 'yes' ? t('share_yes') : t('share_no')}</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_daily_salary')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{props.isYuan === 'true' ? '¥' : '$'}{props.dailySalary}/{t('share_day')}</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_working_days_per_year')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{props.workDaysPerYear} {t('share_days')}</div>
+                    </div>
                   </div>
                 </div>
-                <p className="text-gray-700">
-                  {parseFloat(props.value) < 1.0 
-                    ? "当前工作性价比较低，建议积累经验后考虑寻找新机会。" 
-                    : parseFloat(props.value) <= 2.0 
-                      ? "工作性价比处于中等水平，有发展潜力。" 
-                      : "高性价比工作，值得珍惜和长期发展。"
-                  }
-                </p>
+                
+                {/* 工作时间 */}
+                <div className="col-span-1">
+                  <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
+                    <span className="mr-2">⏱️</span> {t('share_work_hours_title')}
+                  </h2>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                      <span className="text-sm text-gray-500">{t('share_daily_work_hours')}</span>
+                      <span className="font-medium text-gray-800">{props.workHours} {t('share_hours')}</span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                      <span className="text-sm text-gray-500">{t('share_daily_commute_hours')}</span>
+                      <span className="font-medium text-gray-800">{props.commuteHours} {t('share_hours')}</span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                      <span className="text-sm text-gray-500">{t('share_rest_time')}</span>
+                      <span className="font-medium text-gray-800">{props.restTime} {t('share_hours')}</span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                      <span className="text-sm text-gray-500">{t('share_weekly_work_days')}</span>
+                      <span className="font-medium text-gray-800">{props.workDaysPerWeek} {t('share_days')}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 工作环境 */}
+                <div className="col-span-1">
+                  <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
+                    <span className="mr-2">🏢</span> {t('share_work_environment_title')}
+                  </h2>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                      <span className="text-sm text-gray-500">{t('share_office_environment')}</span>
+                      <span className="font-medium text-gray-800">{getWorkEnvironmentDesc(props.workEnvironment, t)}</span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                      <span className="text-sm text-gray-500">{t('share_leadership_relation')}</span>
+                      <span className="font-medium text-gray-800">{getLeadershipDesc(props.leadership, t)}</span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                      <span className="text-sm text-gray-500">{t('share_colleague_relationship')}</span>
+                      <span className="font-medium text-gray-800">{getTeamworkDesc(props.teamwork, t)}</span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                      <span className="text-sm text-gray-500">{t('share_canteen_quality')}</span>
+                      <span className="font-medium text-gray-800">{getCanteenDesc(props.canteen, t)}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 教育背景 */}
+                <div className="col-span-2 mt-2">
+                  <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
+                    <span className="mr-2">📚</span> {t('share_education_and_experience')}
+                  </h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_highest_degree')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{getDegreeDesc(props.degreeType, t)}</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_school_type_label')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{getSchoolTypeDesc(props.schoolType, props.degreeType, t)}</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_work_years_label')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{getWorkYearsDesc(props.workYears, t)}</div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <div className="text-sm text-gray-500">{t('share_contract_type_label')}</div>
+                      <div className="font-medium text-gray-800 mt-1">{getJobStabilityDesc(props.jobStability, t)}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 结论 */}
+                <div className="col-span-2 mt-4">
+                  <div className="rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-6 border border-gray-200">
+                    <h2 className="font-bold text-gray-800 text-lg mb-3 flex items-center">
+                      <span className="mr-2">💎</span> {t('share_final_assessment')}
+                    </h2>
+                    <div className="flex items-center mb-3">
+                      <div className="text-4xl mr-3">{getEmoji(parseFloat(props.value))}</div>
+                      <div className="text-xl font-bold" style={{ color: getColorFromClassName(props.assessmentColor) }}>
+                        {props.value} - {t(getAssessmentKey(props.assessment))}
+                      </div>
+                    </div>
+                    <p className="text-gray-700">
+                      {parseFloat(props.value) < 1.0 
+                        ? t('share_value_low') 
+                        : parseFloat(props.value) <= 2.0 
+                          ? t('share_value_medium') 
+                          : t('share_value_high')
+                      }
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
             
             {/* 页脚 */}
-            <div className="mt-6 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
-              <div>worthjob.zippland.com</div>
+            <div className="bg-gray-50 py-4 px-6 border-t border-gray-200">
+              <div className="flex justify-between items-center">
+                <div className="flex flex-col">
+                  <div className="text-sm font-medium text-gray-700">{t('share_custom_made')}</div>
+                  <div className="text-sm text-gray-500">worthjob.zippland.com</div>
+                </div>
+                <img 
+                  src="/website.png" 
+                  alt="" 
+                  className="h-16 w-16 opacity-85" 
+                />
+              </div>
             </div>
           </div>
         </div>

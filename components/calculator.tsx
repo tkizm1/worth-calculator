@@ -1,10 +1,415 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Wallet, Github, FileText } from 'lucide-react'; // 移除未使用的Share2
+import { Wallet, Github, FileText, Book } from 'lucide-react'; // 添加Book图标
 import Link from 'next/link'; // 导入Link组件用于导航
+import { useLanguage } from './LanguageContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
+
+// 定义PPP转换因子映射表
+const pppFactors: Record<string, { name: string, factor: number }> = {
+  'AF': { name: '阿富汗', factor: 18.71 },
+  'AO': { name: '安哥拉', factor: 167.66 },
+  'AL': { name: '阿尔巴尼亚', factor: 41.01 },
+  'AR': { name: '阿根廷', factor: 28.67 },
+  'AM': { name: '亚美尼亚', factor: 157.09 },
+  'AG': { name: '安提瓜和巴布达', factor: 2.06 },
+  'AU': { name: '澳大利亚', factor: 1.47 },
+  'AT': { name: '奥地利', factor: 0.76 },
+  'AZ': { name: '阿塞拜疆', factor: 0.50 },
+  'BI': { name: '布隆迪', factor: 680.41 },
+  'BE': { name: '比利时', factor: 0.75 },
+  'BJ': { name: '贝宁', factor: 211.97 },
+  'BF': { name: '布基纳法索', factor: 209.84 },
+  'BD': { name: '孟加拉国', factor: 32.81 },
+  'BG': { name: '保加利亚', factor: 0.70 },
+  'BH': { name: '巴林', factor: 0.18 },
+  'BS': { name: '巴哈马', factor: 0.88 },
+  'BA': { name: '波斯尼亚和黑塞哥维那', factor: 0.66 },
+  'BY': { name: '白俄罗斯', factor: 0.77 },
+  'BZ': { name: '伯利兹', factor: 1.37 },
+  'BO': { name: '玻利维亚', factor: 2.60 },
+  'BR': { name: '巴西', factor: 2.36 },
+  'BB': { name: '巴巴多斯', factor: 2.24 },
+  'BN': { name: '文莱达鲁萨兰国', factor: 0.58 },
+  'BT': { name: '不丹', factor: 20.11 },
+  'BW': { name: '博茨瓦纳', factor: 4.54 },
+  'CF': { name: '中非共和国', factor: 280.19 },
+  'CA': { name: '加拿大', factor: 1.21 },
+  'CH': { name: '瑞士', factor: 1.14 },
+  'CL': { name: '智利', factor: 418.43 },
+  'CN': { name: '中国', factor: 4.19 },
+  'CI': { name: '科特迪瓦', factor: 245.25 },
+  'CM': { name: '喀麦隆', factor: 228.75 },
+  'CD': { name: '刚果（金）', factor: 911.27 },
+  'CG': { name: '刚果（布）', factor: 312.04 },
+  'CO': { name: '哥伦比亚', factor: 1352.79 },
+  'KM': { name: '科摩罗', factor: 182.34 },
+  'CV': { name: '佛得角', factor: 46.51 },
+  'CR': { name: '哥斯达黎加', factor: 335.86 },
+  'CY': { name: '塞浦路斯', factor: 0.61 },
+  'CZ': { name: '捷克共和国', factor: 12.66 },
+  'DE': { name: '德国', factor: 0.75 },
+  'DJ': { name: '吉布提', factor: 105.29 },
+  'DM': { name: '多米尼克', factor: 1.69 },
+  'DK': { name: '丹麦', factor: 6.60 },
+  'DO': { name: '多米尼加共和国', factor: 22.90 },
+  'DZ': { name: '阿尔及利亚', factor: 37.24 },
+  'EC': { name: '厄瓜多尔', factor: 0.51 },
+  'EG': { name: '阿拉伯埃及共和国', factor: 4.51 },
+  'ES': { name: '西班牙', factor: 0.62 },
+  'EE': { name: '爱沙尼亚', factor: 0.53 },
+  'ET': { name: '埃塞俄比亚', factor: 12.11 },
+  'FI': { name: '芬兰', factor: 0.84 },
+  'FJ': { name: '斐济', factor: 0.91 },
+  'FR': { name: '法国', factor: 0.73 },
+  'GA': { name: '加蓬', factor: 265.46 },
+  'GB': { name: '英国', factor: 0.70 },
+  'GE': { name: '格鲁吉亚', factor: 0.90 },
+  'GH': { name: '加纳', factor: 2.33 },
+  'GN': { name: '几内亚', factor: 4053.64 },
+  'GM': { name: '冈比亚', factor: 17.79 },
+  'GW': { name: '几内亚比绍共和国', factor: 214.86 },
+  'GQ': { name: '赤道几内亚', factor: 229.16 },
+  'GR': { name: '希腊', factor: 0.54 },
+  'GD': { name: '格林纳达', factor: 1.64 },
+  'GT': { name: '危地马拉', factor: 4.01 },
+  'GY': { name: '圭亚那', factor: 73.60 },
+  'HK': { name: '中国香港特别行政区', factor: 6.07 },
+  'HN': { name: '洪都拉斯', factor: 10.91 },
+  'HR': { name: '克罗地亚', factor: 3.21 },
+  'HT': { name: '海地', factor: 40.20 },
+  'HU': { name: '匈牙利', factor: 148.01 },
+  'ID': { name: '印度尼西亚', factor: 4673.65 },
+  'IN': { name: '印度', factor: 21.99 },
+  'IE': { name: '爱尔兰', factor: 0.78 },
+  'IR': { name: '伊朗伊斯兰共和国', factor: 30007.63 },
+  'IQ': { name: '伊拉克', factor: 507.58 },
+  'IS': { name: '冰岛', factor: 145.34 },
+  'IL': { name: '以色列', factor: 3.59 },
+  'IT': { name: '意大利', factor: 0.66 },
+  'JM': { name: '牙买加', factor: 72.03 },
+  'JO': { name: '约旦', factor: 0.29 },
+  'JP': { name: '日本', factor: 102.84 },
+  'KZ': { name: '哈萨克斯坦', factor: 139.91 },
+  'KE': { name: '肯尼亚', factor: 43.95 },
+  'KG': { name: '吉尔吉斯斯坦', factor: 18.28 },
+  'KH': { name: '柬埔寨', factor: 1400.09 },
+  'KI': { name: '基里巴斯', factor: 1.00 },
+  'KN': { name: '圣基茨和尼维斯', factor: 1.92 },
+  'KR': { name: '大韩民国', factor: 861.82 },
+  'LA': { name: '老挝', factor: 2889.36 },
+  'LB': { name: '黎巴嫩', factor: 1414.91 },
+  'LR': { name: '利比里亚', factor: 0.41 },
+  'LY': { name: '利比亚', factor: 0.48 },
+  'LC': { name: '圣卢西亚', factor: 1.93 },
+  'LK': { name: '斯里兰卡', factor: 51.65 },
+  'LS': { name: '莱索托', factor: 5.90 },
+  'LT': { name: '立陶宛', factor: 0.45 },
+  'LU': { name: '卢森堡', factor: 0.86 },
+  'LV': { name: '拉脱维亚', factor: 0.48 },
+  'MO': { name: '中国澳门特别行政区', factor: 5.18 },
+  'MA': { name: '摩洛哥', factor: 3.92 },
+  'MD': { name: '摩尔多瓦', factor: 6.06 },
+  'MG': { name: '马达加斯加', factor: 1178.10 },
+  'MV': { name: '马尔代夫', factor: 8.35 },
+  'MX': { name: '墨西哥', factor: 9.52 },
+  'MK': { name: '北马其顿', factor: 18.83 },
+  'ML': { name: '马里', factor: 211.41 },
+  'MT': { name: '马耳他', factor: 0.57 },
+  'MM': { name: '缅甸', factor: 417.35 },
+  'ME': { name: '黑山', factor: 0.33 },
+  'MN': { name: '蒙古', factor: 931.67 },
+  'MZ': { name: '莫桑比克', factor: 24.05 },
+  'MR': { name: '毛里塔尼亚', factor: 12.01 },
+  'MU': { name: '毛里求斯', factor: 16.52 },
+  'MW': { name: '马拉维', factor: 298.82 },
+  'MY': { name: '马来西亚', factor: 1.57 },
+  'NA': { name: '纳米比亚', factor: 7.40 },
+  'NE': { name: '尼日尔', factor: 257.60 },
+  'NG': { name: '尼日利亚', factor: 144.27 },
+  'NI': { name: '尼加拉瓜', factor: 11.75 },
+  'NL': { name: '荷兰', factor: 0.77 },
+  'NO': { name: '挪威', factor: 10.03 },
+  'NP': { name: '尼泊尔', factor: 33.52 },
+  'NZ': { name: '新西兰', factor: 1.45 },
+  'PK': { name: '巴基斯坦', factor: 38.74 },
+  'PA': { name: '巴拿马', factor: 0.46 },
+  'PE': { name: '秘鲁', factor: 1.80 },
+  'PH': { name: '菲律宾', factor: 19.51 },
+  'PG': { name: '巴布亚新几内亚', factor: 2.11 },
+  'PL': { name: '波兰', factor: 1.78 },
+  'PR': { name: '波多黎各', factor: 0.92 },
+  'PT': { name: '葡萄牙', factor: 0.57 },
+  'PY': { name: '巴拉圭', factor: 2575.54 },
+  'PS': { name: '约旦河西岸和加沙', factor: 0.57 },
+  'QA': { name: '卡塔尔', factor: 2.06 },
+  'RO': { name: '罗马尼亚', factor: 1.71 },
+  'RU': { name: '俄罗斯联邦', factor: 25.88 },
+  'RW': { name: '卢旺达', factor: 339.88 },
+  'SA': { name: '沙特阿拉伯', factor: 1.61 },
+  'SD': { name: '苏丹', factor: 21.85 },
+  'SN': { name: '塞内加尔', factor: 245.98 },
+  'SG': { name: '新加坡', factor: 0.84 },
+  'SB': { name: '所罗门群岛', factor: 7.08 },
+  'SL': { name: '塞拉利昂', factor: 2739.26 },
+  'SV': { name: '萨尔瓦多', factor: 0.45 },
+  'SO': { name: '索马里', factor: 9107.78 },
+  'RS': { name: '塞尔维亚', factor: 41.13 },
+  'ST': { name: '圣多美和普林西比', factor: 10.94 },
+  'SR': { name: '苏里南', factor: 3.55 },
+  'SK': { name: '斯洛伐克共和国', factor: 0.53 },
+  'SI': { name: '斯洛文尼亚', factor: 0.56 },
+  'SE': { name: '瑞典', factor: 8.77 },
+  'SZ': { name: '斯威士兰', factor: 6.36 },
+  'SC': { name: '塞舌尔', factor: 7.82 },
+  'TC': { name: '特克斯科斯群岛', factor: 1.07 },
+  'TD': { name: '乍得', factor: 220.58 },
+  'TG': { name: '多哥', factor: 236.83 },
+  'TH': { name: '泰国', factor: 12.34 },
+  'TJ': { name: '塔吉克斯坦', factor: 2.30 },
+  'TL': { name: '东帝汶', factor: 0.41 },
+  'TT': { name: '特立尼达和多巴哥', factor: 4.15 },
+  'TN': { name: '突尼斯', factor: 0.91 },
+  'TR': { name: '土耳其', factor: 2.13 },
+  'TV': { name: '图瓦卢', factor: 1.29 },
+  'TZ': { name: '坦桑尼亚', factor: 888.32 },
+  'UG': { name: '乌干达', factor: 1321.35 },
+  'UA': { name: '乌克兰', factor: 7.69 },
+  'UY': { name: '乌拉圭', factor: 28.45 },
+  'US': { name: '美国', factor: 1.00 },
+  'UZ': { name: '乌兹别克斯坦', factor: 2297.17 },
+  'VC': { name: '圣文森特和格林纳丁斯', factor: 1.54 },
+  'VN': { name: '越南', factor: 7473.67 },
+  'VU': { name: '瓦努阿图', factor: 110.17 },
+  'XK': { name: '科索沃', factor: 0.33 },
+  'ZA': { name: '南非', factor: 6.93 },
+  'ZM': { name: '赞比亚', factor: 5.59 },
+  'ZW': { name: '津巴布韦', factor: 24.98 }
+};
+
+// 为英文界面添加国家名称
+const countryNamesEn: Record<string, string> = {
+  'AF': 'Afghanistan',
+  'AO': 'Angola',
+  'AL': 'Albania',
+  'AR': 'Argentina',
+  'AM': 'Armenia',
+  'AG': 'Antigua and Barbuda',
+  'AU': 'Australia',
+  'AT': 'Austria',
+  'AZ': 'Azerbaijan',
+  'BI': 'Burundi',
+  'BE': 'Belgium',
+  'BJ': 'Benin',
+  'BF': 'Burkina Faso',
+  'BD': 'Bangladesh',
+  'BG': 'Bulgaria',
+  'BH': 'Bahrain',
+  'BS': 'Bahamas',
+  'BA': 'Bosnia and Herzegovina',
+  'BY': 'Belarus',
+  'BZ': 'Belize',
+  'BO': 'Bolivia',
+  'BR': 'Brazil',
+  'BB': 'Barbados',
+  'BN': 'Brunei Darussalam',
+  'BT': 'Bhutan',
+  'BW': 'Botswana',
+  'CF': 'Central African Republic',
+  'CA': 'Canada',
+  'CH': 'Switzerland',
+  'CL': 'Chile',
+  'CN': 'China',
+  'CI': 'Côte d\'Ivoire',
+  'CM': 'Cameroon',
+  'CD': 'Congo (DRC)',
+  'CG': 'Congo (Republic)',
+  'CO': 'Colombia',
+  'KM': 'Comoros',
+  'CV': 'Cape Verde',
+  'CR': 'Costa Rica',
+  'CY': 'Cyprus',
+  'CZ': 'Czech Republic',
+  'DE': 'Germany',
+  'DJ': 'Djibouti',
+  'DM': 'Dominica',
+  'DK': 'Denmark',
+  'DO': 'Dominican Republic',
+  'DZ': 'Algeria',
+  'EC': 'Ecuador',
+  'EG': 'Egypt',
+  'ES': 'Spain',
+  'EE': 'Estonia',
+  'ET': 'Ethiopia',
+  'FI': 'Finland',
+  'FJ': 'Fiji',
+  'FR': 'France',
+  'GA': 'Gabon',
+  'GB': 'United Kingdom',
+  'GE': 'Georgia',
+  'GH': 'Ghana',
+  'GN': 'Guinea',
+  'GM': 'Gambia',
+  'GW': 'Guinea-Bissau',
+  'GQ': 'Equatorial Guinea',
+  'GR': 'Greece',
+  'GD': 'Grenada',
+  'GT': 'Guatemala',
+  'GY': 'Guyana',
+  'HK': 'Hong Kong SAR',
+  'HN': 'Honduras',
+  'HR': 'Croatia',
+  'HT': 'Haiti',
+  'HU': 'Hungary',
+  'ID': 'Indonesia',
+  'IN': 'India',
+  'IE': 'Ireland',
+  'IR': 'Iran',
+  'IQ': 'Iraq',
+  'IS': 'Iceland',
+  'IL': 'Israel',
+  'IT': 'Italy',
+  'JM': 'Jamaica',
+  'JO': 'Jordan',
+  'JP': 'Japan',
+  'KZ': 'Kazakhstan',
+  'KE': 'Kenya',
+  'KG': 'Kyrgyzstan',
+  'KH': 'Cambodia',
+  'KI': 'Kiribati',
+  'KN': 'St. Kitts and Nevis',
+  'KR': 'South Korea',
+  'LA': 'Laos',
+  'LB': 'Lebanon',
+  'LR': 'Liberia',
+  'LY': 'Libya',
+  'LC': 'St. Lucia',
+  'LK': 'Sri Lanka',
+  'LS': 'Lesotho',
+  'LT': 'Lithuania',
+  'LU': 'Luxembourg',
+  'LV': 'Latvia',
+  'MO': 'Macao SAR',
+  'MA': 'Morocco',
+  'MD': 'Moldova',
+  'MG': 'Madagascar',
+  'MV': 'Maldives',
+  'MX': 'Mexico',
+  'MK': 'North Macedonia',
+  'ML': 'Mali',
+  'MT': 'Malta',
+  'MM': 'Myanmar',
+  'ME': 'Montenegro',
+  'MN': 'Mongolia',
+  'MZ': 'Mozambique',
+  'MR': 'Mauritania',
+  'MU': 'Mauritius',
+  'MW': 'Malawi',
+  'MY': 'Malaysia',
+  'NA': 'Namibia',
+  'NE': 'Niger',
+  'NG': 'Nigeria',
+  'NI': 'Nicaragua',
+  'NL': 'Netherlands',
+  'NO': 'Norway',
+  'NP': 'Nepal',
+  'NZ': 'New Zealand',
+  'PK': 'Pakistan',
+  'PA': 'Panama',
+  'PE': 'Peru',
+  'PH': 'Philippines',
+  'PG': 'Papua New Guinea',
+  'PL': 'Poland',
+  'PR': 'Puerto Rico',
+  'PT': 'Portugal',
+  'PY': 'Paraguay',
+  'PS': 'West Bank and Gaza',
+  'QA': 'Qatar',
+  'RO': 'Romania',
+  'RU': 'Russia',
+  'RW': 'Rwanda',
+  'SA': 'Saudi Arabia',
+  'SD': 'Sudan',
+  'SN': 'Senegal',
+  'SG': 'Singapore',
+  'SB': 'Solomon Islands',
+  'SL': 'Sierra Leone',
+  'SV': 'El Salvador',
+  'SO': 'Somalia',
+  'RS': 'Serbia',
+  'ST': 'São Tomé and Principe',
+  'SR': 'Suriname',
+  'SK': 'Slovak Republic',
+  'SI': 'Slovenia',
+  'SE': 'Sweden',
+  'SZ': 'Eswatini',
+  'SC': 'Seychelles',
+  'TC': 'Turks and Caicos Islands',
+  'TD': 'Chad',
+  'TG': 'Togo',
+  'TH': 'Thailand',
+  'TJ': 'Tajikistan',
+  'TL': 'Timor-Leste',
+  'TT': 'Trinidad and Tobago',
+  'TN': 'Tunisia',
+  'TR': 'Turkey',
+  'TV': 'Tuvalu',
+  'TZ': 'Tanzania',
+  'UG': 'Uganda',
+  'UA': 'Ukraine',
+  'UY': 'Uruguay',
+  'US': 'United States',
+  'UZ': 'Uzbekistan',
+  'VC': 'St. Vincent and the Grenadines',
+  'VN': 'Vietnam',
+  'VU': 'Vanuatu',
+  'XK': 'Kosovo',
+  'ZA': 'South Africa',
+  'ZM': 'Zambia',
+  'ZW': 'Zimbabwe'
+};
+
+// 定义表单数据接口
+interface FormData {
+  salary: string;
+  nonChinaSalary: boolean;
+  workDaysPerWeek: string;
+  wfhDaysPerWeek: string;
+  annualLeave: string;
+  paidSickLeave: string;
+  publicHolidays: string;
+  workHours: string;
+  commuteHours: string;
+  restTime: string;
+  cityFactor: string;
+  workEnvironment: string;
+  leadership: string;
+  teamwork: string;
+  homeTown: string;
+  degreeType: string;
+  schoolType: string;
+  bachelorType: string;
+  workYears: string;
+  shuttle: string;
+  canteen: string;
+  jobStability: string;
+  education: string;
+}
+
+// 定义计算结果接口
+interface Result {
+  value: number;
+  workDaysPerYear: number;
+  dailySalary: number;
+  assessment: string;
+  assessmentColor: string;
+}
 
 const SalaryCalculator = () => {
+  // 获取语言上下文
+  const { t, language } = useLanguage();
+  
   // 添加滚动位置保存的引用
   const scrollPositionRef = useRef(0);
   
@@ -22,32 +427,63 @@ const SalaryCalculator = () => {
   // 添加用于创建分享图片的引用
   const shareResultsRef = useRef<HTMLDivElement>(null);
 
-  const [formData, setFormData] = useState({
-    annualSalary: '',         // 年薪
-    pppFactor: '4.19',        // 购买力平价转换因子，默认为中国大陆
-    country: 'china',         // 国家/地区，默认为中国
-    workDaysPerWeek: '5',     // 每周工作天数
-    wfhDaysPerWeek: '0',      // 每周居家办公天数
-    annualLeave: '5',         // 年假天数
-    paidSickLeave: '12',       // 带薪病假天数
-    publicHolidays: '13',     // 法定节假日
-    workHours: '10',          // 工作时长
-    commuteHours: '2',        // 通勤时长
-    restTime: '2',            // 休息时间（午休+摸鱼）
-    workEnvironment: '1.0',   // 工作环境系数
-    leadership: '1.0',        // 领导/老板系数
-    teamwork: '1.0',          // 同事环境系数
-    degreeType: 'bachelor',   // 学位类型，改为本科
-    schoolType: 'elite',      // 学校类型
-    bachelorType: 'elite',    // 新增：本科背景类型
-    education: '1.2',         // 学历系数，修改为对应本科985/211的系数
-    cityFactor: '1.0',        // 城市系数，默认为三线城市
-    homeTown: 'no',          // 新增：是否在家乡工作，默认不在
-    shuttle: '1.0',           // 班车系数
-    canteen: '1.0',           // 食堂系数
-    workYears: '0',           // 新增：工作年限
-    jobStability: 'private'   // 新增：工作稳定度/类型
+  // 状态管理 - 基础表单和选项
+  const [formData, setFormData] = useState<FormData>({
+    salary: '',
+    nonChinaSalary: false,
+    workDaysPerWeek: '5',
+    wfhDaysPerWeek: '0',
+    annualLeave: '5',
+    paidSickLeave: '3',
+    publicHolidays: '13',
+    workHours: '10',
+    commuteHours: '2',
+    restTime: '2',
+    cityFactor: '1.0',
+    workEnvironment: '1.0',
+    leadership: '1.0',
+    teamwork: '1.0',
+    homeTown: 'no',
+    degreeType: 'bachelor',
+    schoolType: 'firstTier',
+    bachelorType: 'firstTier',
+    workYears: '0',
+    shuttle: '1.0',
+    canteen: '1.0',
+    jobStability: 'private',   // 新增：工作稳定度/类型
+    education: '1.0'
   });
+
+  const [showPPPInput, setShowPPPInput] = useState(false);
+  // 修改为国家代码，默认为中国
+  const [selectedCountry, setSelectedCountry] = useState<string>('CN');
+  const [result, setResult] = useState<Result | null>(null);
+  const [showPPPList, setShowPPPList] = useState(false);
+  const [assessment, setAssessment] = useState("");
+  const [assessmentColor, setAssessmentColor] = useState("text-gray-500");
+  const [visitorVisible, setVisitorVisible] = useState(false);
+
+  // 监听访客统计加载
+  useEffect(() => {
+    // 延迟检查busuanzi是否已加载
+    const timer = setTimeout(() => {
+      const pv = document.getElementById('busuanzi_value_site_pv');
+      if (pv && pv.innerText !== '') {
+        setVisitorVisible(true);
+      } else {
+        // 如果未加载，再次尝试
+        const retryTimer = setTimeout(() => {
+          const pv = document.getElementById('busuanzi_value_site_pv');
+          if (pv && pv.innerText !== '') {
+            setVisitorVisible(true);
+          }
+        }, 2000);
+        return () => clearTimeout(retryTimer);
+      }
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // 添加滚动位置保存和恢复逻辑
   useEffect(() => {
@@ -86,30 +522,32 @@ const SalaryCalculator = () => {
   }, [formData.workDaysPerWeek, formData.annualLeave, formData.publicHolidays, formData.paidSickLeave]);
 
   const calculateDailySalary = useCallback(() => {
-    if (!formData.annualSalary) return 0;
+    if (!formData.salary) return 0;
     const workingDays = calculateWorkingDays();
     
     // 应用PPP转换因子标准化薪资
-    // 中国地区直接使用默认值4.19，其他地区使用用户输入的PPP
-    const pppFactor = formData.country === 'china' ? 4.19 : (Number(formData.pppFactor) || 4.19);
-    const standardizedSalary = Number(formData.annualSalary) * (4.19 / pppFactor);
+    // 如果选择了非中国地区，使用选定国家的PPP；否则使用中国默认值4.19
+    const isNonChina = selectedCountry !== 'CN';
+    const pppFactor = isNonChina ? pppFactors[selectedCountry]?.factor || 4.19 : 4.19;
+    const standardizedSalary = Number(formData.salary) * (4.19 / pppFactor);
     
     return standardizedSalary / workingDays; // 除 0 不管, Infinity(爽到爆炸)!
-  }, [formData.annualSalary, formData.pppFactor, formData.country, calculateWorkingDays]);
+  }, [formData.salary, selectedCountry, calculateWorkingDays]);
 
   // 新增：获取显示用的日薪（转回原始货币）
   const getDisplaySalary = useCallback(() => {
     const dailySalaryInCNY = calculateDailySalary();
-    if (formData.country === 'china') {
-      return dailySalaryInCNY.toFixed(2);
-    } else {
+    const isNonChina = selectedCountry !== 'CN';
+    if (isNonChina) {
       // 非中国地区，转回本地货币
-      const pppFactor = Number(formData.pppFactor) || 4.19;
+      const pppFactor = pppFactors[selectedCountry]?.factor || 4.19;
       return (dailySalaryInCNY * pppFactor / 4.19).toFixed(2);
+    } else {
+      return dailySalaryInCNY.toFixed(2);
     }
-  }, [calculateDailySalary, formData.country, formData.pppFactor]);
+  }, [calculateDailySalary, selectedCountry]);
 
-  const handleInputChange = useCallback((name: string, value: string) => {
+  const handleInputChange = useCallback((name: string, value: string | boolean) => {
     // 触发自定义事件，保存滚动位置
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('beforeStateChange'));
@@ -130,7 +568,7 @@ const SalaryCalculator = () => {
   }, []);
 
   const calculateValue = () => {
-    if (!formData.annualSalary) return 0;
+    if (!formData.salary) return 0;
     
     const dailySalary = calculateDailySalary();
     const workHours = Number(formData.workHours);
@@ -206,26 +644,26 @@ const SalaryCalculator = () => {
   const value = calculateValue();
   
   const getValueAssessment = () => {
-    if (!formData.annualSalary) return { text: "请输入年薪", color: "text-gray-500" };
-    if (value < 0.6) return { text: "惨绝人寰", color: "text-pink-800" };
-    if (value < 1.0) return { text: "略惨", color: "text-red-500" };
-    if (value <= 1.8) return { text: "一般", color: "text-orange-500" };
-    if (value <= 2.5) return { text: "还不错", color: "text-blue-500" };
-    if (value <= 3.2) return { text: "很爽", color: "text-green-500" };
-    if (value <= 4.0) return { text: "爽到爆炸", color: "text-purple-500" };
-    return { text: "人生巅峰", color: "text-yellow-400" };
+    if (!formData.salary) return { text: t('rating_enter_salary'), color: "text-gray-500" };
+    if (value < 0.6) return { text: t('rating_terrible'), color: "text-pink-800" };
+    if (value < 1.0) return { text: t('rating_poor'), color: "text-red-500" };
+    if (value <= 1.8) return { text: t('rating_average'), color: "text-orange-500" };
+    if (value <= 2.5) return { text: t('rating_good'), color: "text-blue-500" };
+    if (value <= 3.2) return { text: t('rating_great'), color: "text-green-500" };
+    if (value <= 4.0) return { text: t('rating_excellent'), color: "text-purple-500" };
+    return { text: t('rating_perfect'), color: "text-yellow-400" };
   };
 
   const RadioGroup = ({ label, name, value, onChange, options }: {
     label: string;
     name: string;
     value: string;
-    onChange: (name: string, value: string) => void;
+    onChange: (name: string, value: string | boolean) => void;
     options: Array<{ label: string; value: string; }>;
   }) => (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
-      <div className="grid grid-cols-4 gap-2">
+      <div className={`grid ${language === 'en' ? 'grid-cols-3' : 'grid-cols-4'} gap-2`}>
         {options.map((option) => (
           <button
             key={option.value}
@@ -307,132 +745,55 @@ const SalaryCalculator = () => {
     calculateEducationFactor();
   }, [formData.degreeType, formData.schoolType, calculateEducationFactor]);
 
+  // 获取当前选择的国家名称（根据语言）
+  const getCountryName = useCallback((countryCode: string) => {
+    if (language === 'en') {
+      return countryNamesEn[countryCode] || pppFactors[countryCode]?.name || 'Unknown';
+    }
+    return pppFactors[countryCode]?.name || 'Unknown';
+  }, [language]);
+
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-8 text-gray-900 dark:text-white">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-          这b班上得值不值·测算版
-          <span className="ml-2 text-xs align-top text-gray-500 dark:text-gray-400">v4.4.1</span>
-        </h1>
+    <div className="max-w-2xl mx-auto p-4 sm:p-6">
+      <div className="mb-4 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 py-2">{t('title')}</h1>
         
-        {/* GitHub 链接和访问量计数 */}
-        <div className="flex flex-col items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          {/* 第一排: GitHub、Email、小红书 */}
-          <div className="flex items-center justify-center gap-4">
-          <a 
-            href="https://github.com/zippland/worth-calculator" 
-            target="_blank" 
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('version')}</p>
+          <a
+            href="https://github.com/zippland/worth-calculator"
+            target="_blank"
             rel="noopener noreferrer"
-              className="flex items-center gap-1.5 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+            className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
           >
-            <Github className="w-4 h-4" />
-            <span className="hidden sm:inline">Star on</span>
-            <span>GitHub</span>
+            <Github className="h-3.5 w-3.5" />
+            {t('github')}
           </a>
-            
-            <div className="w-px h-4 bg-gray-300 dark:bg-gray-700"></div>
-            <a 
-              href="mailto:zylanjian@outlook.com" 
-              className="flex items-center gap-1.5 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
-              <span>Email</span>
-            </a>
-            <div className="w-px h-4 bg-gray-300 dark:bg-gray-700"></div>
-            <a 
-              href="https://www.xiaohongshu.com/user/profile/623e8b080000000010007721?xsec_token=YBdeHZTp_aVwi1Ijmras5CgTN9fhmJ9fwVRviTyiF_EAs%3D&xsec_source=app_share&xhsshare=CopyLink&appuid=623e8b080000000010007721&apptime=1742023486&share_id=48e7c11a2abe404494693a24218213ae&share_channel=copy_link" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path d="M12 22c5.421 0 10-4.579 10-10S17.421 2 12 2 2 6.579 2 12s4.579 10 10 10zm0-18c4.337 0 8 3.663 8 8s-3.663 8-8 8-8-3.663-8-8 3.663-8 8-8z"/>
-                <path d="M17 8.4c0-1.697-1.979-2.709-3.489-1.684-1.628-1.028-3.639.045-3.511 1.68-1.579-.104-2.702 1.74-1.614 3.079-1.191.974-.401 3.062 1.394 3.062.966 1.269 2.902.941 3.614-.335 1.53.503 3.204-.812 2.604-2.802 1.468-.572.905-2.749-.998-3.001z"/>
-              </svg>
-              <span>小红书</span>
-            </a>
-          </div>
-          
-          {/* 第二排: "持续更新中..."和欢迎建议文字 */}
-          <div className="flex items-center gap-2">
-            <span className="text-blue-500 dark:text-blue-400 font-medium">
-              <span className="animate-pulse">✨</span> 
-              已自动跳转，新网址无需科学上网
-              <span className="animate-pulse">✨</span>
-            </span>
-          </div>
-          
-          {/* 第三排: 访问量 */}
-          <div className="flex items-center justify-center">
-            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              <span id="busuanzi_container_site_pv" style={{display: 'none'}}>
-                访问量: <span id="busuanzi_value_site_pv" className="hidden"></span><span id="adjusted_pv">--</span>
-              </span>
-              <span className="mx-1">|</span>
-              <span id="busuanzi_container_site_uv" style={{display: 'none'}}>
-                访客数: <span id="busuanzi_value_site_uv" className="hidden"></span><span id="adjusted_uv">--</span>
-              </span>
-            </span>
-          </div>
-          
-          {/* 添加访问量调整脚本 */}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                // 由于seeyoufarm计数器服务停用导致原有200万访问量数据被清零
-                // 手动添加历史访问量数据以保持统计连续性
-                const historicalPV = 1997500; // 历史PV数据
-                const historicalUV = 580000;  // 估算历史UV数据
-                
-                // 初始隐藏所有计数器
-                document.getElementById('busuanzi_container_site_pv').style.display = 'none';
-                document.getElementById('busuanzi_container_site_uv').style.display = 'none';
-                
-                // 检查并添加历史数据
-                const checkAndUpdateStats = () => {
-                  const pvElement = document.getElementById('busuanzi_value_site_pv');
-                  const uvElement = document.getElementById('busuanzi_value_site_uv');
-                  const adjustedPV = document.getElementById('adjusted_pv');
-                  const adjustedUV = document.getElementById('adjusted_uv');
-                  const pvContainer = document.getElementById('busuanzi_container_site_pv');
-                  const uvContainer = document.getElementById('busuanzi_container_site_uv');
-                  
-                  if (pvElement && pvElement.textContent && pvElement.textContent !== '0') {
-                    const currentPV = parseInt(pvElement.textContent, 10) || 0;
-                    adjustedPV.textContent = (historicalPV + currentPV).toLocaleString();
-                    pvContainer.style.display = 'inline';
-                  }
-                  
-                  if (uvElement && uvElement.textContent && uvElement.textContent !== '0') {
-                    const currentUV = parseInt(uvElement.textContent, 10) || 0;
-                    adjustedUV.textContent = (historicalUV + currentUV).toLocaleString();
-                    uvContainer.style.display = 'inline';
-                  }
-                  
-                  // 如果尚未加载成功，继续尝试
-                  if (adjustedPV.textContent === '--' || adjustedUV.textContent === '--') {
-                    setTimeout(checkAndUpdateStats, 500);
-                  }
-                };
-                
-                // 页面加载后开始检查
-                window.addEventListener('load', () => {
-                  // 等待不蒜子加载完成
-                  setTimeout(checkAndUpdateStats, 1000);
-                });
-              `
-            }}
-          />
+          <a
+            href="https://www.xiaohongshu.com/user/profile/6355d5c4000000001f0292bf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
+          >
+            <Book className="h-3.5 w-3.5" />
+            {language === 'zh' ? t('xiaohongshu') : 'Rednote'}
+          </a>
+        </div>
+        
+        <div className="flex justify-center mb-2">
+          <LanguageSwitcher />
+        </div>
+        
+        {/* 访问统计 */}
+        <div className="mt-1 text-xs text-gray-400 dark:text-gray-600 flex justify-center gap-4">
+          <span id="busuanzi_container_site_pv" className={visitorVisible ? 'opacity-100' : 'opacity-0'}>
+            {t('visits')}: <span id="busuanzi_value_site_pv"></span>
+          </span>
+          <span id="busuanzi_container_site_uv" className={visitorVisible ? 'opacity-100' : 'opacity-0'}>
+            {t('visitors')}: <span id="busuanzi_value_site_uv"></span>
+          </span>
         </div>
       </div>
-      
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30">
         <div className="p-6 space-y-8">
@@ -440,68 +801,53 @@ const SalaryCalculator = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {formData.country === 'china' ? '年薪总包（元）' : '年薪总包（当地货币）'}
+                {selectedCountry !== 'CN' ? t('annual_salary_foreign') : t('annual_salary_cny')}
               </label>
               <div className="flex items-center gap-2 mt-1">
                 <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 <input
                   type="number"
-                  value={formData.annualSalary}
-                  onChange={(e) => handleInputChange('annualSalary', e.target.value)}
-                  placeholder={formData.country === 'china' ? "税前年薪" : "使用当地货币"}
+                  value={formData.salary}
+                  onChange={(e) => handleInputChange('salary', e.target.value)}
+                  placeholder={selectedCountry !== 'CN' ? t('salary_placeholder_foreign') : t('salary_placeholder_cny')}
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
-              <div className="flex items-center mt-2">
-                <input
-                  id="non-china"
-                  type="checkbox"
-                  checked={formData.country !== 'china'}
-                  onChange={(e) => handleInputChange('country', e.target.checked ? 'other' : 'china')}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor="non-china" className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-                  非中国地区薪资
-                </label>
-              </div>
             </div>
 
-            {formData.country === 'other' && (
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  购买力平价(PPP)转换因子
-                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                    ?
-                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      PPP转换因子是将各国货币购买力标准化的指标。例如中国为4.19，表示1美元在美国的购买力等同于4.19元人民币在中国的购买力。
-                    </span>
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('country_selection')}
+                <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                  ?
+                  <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                    {t('ppp_tooltip')}
                   </span>
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.pppFactor}
-                  onChange={(e) => handleInputChange('pppFactor', e.target.value)}
-                  placeholder="请输入购买力平价转换因子"
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  常见地区：中国大陆:4.19, 日本:102.59, 美国:1.00, 新加坡:0.84
-                  <a 
-                    href="https://zh.wikipedia.org/wiki/%E8%B4%AD%E4%B9%B0%E5%8A%9B%E5%B9%B3%E4%BB%B7%E8%BD%AC%E6%8D%A2%E5%9B%A0%E5%AD%90" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="ml-1 text-blue-500 hover:underline"
-                  >
-                    查看更多
-                  </a>
-                </p>
-              </div>
-            )}
+                </span>
+              </label>
+              <select
+                value={selectedCountry}
+                onChange={(e) => setSelectedCountry(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+              >
+                {Object.keys(pppFactors).sort((a, b) => {
+                  const nameA = getCountryName(a);
+                  const nameB = getCountryName(b);
+                  return nameA.localeCompare(nameB);
+                }).map(code => (
+                  <option key={code} value={code}>
+                    {getCountryName(code)} ({pppFactors[code].factor})
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {t('selected_ppp')}: {pppFactors[selectedCountry]?.factor || 4.19}
+              </p>
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">每周工作天数/d</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_days_per_week')}</label>
                 <input
                   type="number"
                   value={formData.workDaysPerWeek}
@@ -511,11 +857,11 @@ const SalaryCalculator = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  周WFH天数/d
+                  {t('wfh_days_per_week')}
                   <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
                     ?
                     <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      WFH指居家办公(Work From Home)，这里填写的是前面工作天数中有多少天是在家办公的。
+                      {t('wfh_tooltip')}
                     </span>
                   </span>
                 </label>
@@ -533,7 +879,7 @@ const SalaryCalculator = () => {
             
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">年假天数/d</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('annual_leave')}</label>
                 <input
                   type="number"
                   value={formData.annualLeave}
@@ -542,7 +888,7 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">法定假日/d</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('public_holidays')}</label>
                 <input
                   type="number"
                   value={formData.publicHolidays}
@@ -551,7 +897,7 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">带薪病假/d</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('paid_sick_leave')}</label>
                 <input
                   type="number"
                   value={formData.paidSickLeave}
@@ -564,11 +910,11 @@ const SalaryCalculator = () => {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  工时/h
+                  {t('work_hours')}
                   <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
                     ?
                     <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      工时：是指&quot;下班时间-上班时间&quot;的总时间，包括吃饭、午休、加班等（不含通勤）。
+                      {t('work_hours_tooltip')}
                     </span>
                   </span>
                 </label>
@@ -581,11 +927,11 @@ const SalaryCalculator = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  通勤/h
+                  {t('commute_hours')}
                   <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
                     ?
                     <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      通勤时长是指上下班往返的总时间，即家到公司和公司回家的时间总和。
+                      {t('commute_tooltip')}
                     </span>
                   </span>
                 </label>
@@ -597,7 +943,7 @@ const SalaryCalculator = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">午休&摸鱼/h</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('rest_time')}</label>
                 <input
                   type="number"
                   value={formData.restTime}
@@ -614,147 +960,147 @@ const SalaryCalculator = () => {
           <div className="space-y-4">
             {/* 添加工作类型RadioGroup */}
             <RadioGroup
-              label="合同类型"
+              label={t('job_stability')}
               name="jobStability"
               value={formData.jobStability}
               onChange={handleInputChange}
               options={[
-                { label: '私企续签', value: 'private' },
-                { label: '外企续签', value: 'foreign' },
-                { label: '长期雇佣', value: 'state' },
-                { label: '永久编制', value: 'government' },
+                { label: t('job_private'), value: 'private' },
+                { label: t('job_foreign'), value: 'foreign' },
+                { label: t('job_state'), value: 'state' },
+                { label: t('job_government'), value: 'government' },
               ]}
             />
             
             <RadioGroup
-              label="工作环境"
+              label={t('work_environment')}
               name="workEnvironment"
               value={formData.workEnvironment}
               onChange={handleInputChange}
               options={[
-                { label: '偏僻的工厂/工地/户外', value: '0.8' },
-                { label: '工厂/工地/户外', value: '0.9' },
-                { label: '普通环境', value: '1.0' },
-                { label: 'CBD', value: '1.1' },
+                { label: t('env_remote'), value: '0.8' },
+                { label: t('env_factory'), value: '0.9' },
+                { label: t('env_normal'), value: '1.0' },
+                { label: t('env_cbd'), value: '1.1' },
               ]}
             />
 
             <RadioGroup
-              label="所在城市（按生活成本选择）"
+              label={t('city_factor')}
               name="cityFactor"
               value={formData.cityFactor}
               onChange={handleInputChange}
               options={[
-                { label: '一线城市', value: '0.70' },
-                { label: '新一线', value: '0.80' },
-                { label: '二线城市', value: '1.0' },
-                { label: '三线城市', value: '1.10' },
-                { label: '四线城市', value: '1.25' },
-                { label: '县城', value: '1.40' },
-                { label: '乡镇', value: '1.50' },
+                { label: t('city_tier1'), value: '0.70' },
+                { label: t('city_newtier1'), value: '0.80' },
+                { label: t('city_tier2'), value: '1.0' },
+                { label: t('city_tier3'), value: '1.10' },
+                { label: t('city_tier4'), value: '1.25' },
+                { label: t('city_county'), value: '1.40' },
+                { label: t('city_town'), value: '1.50' },
               ]}
             />
 
             <RadioGroup
-              label="是否在家乡工作"
+              label={t('hometown')}
               name="homeTown"
               value={formData.homeTown}
               onChange={handleInputChange}
               options={[
-                { label: '不在家乡', value: 'no' },
-                { label: '在家乡', value: 'yes' },
+                { label: t('not_hometown'), value: 'no' },
+                { label: t('is_hometown'), value: 'yes' },
               ]}
             />
 
             <RadioGroup
-              label="领导/老板"
+              label={t('leadership')}
               name="leadership"
               value={formData.leadership}
               onChange={handleInputChange}
               options={[
-                { label: '对我不爽', value: '0.7' },
-                { label: '管理严格', value: '0.9' },
-                { label: '中规中矩', value: '1.0' },
-                { label: '善解人意', value: '1.1' },
-                { label: '我是嫡系', value: '1.3' },
+                { label: t('leader_bad'), value: '0.7' },
+                { label: t('leader_strict'), value: '0.9' },
+                { label: t('leader_normal'), value: '1.0' },
+                { label: t('leader_good'), value: '1.1' },
+                { label: t('leader_favorite'), value: '1.3' },
               ]}
             />
 
             <RadioGroup
-              label="同事环境"
+              label={t('teamwork')}
               name="teamwork"
               value={formData.teamwork}
               onChange={handleInputChange}
               options={[
-                { label: '都是傻逼', value: '0.9' },
-                { label: '萍水相逢', value: '1.0' },
-                { label: '和和睦睦', value: '1.1' },
-                { label: '私交甚好', value: '1.2' },
+                { label: t('team_bad'), value: '0.9' },
+                { label: t('team_normal'), value: '1.0' },
+                { label: t('team_good'), value: '1.1' },
+                { label: t('team_excellent'), value: '1.2' },
               ]}
             />
 
             <RadioGroup
-              label="班车服务（加分项）"
+              label={t('shuttle')}
               name="shuttle"
               value={formData.shuttle}
               onChange={handleInputChange}
               options={[
-                { label: '无班车', value: '1.0' },
-                { label: '班车不便', value: '0.9' },
-                { label: '便利班车', value: '0.7' },
-                { label: '班车直达', value: '0.5' },
+                { label: t('shuttle_none'), value: '1.0' },
+                { label: t('shuttle_inconvenient'), value: '0.9' },
+                { label: t('shuttle_convenient'), value: '0.7' },
+                { label: t('shuttle_direct'), value: '0.5' },
               ]}
             />
 
             <RadioGroup
-              label="食堂情况（加分项）"
+              label={t('canteen')}
               name="canteen"
               value={formData.canteen}
               onChange={handleInputChange}
               options={[
-                { label: '无食堂/很难吃', value: '1.0' },
-                { label: '食堂一般', value: '1.05' },
-                { label: '食堂不错', value: '1.1' },
-                { label: '食堂超赞', value: '1.15' },
+                { label: t('canteen_none'), value: '1.0' },
+                { label: t('canteen_average'), value: '1.05' },
+                { label: t('canteen_good'), value: '1.1' },
+                { label: t('canteen_excellent'), value: '1.15' },
               ]}
             />
 
             {/* 学历和工作年限 */}
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">个人学历水平</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('education_level')}</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">学位类型</label>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('degree_type')}</label>
                     <select
                       value={formData.degreeType}
                       onChange={(e) => handleInputChange('degreeType', e.target.value)}
                       className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                     >
-                      <option value="belowBachelor">专科及以下</option>
-                      <option value="bachelor">本科</option>
-                      <option value="masters">硕士</option>
-                      <option value="phd">博士</option>
+                      <option value="belowBachelor">{t('below_bachelor')}</option>
+                      <option value="bachelor">{t('bachelor')}</option>
+                      <option value="masters">{t('masters')}</option>
+                      <option value="phd">{t('phd')}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">学校类型</label>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('school_type')}</label>
                     <select
                       value={formData.schoolType}
                       onChange={(e) => handleInputChange('schoolType', e.target.value)}
                       className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                       disabled={formData.degreeType === 'belowBachelor'}
                     >
-                      <option value="secondTier">二本三本</option>
+                      <option value="secondTier">{t('school_second_tier')}</option>
                       {formData.degreeType === 'bachelor' ? (
                         <>
-                          <option value="firstTier">双非/ QS200/ USnews80</option>
-                          <option value="elite">985211/ QS50/ USnews30</option>
+                          <option value="firstTier">{t('school_first_tier_bachelor')}</option>
+                          <option value="elite">{t('school_elite_bachelor')}</option>
                         </>
                       ) : (
                         <>
-                          <option value="firstTier">双非/ QS100/ USnews50</option>
-                          <option value="elite">985211/ QS30/ USnews20</option>
+                          <option value="firstTier">{t('school_first_tier_higher')}</option>
+                          <option value="elite">{t('school_elite_higher')}</option>
                         </>
                       )}
                     </select>
@@ -764,15 +1110,15 @@ const SalaryCalculator = () => {
                 {/* 硕士显示本科背景选项 */}
                 {formData.degreeType === 'masters' && (
                   <div className="mt-4">
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">本科背景</label>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('bachelor_background')}</label>
                     <select
                       value={formData.bachelorType}
                       onChange={(e) => handleInputChange('bachelorType', e.target.value)}
                       className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                     >
-                      <option value="secondTier">二本三本</option>
-                      <option value="firstTier">双非/ QS200/ USnews80</option>
-                      <option value="elite">985211/ QS50/ USnews30</option>
+                      <option value="secondTier">{t('school_second_tier')}</option>
+                      <option value="firstTier">{t('school_first_tier_bachelor')}</option>
+                      <option value="elite">{t('school_elite_bachelor')}</option>
                     </select>
                   </div>
                 )}
@@ -780,19 +1126,19 @@ const SalaryCalculator = () => {
 
               {/* 工作年限选择 */}
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">工作年限</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_years')}</label>
                 <select
                   value={formData.workYears}
                   onChange={(e) => handleInputChange('workYears', e.target.value)}
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 >
-                  <option value="0">应届生</option>
-                  <option value="1">1-3年</option>
-                  <option value="2">3-5年</option>
-                  <option value="4">5-8年</option>
-                  <option value="6">8-10年</option>
-                  <option value="10">10-12年</option>
-                  <option value="15">12年以上</option>
+                  <option value="0">{t('fresh_graduate')}</option>
+                  <option value="1">{t('years_1_3')}</option>
+                  <option value="2">{t('years_3_5')}</option>
+                  <option value="4">{t('years_5_8')}</option>
+                  <option value="6">{t('years_8_10')}</option>
+                  <option value="10">{t('years_10_12')}</option>
+                  <option value="15">{t('years_above_12')}</option>
                 </select>
               </div>
             </div>
@@ -804,17 +1150,17 @@ const SalaryCalculator = () => {
       <div ref={shareResultsRef} className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-inner">
         <div className="grid grid-cols-3 gap-8">
           <div>
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">年工作天数</div>
-            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">{calculateWorkingDays()}天</div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('working_days_per_year')}</div>
+            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">{calculateWorkingDays()}{t('days_unit')}</div>
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">平均日薪</div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('average_daily_salary')}</div>
             <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
-              {formData.country === 'china' ? '¥' : '$'}{getDisplaySalary()}
+              {selectedCountry !== 'CN' ? '$' : '¥'}{getDisplaySalary()}
             </div>
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">工作性价比</div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('job_value')}</div>
             <div className={`text-2xl font-semibold mt-1 ${getValueAssessment().color}`}>
               {value.toFixed(2)}
               <span className="text-base ml-2">({getValueAssessment().text})</span>
@@ -836,7 +1182,7 @@ const SalaryCalculator = () => {
                 commuteHours: formData.commuteHours,
                 restTime: formData.restTime,
                 dailySalary: getDisplaySalary(),
-                isYuan: formData.country === 'china' ? 'true' : 'false',
+                isYuan: selectedCountry !== 'CN' ? 'false' : 'true',
                 workDaysPerYear: calculateWorkingDays().toString(),
                 workDaysPerWeek: formData.workDaysPerWeek,
                 wfhDaysPerWeek: formData.wfhDaysPerWeek,
@@ -854,15 +1200,17 @@ const SalaryCalculator = () => {
                 canteen: formData.canteen,
                 workYears: formData.workYears,
                 jobStability: formData.jobStability,
-                bachelorType: formData.bachelorType
+                bachelorType: formData.bachelorType,
+                countryCode: selectedCountry,
+                countryName: getCountryName(selectedCountry)
               }
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors
-              ${formData.annualSalary ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800' : 
+              ${formData.salary ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800' : 
               'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'}`}
           >
             <FileText className="w-4 h-4" />
-            查看我的工作性价比报告
+            {t('view_report')}
           </Link>
         </div>
       </div>
