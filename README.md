@@ -1,38 +1,50 @@
-# Worth Calculator | 工作性价比计算器
-
 <div align="center">
-  
+
+# Worth-Calculator | 工作性价比计算器
+
 <a href="https://trendshift.io/repositories/13145" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13145" alt="Zippland%2Fworth-calculator | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
-**[English](#job-worth-calculator) | [中文](#工作性价比计算器-1)**
+<p>
+<img src="https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
+<img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+<img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+</p>
+
+<p>A comprehensive tool for calculating the actual value of your job beyond just salary | 一款全面的工具，计算工作的真实价值</p>
+
+<div align="center" style="margin: 20px 0;">
+  <a href="https://worthjob.zippland.com" target="_blank">
+    <div style="display: inline-block; background: linear-gradient(45deg, #FF512F, #DD2476); color: white; font-weight: bold; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: all 0.3s;">
+      🚀&nbsp;&nbsp;<span style="font-size: 18px;">Try it now | 立即使用</span>&nbsp;&nbsp;👈
+    </div>
+  </a>
+</div>
+
+<p>
+<a href="#english"><img src="https://img.shields.io/badge/English-blue?style=for-the-badge" alt="English" /></a>
+&nbsp;&nbsp;
+<a href="#中文"><img src="https://img.shields.io/badge/中文-red?style=for-the-badge" alt="中文" /></a>
+</p>
 
 </div>
 
----
+<br />
 
-## 🌟 Job Worth Calculator 
+<div id="english">
 
-A clean, comprehensive tool for calculating the actual value of your job considering multiple factors beyond just salary.
+<h2 align="center">📊 Job Worth Calculator</h2>
+
+<p align="center"><i>Calculate how much your job is really worth considering all factors</i></p>
 
 ### ✨ Features
 
-- **Comprehensive Evaluation**: Calculate job worth based on salary, work hours, commute time, environment, and more
-- **PPP Conversion**: International salary comparison with Purchasing Power Parity conversion across 190+ countries
-- **Personal Factors**: Customize calculations with personal education level, work experience, and more
-- **Detailed Report**: Generate a shareable, downloadable job analysis report
-- **Internationalization**: Available in both English and Chinese
-- **Mobile Friendly**: Responsive design works on all devices
-
-### 🚀 Live Demo
-
-Visit [worthjob.zippland.com](https://worthjob.zippland.com) to try it out!
-
-### 🛠️ Technologies
-
-- Next.js
-- React
-- Tailwind CSS
-- TypeScript
+- **💰 Comprehensive Evaluation**: Calculate job worth based on salary, work hours, commute time, environment, and more
+- **🌏 PPP Conversion**: International salary comparison with Purchasing Power Parity conversion across 190+ countries
+- **👩‍🎓 Personal Factors**: Customize calculations with personal education level, work experience, and more
+- **📱 Detailed Report**: Generate a shareable, downloadable job analysis report
+- **🌐 Internationalization**: Available in both English and Chinese
+- **📱 Mobile Friendly**: Responsive design works on all devices
 
 ### 🖥️ How to Use
 
@@ -53,35 +65,38 @@ The job worth score is calculated using a comprehensive formula that accounts fo
 - Educational qualification premiums
 - Experience-based expectations
 
+### 👨‍💻 Contributing
+
+Contributions are welcome! Here's how you can help:
+
+- [Open an issue](https://github.com/zippland/worth-calculator/issues/new) if you have suggestions or find a bug
+- Fork the repository and submit a PR for new features or bug fixes
+- Improve documentation or translations
+
+Please make sure to test your changes before submitting a PR.
+
 ### 📝 License
 
 [MIT License](LICENSE)
 
+</div>
+
 ---
 
-## 🌟 工作性价比计算器
+<div id="中文">
 
-一款简洁、全面的工具，用于计算工作的实际价值，考虑了薪资以外的多种因素。
+<h2 align="center">📊 工作性价比计算器</h2>
+
+<p align="center"><i>全面考量各种因素，算一算你的工作到底值不值</i></p>
 
 ### ✨ 特点
 
-- **全面评估**: 基于薪资、工作时间、通勤时间、工作环境等多方面因素计算工作价值
-- **PPP转换**: 通过购买力平价(PPP)转换支持190多个国家的薪资比较
-- **个人因素**: 根据个人学历、工作经验等定制计算
-- **详细报告**: 生成可分享、可下载的工作分析报告
-- **国际化**: 支持中英文双语
-- **移动友好**: 响应式设计，适用于所有设备
-
-### 🚀 在线演示
-
-访问 [worthjob.zippland.com](https://worthjob.zippland.com) 立即试用！
-
-### 🛠️ 技术栈
-
-- Next.js
-- React
-- Tailwind CSS
-- TypeScript
+- **💰 全面评估**: 基于薪资、工作时间、通勤时间、工作环境等多方面因素计算工作价值
+- **🌏 PPP转换**: 通过购买力平价(PPP)转换支持190多个国家的薪资比较
+- **👩‍🎓 个人因素**: 根据个人学历、工作经验等定制计算
+- **📱 详细报告**: 生成可分享、可下载的工作分析报告
+- **🌐 国际化**: 支持中英文双语
+- **📱 移动友好**: 响应式设计，适用于所有设备
 
 ### 🖥️ 使用方法
 
@@ -102,6 +117,18 @@ The job worth score is calculated using a comprehensive formula that accounts fo
 - 学历加成
 - 基于经验的期望值调整
 
+### 👨‍💻 贡献指南
+
+欢迎参与贡献！以下是您可以提供帮助的方式：
+
+- 如有建议或发现错误，请[提交问题](https://github.com/zippland/worth-calculator/issues/new)
+- 分叉仓库并提交PR，增加新功能或修复bug
+- 改进文档或翻译
+
+请确保在提交PR前测试您的更改。
+
 ### 📝 许可证
 
 [MIT 许可证](LICENSE)
+
+</div>
