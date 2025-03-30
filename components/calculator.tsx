@@ -468,19 +468,37 @@ const SalaryCalculator = () => {
     // 延迟检查busuanzi是否已加载
     const timer = setTimeout(() => {
       const pv = document.getElementById('busuanzi_value_site_pv');
+      const uv = document.getElementById('busuanzi_value_site_uv');
+      
       if (pv && pv.innerText !== '') {
         // 直接在现有数字上加上1700000（原seeyoufarm统计数据）
         const currentCount = parseInt(pv.innerText, 10) || 0;
         pv.innerText = (currentCount + 1700000).toString();
+        
+        // 同时增加访客数的历史数据
+        if (uv && uv.innerText !== '') {
+          const currentUV = parseInt(uv.innerText, 10) || 0;
+          uv.innerText = (currentUV + 250000).toString();
+        }
+        
         setVisitorVisible(true);
       } else {
         // 如果未加载，再次尝试
         const retryTimer = setTimeout(() => {
           const pv = document.getElementById('busuanzi_value_site_pv');
+          const uv = document.getElementById('busuanzi_value_site_uv');
+          
           if (pv && pv.innerText !== '') {
             // 直接在现有数字上加上1700000（原seeyoufarm统计数据）
             const currentCount = parseInt(pv.innerText, 10) || 0;
             pv.innerText = (currentCount + 1700000).toString();
+            
+            // 同时增加访客数的历史数据
+            if (uv && uv.innerText !== '') {
+              const currentUV = parseInt(uv.innerText, 10) || 0;
+              uv.innerText = (currentUV + 1300000).toString();
+            }
+            
             setVisitorVisible(true);
           }
         }, 2000);
