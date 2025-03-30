@@ -1,94 +1,107 @@
-# 这b班上得值不值·测算版
+# Worth Calculator | 工作性价比计算器
 
-<a href="https://trendshift.io/repositories/13145" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13145" alt="Zippland%2Fworth-calculator | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+<div align="center">
+  
+[![TrendShift Score](https://trendshift.io/api/score/repositories/13145)](https://trendshift.io/repositories/13145)
 
-> 🤔 "这b班到底值不值得上？" —— 打工人日常疑惑
+**[English](#job-worth-calculator) | [中文](#工作性价比计算器-1)**
 
-在线体验：[https://worthjob.zippland.com/](https://worthjob.zippland.com/)
-
-## 项目简介
-
-这是一个基于Next.js 15开发的现代化工作性价比计算器，帮助打工人评估当前工作的"性价比"。通过综合考虑薪资、工作时间、工作环境等多个维度，给出一个直观的参考指标。灵感来源是网络上曾经流行的一个Excel计算工具。
-
-## 核心功能
-
-### 1. 薪资计算
-- 支持全球薪资对比（基于PPP购买力平价）
-- 自动计算实际日薪
-- 考虑年假、病假、节假日等
-
-### 2. 时间成本
-- 精确计算实际工作时间
-- 支持远程办公比例设置
-- 考虑通勤时间成本
-- 计算休息和摸鱼时间
-
-### 3. 工作环境评估
-- 工作环境舒适度
-- 领导/老板评分
-- 团队氛围评估
-- 城市生活成本系数
-
-### 4. 教育背景
-- 学历类型（本科/硕士/博士）
-- 学校类型（985/211/普通）
-- 本科背景类型
-- 工作年限影响
-
-### 5. 其他因素
-- 是否在家乡工作
-- 公司类型（私企/外企/国企/体制内）
-- 班车/食堂等福利
-- 工作稳定性
-
-## 技术特点
-
-- 🚀 基于Next.js 15开发
-- 💅 使用Tailwind CSS构建现代化UI
-- 🌙 支持深色模式
-- 📱 完全响应式设计
-- 🔄 实时计算结果
-- 🖼️ 支持生成分享图片
-- 🌍 支持全球薪资对比
-
-## 使用方法
-
-1. 访问 [https://worthjob.zippland.com/](https://worthjob.zippland.com/)
-2. 填写你的工作信息：
-   - 基本薪资信息
-   - 工作时间安排
-   - 工作环境评估
-   - 教育背景
-   - 其他相关因素
-3. 查看计算结果和详细分析
-
-## 评分标准
-
-- 😱 < 1.0：很惨
-- 😐 1.0-1.8：一般
-- 😎 1.8-2.5：很爽
-- 🤩 > 2.5：爽到爆炸
-
-## 开发计划
-
-- [ ] 添加更多工作类型模板
-- [ ] 支持数据导出功能
-- [ ] 添加历史记录功能
-- [x] 支持多语言
-- [ ] 添加更多可视化图表
-
-## 贡献指南
-
-欢迎提交Issue和Pull Request来改进这个项目。在提交代码前，请确保：
-
-1. 代码符合项目的代码规范
-2. 新功能有适当的测试覆盖
-3. 更新相关文档
-
-## 许可证
-
-[MIT License © 2024](LICENSE)
+</div>
 
 ---
 
-> 💡 记住：工作选择要综合考虑多方面因素，这个工具仅供参考！
+## 🌟 Job Worth Calculator 
+
+A clean, comprehensive tool for calculating the actual value of your job considering multiple factors beyond just salary.
+
+### ✨ Features
+
+- **Comprehensive Evaluation**: Calculate job worth based on salary, work hours, commute time, environment, and more
+- **PPP Conversion**: International salary comparison with Purchasing Power Parity conversion across 190+ countries
+- **Personal Factors**: Customize calculations with personal education level, work experience, and more
+- **Detailed Report**: Generate a shareable, downloadable job analysis report
+- **Internationalization**: Available in both English and Chinese
+- **Mobile Friendly**: Responsive design works on all devices
+
+### 🚀 Live Demo
+
+Visit [worthjob.zippland.com](https://worthjob.zippland.com) to try it out!
+
+### 🛠️ Technologies
+
+- Next.js
+- React
+- Tailwind CSS
+- TypeScript
+
+### 🖥️ How to Use
+
+1. Enter your annual salary
+2. Select your country/region
+3. Fill in work details (days per week, hours, commute time, etc.)
+4. Specify environmental factors (city, work environment, team, etc.)
+5. Input your education and experience
+6. View your job worth score and detailed evaluation
+7. Generate a shareable report
+
+### 📊 The Calculation
+
+The job worth score is calculated using a comprehensive formula that accounts for:
+- Standardized daily salary (adjusted for PPP)
+- Work-life balance factors (hours, commute, WFH options)
+- Environmental aspects (office location, team dynamics)
+- Educational qualification premiums
+- Experience-based expectations
+
+### 📝 License
+
+[MIT License](LICENSE)
+
+---
+
+## 🌟 工作性价比计算器
+
+一款简洁、全面的工具，用于计算工作的实际价值，考虑了薪资以外的多种因素。
+
+### ✨ 特点
+
+- **全面评估**: 基于薪资、工作时间、通勤时间、工作环境等多方面因素计算工作价值
+- **PPP转换**: 通过购买力平价(PPP)转换支持190多个国家的薪资比较
+- **个人因素**: 根据个人学历、工作经验等定制计算
+- **详细报告**: 生成可分享、可下载的工作分析报告
+- **国际化**: 支持中英文双语
+- **移动友好**: 响应式设计，适用于所有设备
+
+### 🚀 在线演示
+
+访问 [worthjob.zippland.com](https://worthjob.zippland.com) 立即试用！
+
+### 🛠️ 技术栈
+
+- Next.js
+- React
+- Tailwind CSS
+- TypeScript
+
+### 🖥️ 使用方法
+
+1. 输入年薪
+2. 选择工作国家/地区
+3. 填写工作细节（每周工作天数、工作时长、通勤时间等）
+4. 指定环境因素（城市、工作环境、团队等）
+5. 输入学历和工作经验
+6. 查看工作性价比分数和详细评估
+7. 生成可分享的报告
+
+### 📊 计算方法
+
+工作性价比分数使用全面的公式计算，考虑了：
+- 标准化日薪（经PPP调整）
+- 工作生活平衡因素（工作时长、通勤、远程工作选项）
+- 环境因素（办公地点、团队关系）
+- 学历加成
+- 基于经验的期望值调整
+
+### 📝 许可证
+
+[MIT 许可证](LICENSE)
