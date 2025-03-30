@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Wallet, Github, FileText, Book } from 'lucide-react'; // 添加Book图标
+import { Wallet, Github, FileText, Book, Star } from 'lucide-react'; // 添加Book图标和Star图标
 import Link from 'next/link'; // 导入Link组件用于导航
 import { useLanguage } from './LanguageContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -781,6 +781,18 @@ const SalaryCalculator = () => {
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
       <div className="mb-4 text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 py-2">{t('title')}</h1>
+        
+        <div className="mb-3">
+          <a
+            href="https://github.com/zippland/worth-calculator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm hover:text-blue-500 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1 mx-auto px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
+          >
+            <Star className="h-3.5 w-3.5 fill-current" />
+            {t('star_request')}
+          </a>
+        </div>
         
         <div className="flex items-center justify-center gap-3 mb-2">
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('version')}</p>

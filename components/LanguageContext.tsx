@@ -27,13 +27,14 @@ const translations: Record<Language, Record<string, string>> = {
   zh: {
     // 标题和导航
     'title': '这b班上得值不值·测算版',
-    'version': 'v5.0.0',
+    'version': 'v5.1.0',
     'github': 'GitHub',
     'email': 'Email',
     'xiaohongshu': '小红书',
     'redirect_notice': '已自动跳转，新网址无需科学上网',
     'visits': '访问量',
     'visitors': '访客数',
+    'star_request': '如果觉得好用，请给项目点个⭐Star吧！',
     
     // 表单标签
     'annual_salary_cny': '年薪总包（元）',
@@ -251,14 +252,15 @@ const translations: Record<Language, Record<string, string>> = {
   },
   en: {
     // Title and navigation
-    'title': 'Is This Job Worth It?',
-    'version': 'v5.0.0',
+    'title': 'Is My Damn Job Worth It?',
+    'version': 'v5.1.0',
     'github': 'GitHub',
     'email': 'Email',
     'xiaohongshu': 'Rednote',
-    'redirect_notice': 'Redirected automatically to new domain',
+    'redirect_notice': 'Automatically redirected, no VPN needed',
     'visits': 'Visits',
     'visitors': 'Visitors',
+    'star_request': 'If you find this tool helpful, please give it a ⭐Star!',
     
     // Form labels
     'annual_salary_cny': 'Annual Salary (CNY)',
@@ -363,7 +365,7 @@ const translations: Record<Language, Record<string, string>> = {
     'share_back_to_calculator': 'Back to Calculator',
     'share_your_job_worth_report': 'Your Job Worth Report',
     'share_job_worth_report': 'Job Worth Report',
-    'share_custom_made': 'Custom made by "Is This Job Worth It?"',
+    'share_custom_made': 'Custom made by "Is My Job Worth It?"',
     'share_generating': 'Generating...',
     'share_download_report': 'Download Report',
     'share_basic_info': 'Basic Information',
