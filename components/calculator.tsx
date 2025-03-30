@@ -788,6 +788,7 @@ const SalaryCalculator = () => {
         <div className="mt-1 text-xs text-gray-400 dark:text-gray-600 flex justify-center gap-4">
           <span id="busuanzi_container_site_pv" className={visitorVisible ? 'opacity-100' : 'opacity-0'}>
             {t('visits')}: <span id="busuanzi_value_site_pv"></span>
+            <span title="原seeyoufarm统计数据">+1,700,000</span>
           </span>
           <span id="busuanzi_container_site_uv" className={visitorVisible ? 'opacity-100' : 'opacity-0'}>
             {t('visitors')}: <span id="busuanzi_value_site_uv"></span>
