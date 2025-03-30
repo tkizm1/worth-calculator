@@ -11,13 +11,15 @@
    <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
 </p>
 
-<p>A comprehensive tool for calculating the actual value of your job beyond just salary | 一款全面的工具，计算工作的真实价值</p>
+<p>A comprehensive tool for calculating the actual value of your job beyond just salary</p>
 
-<h2>
-  <a href="https://worthjob.zippland.com" target="_blank">
-    👉 Try it now | 立即使用 👈
+<p>一款全面的工具，计算工作的真实价值</p>
+
+<div>
+  <a href="https://worthjob.zippland.com" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; text-decoration: none; font-weight: bold; font-size: 18px; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin: 16px 0; transition: all 0.3s ease;">
+    ✨ Try it now | 立即使用 ✨
   </a>
-</h2>
+</div>
 
 <p>
    <a href="#english"><img src="https://img.shields.io/badge/English-blue?style=for-the-badge" alt="English" /></a>
@@ -26,6 +28,8 @@
 </p>
 
 </div>
+
+---
 
 <div id="english">
 
