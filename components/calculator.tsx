@@ -469,12 +469,18 @@ const SalaryCalculator = () => {
     const timer = setTimeout(() => {
       const pv = document.getElementById('busuanzi_value_site_pv');
       if (pv && pv.innerText !== '') {
+        // 直接在现有数字上加上1700000（原seeyoufarm统计数据）
+        const currentCount = parseInt(pv.innerText, 10) || 0;
+        pv.innerText = (currentCount + 1700000).toString();
         setVisitorVisible(true);
       } else {
         // 如果未加载，再次尝试
         const retryTimer = setTimeout(() => {
           const pv = document.getElementById('busuanzi_value_site_pv');
           if (pv && pv.innerText !== '') {
+            // 直接在现有数字上加上1700000（原seeyoufarm统计数据）
+            const currentCount = parseInt(pv.innerText, 10) || 0;
+            pv.innerText = (currentCount + 1700000).toString();
             setVisitorVisible(true);
           }
         }, 2000);
@@ -788,7 +794,6 @@ const SalaryCalculator = () => {
         <div className="mt-1 text-xs text-gray-400 dark:text-gray-600 flex justify-center gap-4">
           <span id="busuanzi_container_site_pv" className={visitorVisible ? 'opacity-100' : 'opacity-0'}>
             {t('visits')}: <span id="busuanzi_value_site_pv"></span>
-            <span title="原seeyoufarm统计数据">+1,700,000</span>
           </span>
           <span id="busuanzi_container_site_uv" className={visitorVisible ? 'opacity-100' : 'opacity-0'}>
             {t('visitors')}: <span id="busuanzi_value_site_uv"></span>
