@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Wallet, Github, FileText, Book } from 'lucide-react'; // 添加Book图标
+import { Wallet, Github, FileText, Book, History, Eye } from 'lucide-react'; // 添加新图标
 import Link from 'next/link'; // 导入Link组件用于导航
 import { useLanguage } from './LanguageContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -370,6 +370,19 @@ const countryNamesEn: Record<string, string> = {
   'ZW': 'Zimbabwe'
 };
 
+// 定义历史记录项的接口
+interface HistoryItem {
+  id: string;
+  timestamp: number;
+  value: string;
+  assessment: string;
+  assessmentColor: string;
+  salary: string;
+  countryCode: string;
+  countryName: string;
+  jobTitle?: string; // 可选的职位名称
+}
+
 // 定义表单数据接口
 interface FormData {
   salary: string;
@@ -410,12 +423,21 @@ const SalaryCalculator = () => {
   // 获取语言上下文
   const { t, language } = useLanguage();
   
+  // 添加客户端检测
+  const [isBrowser, setIsBrowser] = useState(false);
+  
   // 添加滚动位置保存的引用
   const scrollPositionRef = useRef(0);
   
-  // 添加自动重定向逻辑
+  // 添加历史记录状态
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  
+  // 在组件挂载时标记为浏览器环境
   useEffect(() => {
-    // 在所有环境中执行重定向
+    setIsBrowser(true);
+    
+    // 在客户端环境中执行重定向
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
       if (hostname !== 'worthjob.zippland.com' && hostname !== 'localhost' && !hostname.includes('127.0.0.1')) {
@@ -423,7 +445,7 @@ const SalaryCalculator = () => {
       }
     }
   }, []);
-
+  
   // 添加用于创建分享图片的引用
   const shareResultsRef = useRef<HTMLDivElement>(null);
 
@@ -462,6 +484,21 @@ const SalaryCalculator = () => {
   const [assessment, setAssessment] = useState("");
   const [assessmentColor, setAssessmentColor] = useState("text-gray-500");
   const [visitorVisible, setVisitorVisible] = useState(false);
+
+  // 添加检查document对象存在的逻辑
+  useEffect(() => {
+    // 确保在客户端环境中执行
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      const savedHistory = localStorage.getItem('jobValueHistory');
+      if (savedHistory) {
+        try {
+          setHistory(JSON.parse(savedHistory));
+        } catch (e) {
+          console.error('加载历史记录失败', e);
+        }
+      }
+    }
+  }, []);
 
   // 监听访客统计加载
   useEffect(() => {
@@ -752,6 +789,68 @@ const SalaryCalculator = () => {
     }
     return pppFactors[countryCode]?.name || 'Unknown';
   }, [language]);
+  
+  // 保存当前记录到历史中
+  const saveToHistory = useCallback(() => {
+    if (!formData.salary || typeof window === 'undefined') return;
+    
+    const newHistoryItem: HistoryItem = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      value: value.toFixed(2),
+      assessment: getValueAssessment().text,
+      assessmentColor: getValueAssessment().color,
+      salary: formData.salary,
+      countryCode: selectedCountry,
+      countryName: getCountryName(selectedCountry)
+    };
+    
+    try {
+      const updatedHistory = [newHistoryItem, ...history.slice(0, 9)]; // 限制保存10条记录
+      setHistory(updatedHistory);
+      localStorage.setItem('jobValueHistory', JSON.stringify(updatedHistory));
+      console.log('保存历史记录成功', newHistoryItem);
+    } catch (e) {
+      console.error('保存历史记录失败', e);
+    }
+    
+    return newHistoryItem;
+  }, [formData.salary, value, getValueAssessment, selectedCountry, history, getCountryName]);
+  
+  // 删除单条历史记录
+  const deleteHistoryItem = useCallback((id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // 阻止事件冒泡
+    e.preventDefault(); // 阻止默认行为
+    
+    try {
+      const updatedHistory = history.filter(item => item.id !== id);
+      setHistory(updatedHistory);
+      localStorage.setItem('jobValueHistory', JSON.stringify(updatedHistory));
+      console.log('删除历史记录成功', id);
+    } catch (e) {
+      console.error('删除历史记录失败', e);
+    }
+  }, [history]);
+  
+  // 清空所有历史记录
+  const clearAllHistory = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation(); // 阻止事件冒泡
+    e.preventDefault(); // 阻止默认行为
+    
+    try {
+      setHistory([]);
+      localStorage.removeItem('jobValueHistory');
+      console.log('清空所有历史记录成功');
+    } catch (e) {
+      console.error('清空历史记录失败', e);
+    }
+  }, []);
+
+  // 格式化日期
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
@@ -778,21 +877,153 @@ const SalaryCalculator = () => {
             <Book className="h-3.5 w-3.5" />
             {language === 'zh' ? t('xiaohongshu') : 'Rednote'}
           </a>
+          {/* 仅在客户端渲染历史记录按钮 */}
+          {isBrowser && (
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <History className="h-3.5 w-3.5" />
+              {language === 'zh' ? '历史记录' : 'History'}
+            </button>
+          )}
         </div>
+        
+        {/* 历史记录列表 - 仅在客户端渲染 */}
+        {isBrowser && showHistory && (
+          <div className="relative z-10">
+            <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 w-72 md:w-96 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 max-h-80 overflow-y-auto">
+              <div className="p-3">
+                <div className="flex justify-between items-center mb-3 border-b pb-2 border-gray-200 dark:border-gray-700">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                    <History className="h-3.5 w-3.5 mr-1" />
+                    {language === 'zh' ? '历史记录' : 'History'}
+                  </h3>
+                  <div className="flex gap-2">
+                    {history.length > 0 && (
+                      <button 
+                        onClick={clearAllHistory}
+                        className="text-xs text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        {language === 'zh' ? '清空' : 'Clear All'}
+                      </button>
+                    )}
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation(); // 阻止事件冒泡
+                        setShowHistory(false);
+                      }}
+                      className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+                
+                {history.length > 0 ? (
+                  <ul className="space-y-2">
+                    {history.map((item) => (
+                      <li key={item.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-750 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors border border-gray-100 dark:border-gray-600">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-sm font-semibold ${item.assessmentColor}`}>{item.value}</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300">
+                              {item.countryCode !== 'CN' ? '$' : '¥'}{item.salary}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 flex items-center">
+                            <span className="mr-2">{formatDate(item.timestamp)}</span>
+                            <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-400 text-[10px]">{item.countryName}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Link
+                            href={{
+                              pathname: '/share',
+                              query: {
+                                value: item.value,
+                                assessment: item.assessment,
+                                assessmentColor: item.assessmentColor,
+                                cityFactor: formData.cityFactor,
+                                workHours: formData.workHours,
+                                commuteHours: formData.commuteHours,
+                                restTime: formData.restTime,
+                                dailySalary: getDisplaySalary(),
+                                isYuan: item.countryCode !== 'CN' ? 'false' : 'true',
+                                workDaysPerYear: calculateWorkingDays().toString(),
+                                workDaysPerWeek: formData.workDaysPerWeek,
+                                wfhDaysPerWeek: formData.wfhDaysPerWeek,
+                                annualLeave: formData.annualLeave,
+                                paidSickLeave: formData.paidSickLeave,
+                                publicHolidays: formData.publicHolidays,
+                                workEnvironment: formData.workEnvironment,
+                                leadership: formData.leadership,
+                                teamwork: formData.teamwork,
+                                degreeType: formData.degreeType,
+                                schoolType: formData.schoolType,
+                                education: formData.education,
+                                homeTown: formData.homeTown,
+                                shuttle: formData.shuttle,
+                                canteen: formData.canteen,
+                                workYears: formData.workYears,
+                                jobStability: formData.jobStability,
+                                bachelorType: formData.bachelorType,
+                                countryCode: item.countryCode,
+                                countryName: item.countryName
+                              }
+                            }}
+                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                          <button
+                            onClick={(e) => deleteHistoryItem(item.id, e)}
+                            className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                            title={language === 'zh' ? '删除' : 'Delete'}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-center py-8 px-4">
+                    <div className="text-gray-400 mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {language === 'zh' ? '暂无历史记录' : 'No history records'}
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      {language === 'zh' ? '查看报告后将自动保存' : 'Records will be saved after viewing reports'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="flex justify-center mb-2">
           <LanguageSwitcher />
         </div>
         
-        {/* 访问统计 */}
-        <div className="mt-1 text-xs text-gray-400 dark:text-gray-600 flex justify-center gap-4">
-          <span id="busuanzi_container_site_pv" className={visitorVisible ? 'opacity-100' : 'opacity-0'}>
-            {t('visits')}: <span id="busuanzi_value_site_pv"></span>
-          </span>
-          <span id="busuanzi_container_site_uv" className={visitorVisible ? 'opacity-100' : 'opacity-0'}>
-            {t('visitors')}: <span id="busuanzi_value_site_uv"></span>
-          </span>
-        </div>
+        {/* 访问统计 - 仅在客户端渲染 */}
+        {isBrowser && (
+          <div className="mt-1 text-xs text-gray-400 dark:text-gray-600 flex justify-center gap-4">
+            <span id="busuanzi_container_site_pv" className={`transition-opacity duration-300 ${visitorVisible ? 'opacity-100' : 'opacity-0'}`}>
+              {t('visits')}: <span id="busuanzi_value_site_pv"></span>
+            </span>
+            <span id="busuanzi_container_site_uv" className={`transition-opacity duration-300 ${visitorVisible ? 'opacity-100' : 'opacity-0'}`}>
+              {t('visitors')}: <span id="busuanzi_value_site_uv"></span>
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30">
@@ -1168,7 +1399,7 @@ const SalaryCalculator = () => {
           </div>
         </div>
         
-        {/* 修改分享按钮为链接到分享页面 */}
+        {/* 修改分享按钮为链接到分享页面，并保存到历史 */}
         <div className="mt-6 flex justify-end">
           <Link
             href={{
@@ -1208,6 +1439,7 @@ const SalaryCalculator = () => {
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors
               ${formData.salary ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800' : 
               'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'}`}
+            onClick={() => formData.salary ? saveToHistory() : null}
           >
             <FileText className="w-4 h-4" />
             {t('view_report')}
