@@ -13,13 +13,11 @@
 
 <p>A comprehensive tool for calculating the actual value of your job beyond just salary | 一款全面的工具，计算工作的真实价值</p>
 
-<div align="center" style="margin: 20px 0;">
+<h2>
   <a href="https://worthjob.zippland.com" target="_blank">
-    <div style="display: inline-block; background: linear-gradient(45deg, #FF512F, #DD2476); color: white; font-weight: bold; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: all 0.3s;">
-      🚀&nbsp;&nbsp;<span style="font-size: 18px;">Try it now | 立即使用</span>&nbsp;&nbsp;👈
-    </div>
+    👉 Try it now | 立即使用 👈
   </a>
-</div>
+</h2>
 
 <p>
 <a href="#english"><img src="https://img.shields.io/badge/English-blue?style=for-the-badge" alt="English" /></a>
