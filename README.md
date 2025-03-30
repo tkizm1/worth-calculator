@@ -15,10 +15,10 @@
 
 <p>一款全面的工具，计算工作的真实价值</p>
 
-<div>
-  <a href="https://worthjob.zippland.com" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; text-decoration: none; font-weight: bold; font-size: 18px; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin: 16px 0; transition: all 0.3s ease;">
-    ✨ Try it now | 立即使用 ✨
-  </a>
+<div align="center">
+
+**[⚡ Try it now | 立即使用 ⚡](https://worthjob.zippland.com)**
+
 </div>
 
 <p>
@@ -80,6 +80,8 @@ Please make sure to test your changes before submitting a PR.
 [MIT License](LICENSE)
 
 </div>
+
+---
 
 <div id="中文">
 
