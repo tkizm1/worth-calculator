@@ -1,10 +1,13 @@
 "use client";
 
 import { useSearchParams } from 'next/navigation';
-import ShareCard from '@/components/ShareCard';
+import dynamic from 'next/dynamic';
 import React, { Suspense } from 'react';
 import { LanguageProvider } from '@/components/LanguageContext';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+
+// 动态导入ShareCard组件，禁用SSR
+const ShareCard = dynamic(() => import('@/components/ShareCard'), { ssr: false });
 
 // 一个包装组件，负责从URL参数获取数据
 function ShareCardWrapper() {
