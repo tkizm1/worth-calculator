@@ -584,8 +584,10 @@ const translations: Record<Language, Record<string, string>> = {
     // 表单标签
     'annual_salary_cny': '年薪总包（元）',
     'annual_salary_foreign': '年薪总包（当地货币）',
+    'annual_salary': '年薪总包',
     'salary_placeholder_cny': '税前年薪',
     'salary_placeholder_foreign': '使用当地货币',
+    'salary_placeholder': '税前年薪',
     'non_china_salary': '非中国地区薪资',
     'ppp_factor': '购买力平价(PPP)转换因子',
     'ppp_tooltip': 'PPP转换因子是将各国货币购买力标准化的指标。例如中国为4.19，表示1美元在美国的购买力等同于4.19元人民币在中国的购买力。',
@@ -809,8 +811,10 @@ const translations: Record<Language, Record<string, string>> = {
     // Form labels
     'annual_salary_cny': 'Annual Salary (CNY)',
     'annual_salary_foreign': 'Annual Salary (Local Currency)',
+    'annual_salary': 'Annual Salary',
     'salary_placeholder_cny': 'Pre-tax annual salary',
     'salary_placeholder_foreign': 'Use local currency',
+    'salary_placeholder': 'Pre-tax annual salary',
     'non_china_salary': 'Non-China Salary',
     'ppp_factor': 'Purchasing Power Parity Factor',
     'ppp_tooltip': 'PPP factor standardizes purchasing power across countries. For example, China\'s 4.19 means that 1 USD in US has the same purchasing power as 4.19 CNY in China.',
@@ -1034,8 +1038,10 @@ const translations: Record<Language, Record<string, string>> = {
     // フォームラベル
     'annual_salary_cny': '年収（元）',
     'annual_salary_foreign': '年収（現地通貨）',
+    'annual_salary': '年収',
     'salary_placeholder_cny': '税引前の年収',
     'salary_placeholder_foreign': '現地通貨で入力',
+    'salary_placeholder': '税引前の年収',
     'non_china_salary': '中国以外の給与',
     'ppp_factor': '購買力平価(PPP)換算係数',
     'ppp_tooltip': 'PPP換算係数は各国の通貨の購買力を標準化する指標です。例えば、中国の4.19は、米国の1ドルが中国の4.19元と同等の購買力を持つことを意味します。',

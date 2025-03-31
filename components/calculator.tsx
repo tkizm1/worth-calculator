@@ -747,7 +747,7 @@ const SalaryCalculator = () => {
         </div>
         
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">v5.2.1</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v5.3.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
@@ -789,7 +789,9 @@ const SalaryCalculator = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {selectedCountry !== 'CN' ? t('annual_salary_foreign') : t('annual_salary_cny')}
+                {selectedCountry !== 'CN' ? 
+                  `${t('annual_salary')}(${getCurrencySymbol(selectedCountry)})` : 
+                  t('annual_salary_cny')}
               </label>
               <div className="flex items-center gap-2 mt-1">
                 <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -797,7 +799,9 @@ const SalaryCalculator = () => {
                   type="number"
                   value={formData.salary}
                   onChange={(e) => handleInputChange('salary', e.target.value)}
-                  placeholder={selectedCountry !== 'CN' ? t('salary_placeholder_foreign') : t('salary_placeholder_cny')}
+                  placeholder={selectedCountry !== 'CN' ? 
+                    `${t('salary_placeholder')} ${getCurrencySymbol(selectedCountry)}` : 
+                    t('salary_placeholder_cny')}
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
