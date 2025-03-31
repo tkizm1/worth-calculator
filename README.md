@@ -1,6 +1,6 @@
 <div align="center">
 
-# Worth-Calculator | 工作性价比计算器 | 仕事の価値計算機
+# Job Worth Calculator | 工作性价比计算器 | 仕事の価値計算機
 
 <a href="https://trendshift.io/repositories/13145" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13145" alt="Zippland%2Fworth-calculator | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
@@ -11,9 +11,11 @@
    <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
 </p>
 
-<p>A comprehensive tool for calculating the actual value of your job beyond just salary</p>
+<p>Calculating the actual value of your job beyond just salary</p>
 
-<p>一款全面的工具，计算工作的真实价值</p>
+<p>计算薪资之外的工作真实价值</p>
+
+<p>給料だけでなく、仕事の本当の価値を計算する</p>
 
 <div align="center">
 

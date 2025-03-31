@@ -739,9 +739,9 @@ const SalaryCalculator = () => {
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm hover:text-blue-500 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1 mx-auto px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1.5"
           >
-            <Star className="h-3.5 w-3.5 fill-current" />
+            <Star className="h-3.5 w-3.5" />
             {t('star_request')}
           </a>
         </div>
