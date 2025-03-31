@@ -17,7 +17,7 @@
 
 <div align="center">
 
-**[⚡ Try it now | 立即使用 ⚡](https://worthjob.zippland.com)**
+**[⚡ Try it now ⚡](https://worthjob.zippland.com)**
 
 </div>
 
