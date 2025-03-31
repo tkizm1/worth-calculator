@@ -602,11 +602,11 @@ const translations: Record<Language, Record<string, string>> = {
     'annual_leave': '年假天数/d',
     'public_holidays': '法定假日/d',
     'paid_sick_leave': '带薪病假/d',
-    'work_hours': '工时/h',
+    'work_hours': '总工时/h',
     'work_hours_tooltip': '工时：是指"下班时间-上班时间"的总时间，包括吃饭、午休、加班等（不含通勤）。',
     'commute_hours': '通勤/h',
     'commute_tooltip': '通勤时长是指上下班往返的总时间，即家到公司和公司回家的时间总和。',
-    'rest_time': '休息&摸鱼',
+    'rest_time': '休息&摸鱼/h',
     
     // 环境系数
     'job_stability': '合同类型',
