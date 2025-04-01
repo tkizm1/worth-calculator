@@ -468,10 +468,10 @@ const SalaryCalculator = () => {
       const savedHistory = localStorage.getItem('jobValueHistory');
       if (savedHistory) {
         try {
-          const parsedHistory = JSON.parse(savedHistory) as any[];
+          const parsedHistory = JSON.parse(savedHistory) as Partial<HistoryItem>[];
           
           // 处理历史记录，为可能缺失的字段添加默认值
-          const normalizedHistory = parsedHistory.map((item: any) => ({
+          const normalizedHistory: HistoryItem[] = parsedHistory.map((item: Partial<HistoryItem>) => ({
             id: item.id || Date.now().toString(),
             timestamp: item.timestamp || Date.now(),
             value: item.value || '0',
@@ -719,7 +719,7 @@ const SalaryCalculator = () => {
 
   const value = calculateValue();
   
-  const getValueAssessment = () => {
+  const getValueAssessment = useCallback(() => {
     if (!formData.salary) return { text: t('rating_enter_salary'), color: "text-gray-500" };
     if (value < 0.6) return { text: t('rating_terrible'), color: "text-pink-800" };
     if (value < 1.0) return { text: t('rating_poor'), color: "text-red-500" };
@@ -728,10 +728,10 @@ const SalaryCalculator = () => {
     if (value <= 3.2) return { text: t('rating_great'), color: "text-green-500" };
     if (value <= 4.0) return { text: t('rating_excellent'), color: "text-purple-500" };
     return { text: t('rating_perfect'), color: "text-yellow-400" };
-  };
+  }, [formData.salary, value, t]);
   
   // 获取评级的翻译键，用于分享链接
-  const getValueAssessmentKey = () => {
+  const getValueAssessmentKey = useCallback(() => {
     if (!formData.salary) return 'rating_enter_salary';
     if (value < 0.6) return 'rating_terrible';
     if (value < 1.0) return 'rating_poor';
@@ -740,7 +740,7 @@ const SalaryCalculator = () => {
     if (value <= 3.2) return 'rating_great';
     if (value <= 4.0) return 'rating_excellent';
     return 'rating_perfect';
-  };
+  }, [formData.salary, value]);
 
   const RadioGroup = ({ label, name, value, onChange, options }: {
     label: string;
@@ -954,7 +954,7 @@ const SalaryCalculator = () => {
         </div>
         
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">v6.1.1</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v6.2.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
@@ -1028,9 +1028,7 @@ const SalaryCalculator = () => {
                             </span>
                           </div>
                           <div className="text-xs text-gray-500 flex items-center">
-                            <span className="mr-2">{formatDate(item.timestamp)}</span>
-                            <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-400 text-[10px]">{getCountryName(item.countryCode)}</span>
-                            <span className="ml-1 text-[10px]">{t(item.assessment)}</span>
+                            <span>{formatDate(item.timestamp)}</span>
                           </div>
                         </div>
                         <div className="flex gap-1">
