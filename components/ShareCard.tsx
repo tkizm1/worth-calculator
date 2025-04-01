@@ -2,7 +2,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { ArrowLeft, Download } from 'lucide-react';
-import html2canvas from 'html2canvas';
 import Link from 'next/link';
 import { useLanguage } from './LanguageContext';
 
@@ -21,6 +20,7 @@ interface ShareCardProps {
   workDaysPerYear: string;
   countryCode: string;
   countryName: string;
+  currencySymbol: string;
   
   // 详细工作信息
   workDaysPerWeek: string;
@@ -48,6 +48,12 @@ interface ShareCardProps {
 
 // 将中文评级转换为翻译键
 const getAssessmentKey = (assessment: string): string => {
+  // 如果已经是翻译键，直接返回
+  if (assessment.startsWith('rating_')) {
+    return assessment;
+  }
+  
+  // 否则，将中文评级转换为翻译键
   switch (assessment) {
     case '惨绝人寰': return 'rating_terrible';
     case '略惨': return 'rating_poor';
@@ -195,9 +201,20 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
   const [fadeIn, setFadeIn] = useState(false);
   const { t, language } = useLanguage();
   
+  // 客户端渲染标志
+  const [isClient, setIsClient] = useState(false);
+  
+  // 确保只在客户端执行
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
   // 页面载入动画效果
   useEffect(() => {
-    setFadeIn(true);
+    // 确保只在客户端执行
+    if (typeof window !== 'undefined') {
+      setFadeIn(true);
+    }
   }, []);
 
   // 生成个性化评价
@@ -235,17 +252,23 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
     const cityName = getCityName(props.cityFactor, t);
     const isHomeTown = props.homeTown === 'yes';
     let cityComment = "";
-    if (isHomeTown) {
-      cityComment = t('share_hometown_comment');
+    
+    // 先根据城市等级添加评价
+    if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
+      cityComment = t('share_tier1_city_comment');
+    } else if (props.cityFactor === '1.0' || props.cityFactor === '1.10') {
+      cityComment = t('share_tier2_city_comment');
     } else {
-      if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
-        cityComment = t('share_tier1_city_comment');
-      } else if (props.cityFactor === '1.0' || props.cityFactor === '1.10') {
-        cityComment = t('share_tier2_city_comment');
-      } else {
-        cityComment = t('share_tier3_city_comment');
-      }
+      cityComment = t('share_tier3_city_comment');
     }
+    
+    // 然后添加家乡相关评价
+    if (isHomeTown) {
+      cityComment += " " + t('share_hometown_comment');
+    } else {
+      cityComment += " " + t('share_not_hometown_comment');
+    }
+    
     comments.push({ 
       title: t('share_work_city'), 
       content: cityComment, 
@@ -466,7 +489,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       content: salaryComment, 
       emoji: "💰",
       details: [
-        { label: t('share_daily_salary'), value: `${isYuan ? '¥' : '$'}${dailySalary}/${t('share_day')}` },
+        { label: t('share_daily_salary'), value: `${props.currencySymbol}${dailySalary}/${t('share_day')}` },
         { label: t('share_working_days_per_year'), value: `${props.workDaysPerYear} ${t('share_days')}` }
       ]
     });
@@ -491,6 +514,21 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
     return comments;
   })();
   
+  // 是否是移动设备（响应式设计辅助函数）
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // 检测设备类型
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 640);
+      };
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }
+  }, []);
+
   // 处理下载图片 - 使用简化版报告
   const handleDownload = async () => {
     if (!simpleReportRef.current || isDownloading) return;
@@ -500,6 +538,10 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       
       // 获取简化版报告元素
       const element = simpleReportRef.current;
+      
+      // 动态导入html2canvas，确保只在客户端加载
+      const html2canvasModule = await import('html2canvas');
+      const html2canvas = html2canvasModule.default;
       
       // 使用html2canvas生成图片
       const canvas = await html2canvas(element, {
@@ -540,47 +582,54 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${getBackground()} flex flex-col items-center justify-start p-4 md:p-8 transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'} dark:text-white`}>
       {/* 返回按钮 */}
-      <div className="w-full max-w-4xl mb-6">
-        <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
-          <ArrowLeft className="w-4 h-4" />
+      <div className="w-full max-w-4xl mb-4 md:mb-6">
+        <Link href="/" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+          <ArrowLeft className="w-3.5 h-3.5" />
           <span>{t('share_back_to_calculator')}</span>
         </Link>
       </div>
       
-      <div ref={reportRef} className="w-full max-w-4xl bg-white rounded-xl shadow-xl p-6 md:p-10">
-        {/* 标题 */}
-        <div className="mb-10 text-center">
-          <div className="text-6xl mb-4">{getEmoji(parseFloat(props.value))}</div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+      <div ref={reportRef} className="w-full max-w-4xl bg-white rounded-xl shadow-xl p-4 md:p-10">
+        {/* 标题 - 移动端更紧凑 */}
+        <div className="mb-5 md:mb-10 text-center">
+          <div className="text-4xl md:text-6xl mb-2 md:mb-4">{isClient ? getEmoji(parseFloat(props.value)) : '😊'}</div>
+          <h1 className="text-xl md:text-3xl font-bold mb-2 md:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
             {t('share_your_job_worth_report')}
           </h1>
-          <div className="flex justify-center items-center gap-3">
-            <span className="text-2xl font-bold px-3 py-1 rounded-lg" style={{ color: getColorFromClassName(props.assessmentColor), backgroundColor: `${getColorFromClassName(props.assessmentColor)}20` }}>
+          <div className="flex justify-center items-center gap-2">
+            <span className="text-lg md:text-2xl font-bold px-2 py-0.5 rounded-lg" style={{ color: getColorFromClassName(props.assessmentColor), backgroundColor: `${getColorFromClassName(props.assessmentColor)}20` }}>
               {props.value}
             </span>
-            <span className="text-lg text-gray-700">{t(getAssessmentKey(props.assessment))}</span>
+            <span className="text-base md:text-lg text-gray-700">{isClient ? t(getAssessmentKey(props.assessment)) : ''}</span>
           </div>
         </div>
         
-        {/* 性价比评语卡片 */}
-        <div className="space-y-8">
-          {personalizedComments.map((comment, index) => (
-            <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 shadow-md transition-all hover:shadow-lg">
-              <div className="flex items-start gap-4">
-                <div className="text-4xl flex-shrink-0">{comment.emoji}</div>
+        {/* 性价比评语卡片 - 移动端更紧凑 */}
+        <div className="space-y-4 md:space-y-6">
+          {isClient && personalizedComments.map((comment, index) => (
+            <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg md:rounded-xl p-3 md:p-5 shadow-sm transition-all hover:shadow-md">
+              <div className="flex items-start gap-2.5 md:gap-4">
+                <div className="text-2xl md:text-4xl flex-shrink-0 mt-0.5">{comment.emoji}</div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-2 text-gray-800">{comment.title}</h3>
-                  <p className="text-gray-700 leading-relaxed mb-4">{comment.content}</p>
+                  <h3 className="text-base md:text-lg font-bold mb-1 md:mb-2 text-gray-800">{comment.title}</h3>
+                  <p className="text-xs md:text-sm text-gray-700 leading-relaxed mb-2 md:mb-3">{comment.content}</p>
                   
-                  {/* 用户选项详情 */}
+                  {/* 用户选项详情 - 移动端使用行内排列 */}
                   {comment.details && comment.details.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="mt-2 pt-2 border-t border-gray-200">
+                      <div className={isMobile ? "flex flex-wrap gap-x-4 gap-y-1.5" : "grid grid-cols-2 gap-2"}>
                         {comment.details.map((detail, i) => (
-                          <div key={i} className="flex flex-col">
-                            <span className="text-xs text-gray-500">{detail.label}</span>
-                            <span className="text-sm font-medium text-gray-800">{detail.value}</span>
-                          </div>
+                          isMobile ? (
+                            <div key={i} className="flex items-center text-xs">
+                              <span className="text-gray-500 mr-1">{detail.label}:</span>
+                              <span className="font-medium text-gray-800">{detail.value}</span>
+                            </div>
+                          ) : (
+                            <div key={i} className="flex justify-between items-center">
+                              <span className="text-xs text-gray-500">{detail.label}</span>
+                              <span className="text-xs md:text-sm font-medium text-gray-800">{detail.value}</span>
+                            </div>
+                          )
                         ))}
                       </div>
                     </div>
@@ -591,192 +640,201 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
           ))}
         </div>
         
-        {/* 底部信息 */}
-        <div className="mt-10 text-center text-gray-500 space-y-1">
+        {/* 底部信息 - 更小的文字 */}
+        <div className="mt-6 md:mt-10 text-center text-gray-500 space-y-0.5 text-xs md:text-sm">
           <div>{t('share_custom_made')}</div>
           <div>worthjob.zippland.com</div>
         </div>
       </div>
       
-      {/* 操作按钮 */}
-      <div className="flex justify-center gap-4 mt-8">
+      {/* 操作按钮 - 更小的按钮 */}
+      <div className="flex justify-center gap-4 mt-4 md:mt-8">
         <button
           onClick={handleDownload}
           disabled={isDownloading}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 md:px-6 md:py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base rounded-lg shadow-md transition-colors"
         >
-          <Download className="w-5 h-5" />
+          <Download className="w-4 h-4 md:w-5 md:h-5" />
           {isDownloading ? t('share_generating') : t('share_download_report')}
         </button>
       </div>
       
       {/* 简化版报告，仅用于下载，在页面中隐藏 */}
-      <div className="fixed top-0 left-0 opacity-0 pointer-events-none">
-        <div ref={simpleReportRef} className="w-[800px] bg-white p-8 text-gray-900" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-          <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            {/* 报告头部 - 渐变背景 */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 border-b border-gray-200">
-              <div className="text-center">
-                <div className="text-5xl mb-4">{getEmoji(parseFloat(props.value))}</div>
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">{t('share_job_worth_report')}</h1>
-                <div className="inline-block px-4 py-2 rounded-full bg-white shadow-sm">
-                  <span className="font-semibold text-xl" style={{ color: getColorFromClassName(props.assessmentColor) }}>
-                    {props.value} - {t(getAssessmentKey(props.assessment))}
-                  </span>
+      {isClient && (
+        <div className="fixed top-0 left-0 opacity-0 pointer-events-none">
+          <div ref={simpleReportRef} className="w-[800px] bg-white p-8 text-gray-900" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+            <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+              {/* 报告头部 - 渐变背景 */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 border-b border-gray-200">
+                <div className="text-center">
+                  <div className="text-5xl mb-4">{getEmoji(parseFloat(props.value))}</div>
+                  <h1 className="text-2xl font-bold text-gray-800 mb-2">{t('share_job_worth_report')}</h1>
+                  <div className="inline-block px-4 py-2 rounded-full bg-white shadow-sm">
+                    <span className="font-semibold text-xl" style={{ color: getColorFromClassName(props.assessmentColor) }}>
+                      {props.value} - {t(getAssessmentKey(props.assessment))}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            {/* 报告内容 */}
-            <div className="p-6">
-              {/* 数据表格 */}
-              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                {/* 基础信息 */}
-                <div className="col-span-2 mb-4">
-                  <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
-                    <span className="mr-2">📊</span> {t('share_basic_info')}
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_work_city')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{getCityName(props.cityFactor, t)}</div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_country')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{props.countryName}</div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_is_hometown')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{props.homeTown === 'yes' ? t('share_yes') : t('share_no')}</div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_daily_salary')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{props.isYuan === 'true' ? '¥' : '$'}{props.dailySalary}/{t('share_day')}</div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_working_days_per_year')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{props.workDaysPerYear} {t('share_days')}</div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* 工作时间 */}
-                <div className="col-span-1">
-                  <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
-                    <span className="mr-2">⏱️</span> {t('share_work_hours_title')}
-                  </h2>
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                      <span className="text-sm text-gray-500">{t('share_daily_work_hours')}</span>
-                      <span className="font-medium text-gray-800">{props.workHours} {t('share_hours')}</span>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                      <span className="text-sm text-gray-500">{t('share_daily_commute_hours')}</span>
-                      <span className="font-medium text-gray-800">{props.commuteHours} {t('share_hours')}</span>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                      <span className="text-sm text-gray-500">{t('share_rest_time')}</span>
-                      <span className="font-medium text-gray-800">{props.restTime} {t('share_hours')}</span>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                      <span className="text-sm text-gray-500">{t('share_weekly_work_days')}</span>
-                      <span className="font-medium text-gray-800">{props.workDaysPerWeek} {t('share_days')}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* 工作环境 */}
-                <div className="col-span-1">
-                  <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
-                    <span className="mr-2">🏢</span> {t('share_work_environment_title')}
-                  </h2>
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                      <span className="text-sm text-gray-500">{t('share_office_environment')}</span>
-                      <span className="font-medium text-gray-800">{getWorkEnvironmentDesc(props.workEnvironment, t)}</span>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                      <span className="text-sm text-gray-500">{t('share_leadership_relation')}</span>
-                      <span className="font-medium text-gray-800">{getLeadershipDesc(props.leadership, t)}</span>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                      <span className="text-sm text-gray-500">{t('share_colleague_relationship')}</span>
-                      <span className="font-medium text-gray-800">{getTeamworkDesc(props.teamwork, t)}</span>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                      <span className="text-sm text-gray-500">{t('share_canteen_quality')}</span>
-                      <span className="font-medium text-gray-800">{getCanteenDesc(props.canteen, t)}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* 教育背景 */}
-                <div className="col-span-2 mt-2">
-                  <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
-                    <span className="mr-2">📚</span> {t('share_education_and_experience')}
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_highest_degree')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{getDegreeDesc(props.degreeType, t)}</div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_school_type_label')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{getSchoolTypeDesc(props.schoolType, props.degreeType, t)}</div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_work_years_label')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{getWorkYearsDesc(props.workYears, t)}</div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-sm text-gray-500">{t('share_contract_type_label')}</div>
-                      <div className="font-medium text-gray-800 mt-1">{getJobStabilityDesc(props.jobStability, t)}</div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* 结论 */}
-                <div className="col-span-2 mt-4">
-                  <div className="rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-6 border border-gray-200">
-                    <h2 className="font-bold text-gray-800 text-lg mb-3 flex items-center">
-                      <span className="mr-2">💎</span> {t('share_final_assessment')}
+              
+              {/* 报告内容 */}
+              <div className="p-6">
+                {/* 数据表格 */}
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                  {/* 基础信息 */}
+                  <div className="col-span-2 mb-4">
+                    <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
+                      <span className="mr-2">📊</span> {t('share_basic_info')}
                     </h2>
-                    <div className="flex items-center mb-3">
-                      <div className="text-4xl mr-3">{getEmoji(parseFloat(props.value))}</div>
-                      <div className="text-xl font-bold" style={{ color: getColorFromClassName(props.assessmentColor) }}>
-                        {props.value} - {t(getAssessmentKey(props.assessment))}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_work_city')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{getCityName(props.cityFactor, t)}</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_country')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{props.countryName}</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_is_hometown')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{props.homeTown === 'yes' ? t('share_yes') : t('share_no')}</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_daily_salary')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{props.currencySymbol}{props.dailySalary}/{t('share_day')}</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_working_days_per_year')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{props.workDaysPerYear} {t('share_days')}</div>
                       </div>
                     </div>
-                    <p className="text-gray-700">
-                      {parseFloat(props.value) < 1.0 
-                        ? t('share_value_low') 
-                        : parseFloat(props.value) <= 2.0 
-                          ? t('share_value_medium') 
-                          : t('share_value_high')
-                      }
-                    </p>
+                  </div>
+                  
+                  {/* 工作时间 */}
+                  <div className="col-span-1">
+                    <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
+                      <span className="mr-2">⏱️</span> {t('share_work_hours_title')}
+                    </h2>
+                    <div className="space-y-3">
+                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                        <span className="text-sm text-gray-500">{t('share_daily_work_hours')}</span>
+                        <span className="font-medium text-gray-800">{props.workHours} {t('share_hours')}</span>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                        <span className="text-sm text-gray-500">{t('share_daily_commute_hours')}</span>
+                        <span className="font-medium text-gray-800">{props.commuteHours} {t('share_hours')}</span>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                        <span className="text-sm text-gray-500">{t('share_rest_time')}</span>
+                        <span className="font-medium text-gray-800">{props.restTime} {t('share_hours')}</span>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                        <span className="text-sm text-gray-500">{t('share_weekly_work_days')}</span>
+                        <span className="font-medium text-gray-800">{props.workDaysPerWeek} {t('share_days')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* 工作环境 */}
+                  <div className="col-span-1">
+                    <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
+                      <span className="mr-2">🏢</span> {t('share_work_environment_title')}
+                    </h2>
+                    <div className="space-y-3">
+                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                        <span className="text-sm text-gray-500">{t('share_office_environment')}</span>
+                        <span className="font-medium text-gray-800">{getWorkEnvironmentDesc(props.workEnvironment, t)}</span>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                        <span className="text-sm text-gray-500">{t('share_leadership_relation')}</span>
+                        <span className="font-medium text-gray-800">{getLeadershipDesc(props.leadership, t)}</span>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                        <span className="text-sm text-gray-500">{t('share_colleague_relationship')}</span>
+                        <span className="font-medium text-gray-800">{getTeamworkDesc(props.teamwork, t)}</span>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                        <span className="text-sm text-gray-500">{t('share_canteen_quality')}</span>
+                        <span className="font-medium text-gray-800">{getCanteenDesc(props.canteen, t)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* 教育背景 */}
+                  <div className="col-span-2 mt-2">
+                    <h2 className="font-bold text-gray-800 text-lg pb-2 mb-3 border-b border-gray-200 flex items-center">
+                      <span className="mr-2">📚</span> {t('share_education_and_experience')}
+                    </h2>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_highest_degree')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{getDegreeDesc(props.degreeType, t)}</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_school_type_label')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{getSchoolTypeDesc(props.schoolType, props.degreeType, t)}</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_work_years_label')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{getWorkYearsDesc(props.workYears, t)}</div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-sm text-gray-500">{t('share_contract_type_label')}</div>
+                        <div className="font-medium text-gray-800 mt-1">{getJobStabilityDesc(props.jobStability, t)}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* 结论 */}
+                  <div className="col-span-2 mt-4">
+                    <div className="rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-6 border border-gray-200">
+                      <h2 className="font-bold text-gray-800 text-lg mb-3 flex items-center">
+                        <span className="mr-2">💎</span> {t('share_final_assessment')}
+                      </h2>
+                      <div className="flex items-center mb-3">
+                        <div className="text-4xl mr-3">{getEmoji(parseFloat(props.value))}</div>
+                        <div className="text-xl font-bold" style={{ color: getColorFromClassName(props.assessmentColor) }}>
+                          {props.value} - {t(getAssessmentKey(props.assessment))}
+                        </div>
+                      </div>
+                      <p className="text-gray-700">
+                        {parseFloat(props.value) < 1.0 
+                          ? t('share_value_low') 
+                          : parseFloat(props.value) <= 2.0 
+                            ? t('share_value_medium') 
+                            : t('share_value_high')
+                        }
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            {/* 页脚 */}
-            <div className="bg-gray-50 py-4 px-6 border-t border-gray-200">
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <div className="text-sm font-medium text-gray-700">{t('share_custom_made')}</div>
-                  <div className="text-sm text-gray-500">worthjob.zippland.com</div>
+              
+              {/* 页脚 */}
+              <div className="bg-gray-50 py-4 px-6 border-t border-gray-200">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <img 
+                      src="/title.png" 
+                      alt="Job Worth Calculator" 
+                      className="h-20 mr-3" 
+                    />
+                    <div className="flex flex-col">
+                      <div className="text-sm font-medium text-gray-700">{t('share_custom_made')}</div>
+                      <div className="text-sm text-gray-500">worthjob.zippland.com</div>
+                    </div>
+                  </div>
+                  <img 
+                    src="/website.png" 
+                    alt="" 
+                    className="h-16 w-16 opacity-85" 
+                  />
                 </div>
-                <img 
-                  src="/website.png" 
-                  alt="" 
-                  className="h-16 w-16 opacity-85" 
-                />
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

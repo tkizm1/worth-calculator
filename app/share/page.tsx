@@ -1,10 +1,13 @@
 "use client";
 
 import { useSearchParams } from 'next/navigation';
-import ShareCard from '@/components/ShareCard';
+import dynamic from 'next/dynamic';
 import React, { Suspense } from 'react';
 import { LanguageProvider } from '@/components/LanguageContext';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+
+// 动态导入ShareCard组件，禁用SSR
+const ShareCard = dynamic(() => import('@/components/ShareCard'), { ssr: false });
 
 // 一个包装组件，负责从URL参数获取数据
 function ShareCardWrapper() {
@@ -23,6 +26,7 @@ function ShareCardWrapper() {
   const workDaysPerYear = searchParams.get('workDaysPerYear') || '250';
   const countryCode = searchParams.get('countryCode') || 'CN';
   const countryName = searchParams.get('countryName') || '中国';
+  const currencySymbol = searchParams.get('currencySymbol') || '¥';
   
   // 额外参数 - 详细工作信息
   const workDaysPerWeek = searchParams.get('workDaysPerWeek') || '5';
@@ -63,6 +67,7 @@ function ShareCardWrapper() {
         workDaysPerYear={workDaysPerYear}
         countryCode={countryCode}
         countryName={countryName}
+        currencySymbol={currencySymbol}
         
         // 详细工作信息
         workDaysPerWeek={workDaysPerWeek}

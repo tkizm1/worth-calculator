@@ -1,373 +1,305 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Wallet, Github, FileText, Book, History, Eye } from 'lucide-react'; // 添加新图标
+import { Wallet, Github, FileText, Book, History, Eye , Star} from 'lucide-react'; // 添加新图标
 import Link from 'next/link'; // 导入Link组件用于导航
 import { useLanguage } from './LanguageContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { countryNames } from './LanguageContext';
 
 // 定义PPP转换因子映射表
-const pppFactors: Record<string, { name: string, factor: number }> = {
-  'AF': { name: '阿富汗', factor: 18.71 },
-  'AO': { name: '安哥拉', factor: 167.66 },
-  'AL': { name: '阿尔巴尼亚', factor: 41.01 },
-  'AR': { name: '阿根廷', factor: 28.67 },
-  'AM': { name: '亚美尼亚', factor: 157.09 },
-  'AG': { name: '安提瓜和巴布达', factor: 2.06 },
-  'AU': { name: '澳大利亚', factor: 1.47 },
-  'AT': { name: '奥地利', factor: 0.76 },
-  'AZ': { name: '阿塞拜疆', factor: 0.50 },
-  'BI': { name: '布隆迪', factor: 680.41 },
-  'BE': { name: '比利时', factor: 0.75 },
-  'BJ': { name: '贝宁', factor: 211.97 },
-  'BF': { name: '布基纳法索', factor: 209.84 },
-  'BD': { name: '孟加拉国', factor: 32.81 },
-  'BG': { name: '保加利亚', factor: 0.70 },
-  'BH': { name: '巴林', factor: 0.18 },
-  'BS': { name: '巴哈马', factor: 0.88 },
-  'BA': { name: '波斯尼亚和黑塞哥维那', factor: 0.66 },
-  'BY': { name: '白俄罗斯', factor: 0.77 },
-  'BZ': { name: '伯利兹', factor: 1.37 },
-  'BO': { name: '玻利维亚', factor: 2.60 },
-  'BR': { name: '巴西', factor: 2.36 },
-  'BB': { name: '巴巴多斯', factor: 2.24 },
-  'BN': { name: '文莱达鲁萨兰国', factor: 0.58 },
-  'BT': { name: '不丹', factor: 20.11 },
-  'BW': { name: '博茨瓦纳', factor: 4.54 },
-  'CF': { name: '中非共和国', factor: 280.19 },
-  'CA': { name: '加拿大', factor: 1.21 },
-  'CH': { name: '瑞士', factor: 1.14 },
-  'CL': { name: '智利', factor: 418.43 },
-  'CN': { name: '中国', factor: 4.19 },
-  'CI': { name: '科特迪瓦', factor: 245.25 },
-  'CM': { name: '喀麦隆', factor: 228.75 },
-  'CD': { name: '刚果（金）', factor: 911.27 },
-  'CG': { name: '刚果（布）', factor: 312.04 },
-  'CO': { name: '哥伦比亚', factor: 1352.79 },
-  'KM': { name: '科摩罗', factor: 182.34 },
-  'CV': { name: '佛得角', factor: 46.51 },
-  'CR': { name: '哥斯达黎加', factor: 335.86 },
-  'CY': { name: '塞浦路斯', factor: 0.61 },
-  'CZ': { name: '捷克共和国', factor: 12.66 },
-  'DE': { name: '德国', factor: 0.75 },
-  'DJ': { name: '吉布提', factor: 105.29 },
-  'DM': { name: '多米尼克', factor: 1.69 },
-  'DK': { name: '丹麦', factor: 6.60 },
-  'DO': { name: '多米尼加共和国', factor: 22.90 },
-  'DZ': { name: '阿尔及利亚', factor: 37.24 },
-  'EC': { name: '厄瓜多尔', factor: 0.51 },
-  'EG': { name: '阿拉伯埃及共和国', factor: 4.51 },
-  'ES': { name: '西班牙', factor: 0.62 },
-  'EE': { name: '爱沙尼亚', factor: 0.53 },
-  'ET': { name: '埃塞俄比亚', factor: 12.11 },
-  'FI': { name: '芬兰', factor: 0.84 },
-  'FJ': { name: '斐济', factor: 0.91 },
-  'FR': { name: '法国', factor: 0.73 },
-  'GA': { name: '加蓬', factor: 265.46 },
-  'GB': { name: '英国', factor: 0.70 },
-  'GE': { name: '格鲁吉亚', factor: 0.90 },
-  'GH': { name: '加纳', factor: 2.33 },
-  'GN': { name: '几内亚', factor: 4053.64 },
-  'GM': { name: '冈比亚', factor: 17.79 },
-  'GW': { name: '几内亚比绍共和国', factor: 214.86 },
-  'GQ': { name: '赤道几内亚', factor: 229.16 },
-  'GR': { name: '希腊', factor: 0.54 },
-  'GD': { name: '格林纳达', factor: 1.64 },
-  'GT': { name: '危地马拉', factor: 4.01 },
-  'GY': { name: '圭亚那', factor: 73.60 },
-  'HK': { name: '中国香港特别行政区', factor: 6.07 },
-  'HN': { name: '洪都拉斯', factor: 10.91 },
-  'HR': { name: '克罗地亚', factor: 3.21 },
-  'HT': { name: '海地', factor: 40.20 },
-  'HU': { name: '匈牙利', factor: 148.01 },
-  'ID': { name: '印度尼西亚', factor: 4673.65 },
-  'IN': { name: '印度', factor: 21.99 },
-  'IE': { name: '爱尔兰', factor: 0.78 },
-  'IR': { name: '伊朗伊斯兰共和国', factor: 30007.63 },
-  'IQ': { name: '伊拉克', factor: 507.58 },
-  'IS': { name: '冰岛', factor: 145.34 },
-  'IL': { name: '以色列', factor: 3.59 },
-  'IT': { name: '意大利', factor: 0.66 },
-  'JM': { name: '牙买加', factor: 72.03 },
-  'JO': { name: '约旦', factor: 0.29 },
-  'JP': { name: '日本', factor: 102.84 },
-  'KZ': { name: '哈萨克斯坦', factor: 139.91 },
-  'KE': { name: '肯尼亚', factor: 43.95 },
-  'KG': { name: '吉尔吉斯斯坦', factor: 18.28 },
-  'KH': { name: '柬埔寨', factor: 1400.09 },
-  'KI': { name: '基里巴斯', factor: 1.00 },
-  'KN': { name: '圣基茨和尼维斯', factor: 1.92 },
-  'KR': { name: '大韩民国', factor: 861.82 },
-  'LA': { name: '老挝', factor: 2889.36 },
-  'LB': { name: '黎巴嫩', factor: 1414.91 },
-  'LR': { name: '利比里亚', factor: 0.41 },
-  'LY': { name: '利比亚', factor: 0.48 },
-  'LC': { name: '圣卢西亚', factor: 1.93 },
-  'LK': { name: '斯里兰卡', factor: 51.65 },
-  'LS': { name: '莱索托', factor: 5.90 },
-  'LT': { name: '立陶宛', factor: 0.45 },
-  'LU': { name: '卢森堡', factor: 0.86 },
-  'LV': { name: '拉脱维亚', factor: 0.48 },
-  'MO': { name: '中国澳门特别行政区', factor: 5.18 },
-  'MA': { name: '摩洛哥', factor: 3.92 },
-  'MD': { name: '摩尔多瓦', factor: 6.06 },
-  'MG': { name: '马达加斯加', factor: 1178.10 },
-  'MV': { name: '马尔代夫', factor: 8.35 },
-  'MX': { name: '墨西哥', factor: 9.52 },
-  'MK': { name: '北马其顿', factor: 18.83 },
-  'ML': { name: '马里', factor: 211.41 },
-  'MT': { name: '马耳他', factor: 0.57 },
-  'MM': { name: '缅甸', factor: 417.35 },
-  'ME': { name: '黑山', factor: 0.33 },
-  'MN': { name: '蒙古', factor: 931.67 },
-  'MZ': { name: '莫桑比克', factor: 24.05 },
-  'MR': { name: '毛里塔尼亚', factor: 12.01 },
-  'MU': { name: '毛里求斯', factor: 16.52 },
-  'MW': { name: '马拉维', factor: 298.82 },
-  'MY': { name: '马来西亚', factor: 1.57 },
-  'NA': { name: '纳米比亚', factor: 7.40 },
-  'NE': { name: '尼日尔', factor: 257.60 },
-  'NG': { name: '尼日利亚', factor: 144.27 },
-  'NI': { name: '尼加拉瓜', factor: 11.75 },
-  'NL': { name: '荷兰', factor: 0.77 },
-  'NO': { name: '挪威', factor: 10.03 },
-  'NP': { name: '尼泊尔', factor: 33.52 },
-  'NZ': { name: '新西兰', factor: 1.45 },
-  'PK': { name: '巴基斯坦', factor: 38.74 },
-  'PA': { name: '巴拿马', factor: 0.46 },
-  'PE': { name: '秘鲁', factor: 1.80 },
-  'PH': { name: '菲律宾', factor: 19.51 },
-  'PG': { name: '巴布亚新几内亚', factor: 2.11 },
-  'PL': { name: '波兰', factor: 1.78 },
-  'PR': { name: '波多黎各', factor: 0.92 },
-  'PT': { name: '葡萄牙', factor: 0.57 },
-  'PY': { name: '巴拉圭', factor: 2575.54 },
-  'PS': { name: '约旦河西岸和加沙', factor: 0.57 },
-  'QA': { name: '卡塔尔', factor: 2.06 },
-  'RO': { name: '罗马尼亚', factor: 1.71 },
-  'RU': { name: '俄罗斯联邦', factor: 25.88 },
-  'RW': { name: '卢旺达', factor: 339.88 },
-  'SA': { name: '沙特阿拉伯', factor: 1.61 },
-  'SD': { name: '苏丹', factor: 21.85 },
-  'SN': { name: '塞内加尔', factor: 245.98 },
-  'SG': { name: '新加坡', factor: 0.84 },
-  'SB': { name: '所罗门群岛', factor: 7.08 },
-  'SL': { name: '塞拉利昂', factor: 2739.26 },
-  'SV': { name: '萨尔瓦多', factor: 0.45 },
-  'SO': { name: '索马里', factor: 9107.78 },
-  'RS': { name: '塞尔维亚', factor: 41.13 },
-  'ST': { name: '圣多美和普林西比', factor: 10.94 },
-  'SR': { name: '苏里南', factor: 3.55 },
-  'SK': { name: '斯洛伐克共和国', factor: 0.53 },
-  'SI': { name: '斯洛文尼亚', factor: 0.56 },
-  'SE': { name: '瑞典', factor: 8.77 },
-  'SZ': { name: '斯威士兰', factor: 6.36 },
-  'SC': { name: '塞舌尔', factor: 7.82 },
-  'TC': { name: '特克斯科斯群岛', factor: 1.07 },
-  'TD': { name: '乍得', factor: 220.58 },
-  'TG': { name: '多哥', factor: 236.83 },
-  'TH': { name: '泰国', factor: 12.34 },
-  'TJ': { name: '塔吉克斯坦', factor: 2.30 },
-  'TL': { name: '东帝汶', factor: 0.41 },
-  'TT': { name: '特立尼达和多巴哥', factor: 4.15 },
-  'TN': { name: '突尼斯', factor: 0.91 },
-  'TR': { name: '土耳其', factor: 2.13 },
-  'TV': { name: '图瓦卢', factor: 1.29 },
-  'TZ': { name: '坦桑尼亚', factor: 888.32 },
-  'UG': { name: '乌干达', factor: 1321.35 },
-  'UA': { name: '乌克兰', factor: 7.69 },
-  'UY': { name: '乌拉圭', factor: 28.45 },
-  'US': { name: '美国', factor: 1.00 },
-  'UZ': { name: '乌兹别克斯坦', factor: 2297.17 },
-  'VC': { name: '圣文森特和格林纳丁斯', factor: 1.54 },
-  'VN': { name: '越南', factor: 7473.67 },
-  'VU': { name: '瓦努阿图', factor: 110.17 },
-  'XK': { name: '科索沃', factor: 0.33 },
-  'ZA': { name: '南非', factor: 6.93 },
-  'ZM': { name: '赞比亚', factor: 5.59 },
-  'ZW': { name: '津巴布韦', factor: 24.98 }
+const pppFactors: Record<string, number> = {
+  'AF': 18.71,
+  'AO': 167.66,
+  'AL': 41.01,
+  'AR': 28.67,
+  'AM': 157.09,
+  'AG': 2.06,
+  'AU': 1.47,
+  'AT': 0.76,
+  'AZ': 0.50,
+  'BI': 680.41,
+  'BE': 0.75,
+  'BJ': 211.97,
+  'BF': 209.84,
+  'BD': 32.81,
+  'BG': 0.70,
+  'BH': 0.18,
+  'BS': 0.88,
+  'BA': 0.66,
+  'BY': 0.77,
+  'BZ': 1.37,
+  'BO': 2.60,
+  'BR': 2.36,
+  'BB': 2.24,
+  'BN': 0.58,
+  'BT': 20.11,
+  'BW': 4.54,
+  'CF': 280.19,
+  'CA': 1.21,
+  'CH': 1.14,
+  'CL': 418.43,
+  'CN': 4.19,
+  'CI': 245.25,
+  'CM': 228.75,
+  'CD': 911.27,
+  'CG': 312.04,
+  'CO': 1352.79,
+  'KM': 182.34,
+  'CV': 46.51,
+  'CR': 335.86,
+  'CY': 0.61,
+  'CZ': 12.66,
+  'DE': 0.75,
+  'DJ': 105.29,
+  'DM': 1.69,
+  'DK': 6.60,
+  'DO': 22.90,
+  'DZ': 37.24,
+  'EC': 0.51,
+  'EG': 4.51,
+  'ES': 0.62,
+  'EE': 0.53,
+  'ET': 12.11,
+  'FI': 0.84,
+  'FJ': 0.91,
+  'FR': 0.73,
+  'GA': 265.46,
+  'GB': 0.70,
+  'GE': 0.90,
+  'GH': 2.33,
+  'GN': 4053.64,
+  'GM': 17.79,
+  'GW': 214.86,
+  'GQ': 229.16,
+  'GR': 0.54,
+  'GD': 1.64,
+  'GT': 4.01,
+  'GY': 73.60,
+  'HK': 6.07,
+  'HN': 10.91,
+  'HR': 3.21,
+  'HT': 40.20,
+  'HU': 148.01,
+  'ID': 4673.65,
+  'IN': 21.99,
+  'IE': 0.78,
+  'IR': 30007.63,
+  'IQ': 507.58,
+  'IS': 145.34,
+  'IL': 3.59,
+  'IT': 0.66,
+  'JM': 72.03,
+  'JO': 0.29,
+  'JP': 102.84,
+  'KZ': 139.91,
+  'KE': 43.95,
+  'KG': 18.28,
+  'KH': 1400.09,
+  'KI': 1.00,
+  'KN': 1.92,
+  'KR': 861.82,
+  'LA': 2889.36,
+  'LB': 1414.91,
+  'LR': 0.41,
+  'LY': 0.48,
+  'LC': 1.93,
+  'LK': 51.65,
+  'LS': 5.90,
+  'LT': 0.45,
+  'LU': 0.86,
+  'LV': 0.48,
+  'MO': 5.18,
+  'MA': 3.92,
+  'MD': 6.06,
+  'MG': 1178.10,
+  'MV': 8.35,
+  'MX': 9.52,
+  'MK': 18.83,
+  'ML': 211.41,
+  'MT': 0.57,
+  'MM': 417.35,
+  'ME': 0.33,
+  'MN': 931.67,
+  'MZ': 24.05,
+  'MR': 12.01,
+  'MU': 16.52,
+  'MW': 298.82,
+  'MY': 1.57,
+  'NA': 7.40,
+  'NE': 257.60,
+  'NG': 144.27,
+  'NI': 11.75,
+  'NL': 0.77,
+  'NO': 10.03,
+  'NP': 33.52,
+  'NZ': 1.45,
+  'PK': 38.74,
+  'PA': 0.46,
+  'PE': 1.80,
+  'PH': 19.51,
+  'PG': 2.11,
+  'PL': 1.78,
+  'PR': 0.92,
+  'PT': 0.57,
+  'PY': 2575.54,
+  'PS': 0.57,
+  'QA': 2.06,
+  'RO': 1.71,
+  'RU': 25.88,
+  'RW': 339.88,
+  'SA': 1.61,
+  'SD': 21.85,
+  'SN': 245.98,
+  'SG': 0.84,
+  'SB': 7.08,
+  'SL': 2739.26,
+  'SV': 0.45,
+  'SO': 9107.78,
+  'RS': 41.13,
+  'ST': 10.94,
+  'SR': 3.55,
+  'SK': 0.53,
+  'SI': 0.56,
+  'SE': 8.77,
+  'SZ': 6.36,
+  'SC': 7.82,
+  'TC': 1.07,
+  'TD': 220.58,
+  'TG': 236.83,
+  'TH': 12.34,
+  'TJ': 2.30,
+  'TL': 0.41,
+  'TT': 4.15,
+  'TN': 0.91,
+  'TR': 2.13,
+  'TV': 1.29,
+  'TW': 13.85,
+  'TZ': 888.32,
+  'UG': 1321.35,
+  'UA': 7.69,
+  'UY': 28.45,
+  'US': 1.00,
+  'UZ': 2297.17,
+  'VC': 1.54,
+  'VN': 7473.67,
+  'VU': 110.17,
+  'XK': 0.33,
+  'ZA': 6.93,
+  'ZM': 5.59,
+  'ZW': 24.98
 };
 
-// 为英文界面添加国家名称
-const countryNamesEn: Record<string, string> = {
-  'AF': 'Afghanistan',
-  'AO': 'Angola',
-  'AL': 'Albania',
-  'AR': 'Argentina',
-  'AM': 'Armenia',
-  'AG': 'Antigua and Barbuda',
-  'AU': 'Australia',
-  'AT': 'Austria',
-  'AZ': 'Azerbaijan',
-  'BI': 'Burundi',
-  'BE': 'Belgium',
-  'BJ': 'Benin',
-  'BF': 'Burkina Faso',
-  'BD': 'Bangladesh',
-  'BG': 'Bulgaria',
-  'BH': 'Bahrain',
-  'BS': 'Bahamas',
-  'BA': 'Bosnia and Herzegovina',
-  'BY': 'Belarus',
-  'BZ': 'Belize',
-  'BO': 'Bolivia',
-  'BR': 'Brazil',
-  'BB': 'Barbados',
-  'BN': 'Brunei Darussalam',
-  'BT': 'Bhutan',
-  'BW': 'Botswana',
-  'CF': 'Central African Republic',
-  'CA': 'Canada',
-  'CH': 'Switzerland',
-  'CL': 'Chile',
-  'CN': 'China',
-  'CI': 'Côte d\'Ivoire',
-  'CM': 'Cameroon',
-  'CD': 'Congo (DRC)',
-  'CG': 'Congo (Republic)',
-  'CO': 'Colombia',
-  'KM': 'Comoros',
-  'CV': 'Cape Verde',
-  'CR': 'Costa Rica',
-  'CY': 'Cyprus',
-  'CZ': 'Czech Republic',
-  'DE': 'Germany',
-  'DJ': 'Djibouti',
-  'DM': 'Dominica',
-  'DK': 'Denmark',
-  'DO': 'Dominican Republic',
-  'DZ': 'Algeria',
-  'EC': 'Ecuador',
-  'EG': 'Egypt',
-  'ES': 'Spain',
-  'EE': 'Estonia',
-  'ET': 'Ethiopia',
-  'FI': 'Finland',
-  'FJ': 'Fiji',
-  'FR': 'France',
-  'GA': 'Gabon',
-  'GB': 'United Kingdom',
-  'GE': 'Georgia',
-  'GH': 'Ghana',
-  'GN': 'Guinea',
-  'GM': 'Gambia',
-  'GW': 'Guinea-Bissau',
-  'GQ': 'Equatorial Guinea',
-  'GR': 'Greece',
-  'GD': 'Grenada',
-  'GT': 'Guatemala',
-  'GY': 'Guyana',
-  'HK': 'Hong Kong SAR',
-  'HN': 'Honduras',
-  'HR': 'Croatia',
-  'HT': 'Haiti',
-  'HU': 'Hungary',
-  'ID': 'Indonesia',
-  'IN': 'India',
-  'IE': 'Ireland',
-  'IR': 'Iran',
-  'IQ': 'Iraq',
-  'IS': 'Iceland',
-  'IL': 'Israel',
-  'IT': 'Italy',
-  'JM': 'Jamaica',
-  'JO': 'Jordan',
-  'JP': 'Japan',
-  'KZ': 'Kazakhstan',
-  'KE': 'Kenya',
-  'KG': 'Kyrgyzstan',
-  'KH': 'Cambodia',
-  'KI': 'Kiribati',
-  'KN': 'St. Kitts and Nevis',
-  'KR': 'South Korea',
-  'LA': 'Laos',
-  'LB': 'Lebanon',
-  'LR': 'Liberia',
-  'LY': 'Libya',
-  'LC': 'St. Lucia',
-  'LK': 'Sri Lanka',
-  'LS': 'Lesotho',
-  'LT': 'Lithuania',
-  'LU': 'Luxembourg',
-  'LV': 'Latvia',
-  'MO': 'Macao SAR',
-  'MA': 'Morocco',
-  'MD': 'Moldova',
-  'MG': 'Madagascar',
-  'MV': 'Maldives',
-  'MX': 'Mexico',
-  'MK': 'North Macedonia',
-  'ML': 'Mali',
-  'MT': 'Malta',
-  'MM': 'Myanmar',
-  'ME': 'Montenegro',
-  'MN': 'Mongolia',
-  'MZ': 'Mozambique',
-  'MR': 'Mauritania',
-  'MU': 'Mauritius',
-  'MW': 'Malawi',
-  'MY': 'Malaysia',
-  'NA': 'Namibia',
-  'NE': 'Niger',
-  'NG': 'Nigeria',
-  'NI': 'Nicaragua',
-  'NL': 'Netherlands',
-  'NO': 'Norway',
-  'NP': 'Nepal',
-  'NZ': 'New Zealand',
-  'PK': 'Pakistan',
-  'PA': 'Panama',
-  'PE': 'Peru',
-  'PH': 'Philippines',
-  'PG': 'Papua New Guinea',
-  'PL': 'Poland',
-  'PR': 'Puerto Rico',
-  'PT': 'Portugal',
-  'PY': 'Paraguay',
-  'PS': 'West Bank and Gaza',
-  'QA': 'Qatar',
-  'RO': 'Romania',
-  'RU': 'Russia',
-  'RW': 'Rwanda',
-  'SA': 'Saudi Arabia',
-  'SD': 'Sudan',
-  'SN': 'Senegal',
-  'SG': 'Singapore',
-  'SB': 'Solomon Islands',
-  'SL': 'Sierra Leone',
-  'SV': 'El Salvador',
-  'SO': 'Somalia',
-  'RS': 'Serbia',
-  'ST': 'São Tomé and Principe',
-  'SR': 'Suriname',
-  'SK': 'Slovak Republic',
-  'SI': 'Slovenia',
-  'SE': 'Sweden',
-  'SZ': 'Eswatini',
-  'SC': 'Seychelles',
-  'TC': 'Turks and Caicos Islands',
-  'TD': 'Chad',
-  'TG': 'Togo',
-  'TH': 'Thailand',
-  'TJ': 'Tajikistan',
-  'TL': 'Timor-Leste',
-  'TT': 'Trinidad and Tobago',
-  'TN': 'Tunisia',
-  'TR': 'Turkey',
-  'TV': 'Tuvalu',
-  'TZ': 'Tanzania',
-  'UG': 'Uganda',
-  'UA': 'Ukraine',
-  'UY': 'Uruguay',
-  'US': 'United States',
-  'UZ': 'Uzbekistan',
-  'VC': 'St. Vincent and the Grenadines',
-  'VN': 'Vietnam',
-  'VU': 'Vanuatu',
-  'XK': 'Kosovo',
-  'ZA': 'South Africa',
-  'ZM': 'Zambia',
-  'ZW': 'Zimbabwe'
+// 添加各国货币符号映射
+const currencySymbols: Record<string, string> = {
+  'AF': '؋', // 阿富汗尼
+  'AL': 'L', // 阿尔巴尼亚列克
+  'DZ': 'د.ج', // 阿尔及利亚第纳尔
+  'AO': 'Kz', // 安哥拉宽扎
+  'AR': '$', // 阿根廷比索
+  'AM': '֏', // 亚美尼亚德拉姆
+  'AU': 'A$', // 澳大利亚元
+  'AT': '€', // 欧元
+  'AZ': '₼', // 阿塞拜疆马纳特
+  'BI': 'FBu', // 布隆迪法郎
+  'BE': '€', // 欧元
+  'BJ': 'CFA', // 西非法郎
+  'BF': 'CFA', // 西非法郎
+  'BD': '৳', // 孟加拉塔卡
+  'BG': 'лв', // 保加利亚列弗
+  'BH': '.د.ب', // 巴林第纳尔
+  'BS': 'B$', // 巴哈马元
+  'BA': 'KM', // 波黑可兑换马克
+  'BY': 'Br', // 白俄罗斯卢布
+  'BZ': 'BZ$', // 伯利兹元
+  'BO': 'Bs', // 玻利维亚诺
+  'BR': 'R$', // 巴西雷亚尔
+  'BB': 'Bds$', // 巴巴多斯元
+  'BN': 'B$', // 文莱元
+  'BT': 'Nu.', // 不丹努扎姆
+  'BW': 'P', // 博茨瓦纳普拉
+  'CA': 'C$', // 加拿大元
+  'CH': 'CHF', // 瑞士法郎
+  'CL': 'CLP$', // 智利比索
+  'CN': '¥', // 人民币
+  'CI': 'CFA', // 西非法郎
+  'CM': 'FCFA', // 中非法郎
+  'CD': 'FC', // 刚果法郎
+  'CG': 'FCFA', // 中非法郎
+  'CO': 'Col$', // 哥伦比亚比索
+  'CR': '₡', // 哥斯达黎加科朗
+  'CY': '€', // 欧元
+  'CZ': 'Kč', // 捷克克朗
+  'DE': '€', // 欧元
+  'DK': 'kr', // 丹麦克朗
+  'DO': 'RD$', // 多米尼加比索
+  'EC': '$', // 美元（厄瓜多尔使用美元）
+  'EG': 'E£', // 埃及镑
+  'ES': '€', // 欧元
+  'EE': '€', // 欧元
+  'ET': 'Br', // 埃塞俄比亚比尔
+  'FI': '€', // 欧元
+  'FJ': 'FJ$', // 斐济元
+  'FR': '€', // 欧元
+  'GB': '£', // 英镑
+  'GE': '₾', // 格鲁吉亚拉里
+  'GH': '₵', // 加纳塞地
+  'GR': '€', // 欧元
+  'GT': 'Q', // 危地马拉格查尔
+  'HK': 'HK$', // 港元
+  'HN': 'L', // 洪都拉斯伦皮拉
+  'HR': '€', // 欧元（克罗地亚自2023年加入欧元区）
+  'HU': 'Ft', // 匈牙利福林
+  'ID': 'Rp', // 印尼盾
+  'IN': '₹', // 印度卢比
+  'IE': '€', // 欧元
+  'IR': '﷼', // 伊朗里亚尔
+  'IQ': 'ع.د', // 伊拉克第纳尔
+  'IS': 'kr', // 冰岛克朗
+  'IL': '₪', // 以色列新谢克尔
+  'IT': '€', // 欧元
+  'JM': 'J$', // 牙买加元
+  'JO': 'JD', // 约旦第纳尔
+  'JP': '¥', // 日元
+  'KE': 'KSh', // 肯尼亚先令
+  'KR': '₩', // 韩元
+  'KW': 'د.ك', // 科威特第纳尔
+  'LB': 'L£', // 黎巴嫩镑
+  'LK': 'Rs', // 斯里兰卡卢比
+  'LT': '€', // 欧元
+  'LU': '€', // 欧元
+  'LV': '€', // 欧元
+  'MA': 'د.م.', // 摩洛哥迪拉姆
+  'MX': 'Mex$', // 墨西哥比索
+  'MY': 'RM', // 马来西亚林吉特
+  'NG': '₦', // 尼日利亚奈拉
+  'NL': '€', // 欧元
+  'NO': 'kr', // 挪威克朗
+  'NP': 'रू', // 尼泊尔卢比
+  'NZ': 'NZ$', // 新西兰元
+  'PK': '₨', // 巴基斯坦卢比
+  'PA': 'B/.', // 巴拿马巴波亚
+  'PE': 'S/.', // 秘鲁索尔
+  'PH': '₱', // 菲律宾比索
+  'PL': 'zł', // 波兰兹罗提
+  'PT': '€', // 欧元
+  'QA': 'ر.ق', // 卡塔尔里亚尔
+  'RO': 'lei', // 罗马尼亚列伊
+  'RU': '₽', // 俄罗斯卢布
+  'SA': 'ر.س', // 沙特里亚尔
+  'SG': 'S$', // 新加坡元
+  'SK': '€', // 欧元
+  'SI': '€', // 欧元
+  'SE': 'kr', // 瑞典克朗
+  'TH': '฿', // 泰铢
+  'TR': '₺', // 土耳其里拉
+  'TW': 'NT$', // 新台币
+  'UA': '₴', // 乌克兰格里夫纳
+  'US': '$', // 美元
+  'UY': '$U', // 乌拉圭比索
+  'VN': '₫', // 越南盾
+  'ZA': 'R', // 南非兰特
+  // 默认其他国家使用美元符号
 };
 
 // 定义历史记录项的接口
@@ -479,6 +411,26 @@ const SalaryCalculator = () => {
   const [showPPPInput, setShowPPPInput] = useState(false);
   // 修改为国家代码，默认为中国
   const [selectedCountry, setSelectedCountry] = useState<string>('CN');
+  
+  // 初始化时从localStorage加载国家设置
+  useEffect(() => {
+    // 从本地存储读取国家设置
+    if (typeof window !== 'undefined') {
+      const savedCountry = localStorage.getItem('selectedCountry');
+      if (savedCountry) {
+        setSelectedCountry(savedCountry);
+      }
+    }
+  }, []);
+  
+  // 当国家选择改变时保存到localStorage
+  const handleCountryChange = (countryCode: string) => {
+    setSelectedCountry(countryCode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedCountry', countryCode);
+    }
+  };
+  
   const [result, setResult] = useState<Result | null>(null);
   const [showPPPList, setShowPPPList] = useState(false);
   const [assessment, setAssessment] = useState("");
@@ -505,13 +457,37 @@ const SalaryCalculator = () => {
     // 延迟检查busuanzi是否已加载
     const timer = setTimeout(() => {
       const pv = document.getElementById('busuanzi_value_site_pv');
+      const uv = document.getElementById('busuanzi_value_site_uv');
+      
       if (pv && pv.innerText !== '') {
+        // 直接在现有数字上加上1700000（原seeyoufarm统计数据）
+        const currentCount = parseInt(pv.innerText, 10) || 0;
+        pv.innerText = (currentCount + 1700000).toString();
+        
+        // 同时增加访客数的历史数据
+        if (uv && uv.innerText !== '') {
+          const currentUV = parseInt(uv.innerText, 10) || 0;
+          uv.innerText = (currentUV + 250000).toString();
+        }
+        
         setVisitorVisible(true);
       } else {
         // 如果未加载，再次尝试
         const retryTimer = setTimeout(() => {
           const pv = document.getElementById('busuanzi_value_site_pv');
+          const uv = document.getElementById('busuanzi_value_site_uv');
+          
           if (pv && pv.innerText !== '') {
+            // 直接在现有数字上加上1700000（原seeyoufarm统计数据）
+            const currentCount = parseInt(pv.innerText, 10) || 0;
+            pv.innerText = (currentCount + 1700000).toString();
+            
+            // 同时增加访客数的历史数据
+            if (uv && uv.innerText !== '') {
+              const currentUV = parseInt(uv.innerText, 10) || 0;
+              uv.innerText = (currentUV + 1300000).toString();
+            }
+            
             setVisitorVisible(true);
           }
         }, 2000);
@@ -565,7 +541,7 @@ const SalaryCalculator = () => {
     // 应用PPP转换因子标准化薪资
     // 如果选择了非中国地区，使用选定国家的PPP；否则使用中国默认值4.19
     const isNonChina = selectedCountry !== 'CN';
-    const pppFactor = isNonChina ? pppFactors[selectedCountry]?.factor || 4.19 : 4.19;
+    const pppFactor = isNonChina ? pppFactors[selectedCountry] || 4.19 : 4.19;
     const standardizedSalary = Number(formData.salary) * (4.19 / pppFactor);
     
     return standardizedSalary / workingDays; // 除 0 不管, Infinity(爽到爆炸)!
@@ -577,7 +553,7 @@ const SalaryCalculator = () => {
     const isNonChina = selectedCountry !== 'CN';
     if (isNonChina) {
       // 非中国地区，转回本地货币
-      const pppFactor = pppFactors[selectedCountry]?.factor || 4.19;
+      const pppFactor = pppFactors[selectedCountry] || 4.19;
       return (dailySalaryInCNY * pppFactor / 4.19).toFixed(2);
     } else {
       return dailySalaryInCNY.toFixed(2);
@@ -690,6 +666,18 @@ const SalaryCalculator = () => {
     if (value <= 4.0) return { text: t('rating_excellent'), color: "text-purple-500" };
     return { text: t('rating_perfect'), color: "text-yellow-400" };
   };
+  
+  // 获取评级的翻译键，用于分享链接
+  const getValueAssessmentKey = () => {
+    if (!formData.salary) return 'rating_enter_salary';
+    if (value < 0.6) return 'rating_terrible';
+    if (value < 1.0) return 'rating_poor';
+    if (value <= 1.8) return 'rating_average';
+    if (value <= 2.5) return 'rating_good';
+    if (value <= 3.2) return 'rating_great';
+    if (value <= 4.0) return 'rating_excellent';
+    return 'rating_perfect';
+  };
 
   const RadioGroup = ({ label, name, value, onChange, options }: {
     label: string;
@@ -785,9 +773,12 @@ const SalaryCalculator = () => {
   // 获取当前选择的国家名称（根据语言）
   const getCountryName = useCallback((countryCode: string) => {
     if (language === 'en') {
-      return countryNamesEn[countryCode] || pppFactors[countryCode]?.name || 'Unknown';
+      return countryNames.en[countryCode] || countryCode || 'Unknown';
     }
-    return pppFactors[countryCode]?.name || 'Unknown';
+    if (language === 'ja') {
+      return countryNames.ja[countryCode] || countryCode || '不明';
+    }
+    return countryNames.zh[countryCode] || countryCode || '未知';
   }, [language]);
   
   // 保存当前记录到历史中
@@ -852,13 +843,30 @@ const SalaryCalculator = () => {
     return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
   };
 
+  // 获取当前选择国家的货币符号
+  const getCurrencySymbol = useCallback((countryCode: string) => {
+    return currencySymbols[countryCode] || '$'; // 如果没有找到对应货币符号，默认使用美元符号
+  }, []);
+
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
       <div className="mb-4 text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 py-2">{t('title')}</h1>
         
+        <div className="mb-3">
+          <a
+            href="https://github.com/zippland/worth-calculator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1.5"
+          >
+            <Star className="h-3.5 w-3.5" />
+            {t('star_request')}
+          </a>
+        </div>
+        
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('version')}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v5.6.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
@@ -869,13 +877,13 @@ const SalaryCalculator = () => {
             {t('github')}
           </a>
           <a
-            href="https://www.xiaohongshu.com/user/profile/6355d5c4000000001f0292bf"
+            href="https://www.xiaohongshu.com/user/profile/623e8b080000000010007721?xsec_token=YBzoLUB4HsSITTBOgPAXY-0Gvqvn3HqHpcDeA3sHhDh-M%3D&xsec_source=app_share&xhsshare=CopyLink&appuid=5c5d5259000000001d00ef04&apptime=1743400694&share_id=b9bfcd5090f9473daf5c1d1dc3eb0921&share_channel=copy_link"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
           >
             <Book className="h-3.5 w-3.5" />
-            {language === 'zh' ? t('xiaohongshu') : 'Rednote'}
+            {t('xiaohongshu')}
           </a>
           {/* 仅在客户端渲染历史记录按钮 */}
           {isBrowser && (
@@ -1032,7 +1040,9 @@ const SalaryCalculator = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {selectedCountry !== 'CN' ? t('annual_salary_foreign') : t('annual_salary_cny')}
+                {selectedCountry !== 'CN' ? 
+                  `${t('annual_salary')}(${getCurrencySymbol(selectedCountry)})` : 
+                  t('annual_salary_cny')}
               </label>
               <div className="flex items-center gap-2 mt-1">
                 <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
@@ -1040,7 +1050,9 @@ const SalaryCalculator = () => {
                   type="number"
                   value={formData.salary}
                   onChange={(e) => handleInputChange('salary', e.target.value)}
-                  placeholder={selectedCountry !== 'CN' ? t('salary_placeholder_foreign') : t('salary_placeholder_cny')}
+                  placeholder={selectedCountry !== 'CN' ? 
+                    `${t('salary_placeholder')} ${getCurrencySymbol(selectedCountry)}` : 
+                    t('salary_placeholder_cny')}
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
               </div>
@@ -1057,22 +1069,25 @@ const SalaryCalculator = () => {
                 </span>
               </label>
               <select
+                id="country"
+                name="country"
                 value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                onChange={(e) => handleCountryChange(e.target.value)}
+                className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 {Object.keys(pppFactors).sort((a, b) => {
-                  const nameA = getCountryName(a);
-                  const nameB = getCountryName(b);
-                  return nameA.localeCompare(nameB);
+                  // 确保中国始终排在第一位
+                  if (a === 'CN') return -1;
+                  if (b === 'CN') return 1;
+                  return getCountryName(a).localeCompare(getCountryName(b));
                 }).map(code => (
                   <option key={code} value={code}>
-                    {getCountryName(code)} ({pppFactors[code].factor})
+                    {getCountryName(code)} ({pppFactors[code].toFixed(2)})
                   </option>
                 ))}
               </select>
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {t('selected_ppp')}: {pppFactors[selectedCountry]?.factor || 4.19}
+                {t('selected_ppp')}: {(pppFactors[selectedCountry] || 4.19).toFixed(2)}
               </p>
             </div>
 
@@ -1387,7 +1402,7 @@ const SalaryCalculator = () => {
           <div>
             <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('average_daily_salary')}</div>
             <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
-              {selectedCountry !== 'CN' ? '$' : '¥'}{getDisplaySalary()}
+              {getCurrencySymbol(selectedCountry)}{getDisplaySalary()}
             </div>
           </div>
           <div>
@@ -1406,7 +1421,7 @@ const SalaryCalculator = () => {
               pathname: '/share',
               query: {
                 value: value.toFixed(2),
-                assessment: getValueAssessment().text,
+                assessment: getValueAssessmentKey(),
                 assessmentColor: getValueAssessment().color,
                 cityFactor: formData.cityFactor,
                 workHours: formData.workHours,
@@ -1433,7 +1448,8 @@ const SalaryCalculator = () => {
                 jobStability: formData.jobStability,
                 bachelorType: formData.bachelorType,
                 countryCode: selectedCountry,
-                countryName: getCountryName(selectedCountry)
+                countryName: getCountryName(selectedCountry),
+                currencySymbol: getCurrencySymbol(selectedCountry)
               }
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors

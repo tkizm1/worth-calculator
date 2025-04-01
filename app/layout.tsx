@@ -16,8 +16,8 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "这b班上得值不值",
-    template: "%s | 这b班上得值不值"
+    default: "Is My Job Worth It?",
+    template: "%s | Is My Job Worth It?"
   },
   alternates: {
     languages: {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
       "zh-CN": "/",
     },
   },
-  description: "这b班上得值不值 - 计算你的工作性价比 | Is This Job Worth It? - Calculate your job's value",
+  description: "这b班上得值不值 - 计算你的工作性价比 | Is My Job Worth It? - Calculate your job's value",
   verification: {
     google: "_OQGiIpYz87USAsgJV2C07-JJhQ8myV_4GoM1kDjFic",
   },
