@@ -979,28 +979,22 @@ const SalaryCalculator = () => {
       <div className="mb-4 text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 py-2">{t('title')}</h1>
         
-        <div className="mb-3">
-          <a
-            href="https://github.com/zippland/worth-calculator"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1.5"
-          >
-            <Star className="h-3.5 w-3.5" />
-            {t('star_request')}
-          </a>
-        </div>
+        {/* 添加应用描述文字 - 调整样式使其更加醒目 */}
+        <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 mb-5 font-medium">
+          {t('app_description')}
+        </p>
         
+        {/* 删除单独的star_request元素，直接将star_request作为GitHub链接文本 */}
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">v6.3.1</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v6.2.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
+            className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors inline-flex items-center gap-1"
           >
-            <Github className="h-3.5 w-3.5" />
-            {t('github')}
+            <Github className="h-3 w-3" />
+            {t('star_request')}
           </a>
           {/* <a
             href="https://www.xiaohongshu.com/user/profile/623e8b080000000010007721?xsec_token=YBzoLUB4HsSITTBOgPAXY-0Gvqvn3HqHpcDeA3sHhDh-M%3D&xsec_source=app_share&xhsshare=CopyLink&appuid=5c5d5259000000001d00ef04&apptime=1743400694&share_id=b9bfcd5090f9473daf5c1d1dc3eb0921&share_channel=copy_link"
@@ -1015,9 +1009,9 @@ const SalaryCalculator = () => {
           {isBrowser && (
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1 cursor-pointer"
+              className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors flex items-center gap-1 cursor-pointer"
             >
-              <History className="h-3.5 w-3.5" />
+              <History className="h-3 w-3" />
               {t('history')}
             </button>
           )}
@@ -1232,6 +1226,8 @@ const SalaryCalculator = () => {
               </button>
             ))}
           </div>
+          
+          {/* 删除此处的完成度指示器 */}
         </div>
 
         {/* 表单内容 */}
@@ -1243,172 +1239,172 @@ const SalaryCalculator = () => {
                 {t('basic_info')}
               </h2>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {selectedCountry !== 'CN' ? 
-                    `${t('annual_salary')}(${getCurrencySymbol(selectedCountry)})` : 
-                    t('annual_salary_cny')}
-                </label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                  <input
-                    type="number"
-                    value={formData.salary}
-                    onChange={(e) => handleInputChange('salary', e.target.value)}
-                    placeholder={selectedCountry !== 'CN' ? 
-                      `${t('salary_placeholder')} ${getCurrencySymbol(selectedCountry)}` : 
-                      t('salary_placeholder_cny')}
-                    className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                  />
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {selectedCountry !== 'CN' ? 
+                  `${t('annual_salary')}(${getCurrencySymbol(selectedCountry)})` : 
+                  t('annual_salary_cny')}
+              </label>
+              <div className="flex items-center gap-2 mt-1">
+                <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <input
+                  type="number"
+                  value={formData.salary}
+                  onChange={(e) => handleInputChange('salary', e.target.value)}
+                  placeholder={selectedCountry !== 'CN' ? 
+                    `${t('salary_placeholder')} ${getCurrencySymbol(selectedCountry)}` : 
+                    t('salary_placeholder_cny')}
+                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
               </div>
+            </div>
 
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('country_selection')}
-                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                    ?
-                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      {t('ppp_tooltip')}
-                    </span>
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('country_selection')}
+                <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                  ?
+                  <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                    {t('ppp_tooltip')}
                   </span>
-                </label>
-                <select
-                  id="country"
-                  name="country"
-                  value={selectedCountry}
-                  onChange={(e) => handleCountryChange(e.target.value)}
-                  className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  {Object.keys(pppFactors).sort((a, b) => {
-                    // 确保中国始终排在第一位
-                    if (a === 'CN') return -1;
-                    if (b === 'CN') return 1;
-                    return getCountryName(a).localeCompare(getCountryName(b));
-                  }).map(code => (
-                    <option key={code} value={code}>
-                      {getCountryName(code)} ({pppFactors[code].toFixed(2)})
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {t('selected_ppp')}: {(pppFactors[selectedCountry] || 4.19).toFixed(2)}
-                </p>
-              </div>
+                </span>
+              </label>
+              <select
+                id="country"
+                name="country"
+                value={selectedCountry}
+                onChange={(e) => handleCountryChange(e.target.value)}
+                className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              >
+                {Object.keys(pppFactors).sort((a, b) => {
+                  // 确保中国始终排在第一位
+                  if (a === 'CN') return -1;
+                  if (b === 'CN') return 1;
+                  return getCountryName(a).localeCompare(getCountryName(b));
+                }).map(code => (
+                  <option key={code} value={code}>
+                    {getCountryName(code)} ({pppFactors[code].toFixed(2)})
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {t('selected_ppp')}: {(pppFactors[selectedCountry] || 4.19).toFixed(2)}
+              </p>
+            </div>
 
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('work_time_schedule')}</h3>
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_days_per_week')}</label>
-                    <input
-                      type="number"
-                      value={formData.workDaysPerWeek}
-                      onChange={(e) => handleInputChange('workDaysPerWeek', e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('wfh_days_per_week')}
-                      <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                        ?
-                        <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                          {t('wfh_tooltip')}
-                        </span>
-                      </span>
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      max={formData.workDaysPerWeek}
-                      step="1"
-                      value={formData.wfhDaysPerWeek}
-                      onChange={(e) => handleInputChange('wfhDaysPerWeek', e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('annual_leave')}</label>
-                    <input
-                      type="number"
-                      value={formData.annualLeave}
-                      onChange={(e) => handleInputChange('annualLeave', e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('public_holidays')}</label>
-                    <input
-                      type="number"
-                      value={formData.publicHolidays}
-                      onChange={(e) => handleInputChange('publicHolidays', e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('paid_sick_leave')}</label>
-                    <input
-                      type="number"
-                      value={formData.paidSickLeave}
-                      onChange={(e) => handleInputChange('paidSickLeave', e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_days_per_week')}</label>
+                <input
+                  type="number"
+                  value={formData.workDaysPerWeek}
+                  onChange={(e) => handleInputChange('workDaysPerWeek', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('wfh_days_per_week')}
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                    ?
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                      {t('wfh_tooltip')}
+                    </span>
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max={formData.workDaysPerWeek}
+                  step="1"
+                  value={formData.wfhDaysPerWeek}
+                  onChange={(e) => handleInputChange('wfhDaysPerWeek', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('annual_leave')}</label>
+                <input
+                  type="number"
+                  value={formData.annualLeave}
+                  onChange={(e) => handleInputChange('annualLeave', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('public_holidays')}</label>
+                <input
+                  type="number"
+                  value={formData.publicHolidays}
+                  onChange={(e) => handleInputChange('publicHolidays', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('paid_sick_leave')}</label>
+                <input
+                  type="number"
+                  value={formData.paidSickLeave}
+                  onChange={(e) => handleInputChange('paidSickLeave', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+                  </div>
+              </div>
+            </div>
 
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                 <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('daily_schedule')}</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('work_hours')}
-                      <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                        ?
-                        <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                          {t('work_hours_tooltip')}
-                        </span>
-                      </span>
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.workHours}
-                      onChange={(e) => handleInputChange('workHours', e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('commute_hours')}
-                      <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                        ?
-                        <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                          {t('commute_tooltip')}
-                        </span>
-                      </span>
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.commuteHours}
-                      onChange={(e) => handleInputChange('commuteHours', e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('rest_time')}</label>
-                    <input
-                      type="number"
-                      value={formData.restTime}
-                      onChange={(e) => handleInputChange('restTime', e.target.value)}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('work_hours')}
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                    ?
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                      {t('work_hours_tooltip')}
+                    </span>
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.workHours}
+                  onChange={(e) => handleInputChange('workHours', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('commute_hours')}
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                    ?
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                      {t('commute_tooltip')}
+                    </span>
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.commuteHours}
+                  onChange={(e) => handleInputChange('commuteHours', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('rest_time')}</label>
+                <input
+                  type="number"
+                  value={formData.restTime}
+                  onChange={(e) => handleInputChange('restTime', e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+          </div>
             </div>
           )}
           
@@ -1420,7 +1416,7 @@ const SalaryCalculator = () => {
               </h2>
               
               <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
-                <div className="space-y-4">
+          <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('education_level')}</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1500,13 +1496,13 @@ const SalaryCalculator = () => {
               
               <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
                 <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('job_type')}</h3>
-                <RadioGroup
-                  label={t('job_stability')}
-                  name="jobStability"
-                  value={formData.jobStability}
-                  onChange={handleInputChange}
-                  options={[
-                    { label: t('job_government'), value: 'government' },
+            <RadioGroup
+              label={t('job_stability')}
+              name="jobStability"
+              value={formData.jobStability}
+              onChange={handleInputChange}
+              options={[
+                { label: t('job_government'), value: 'government' },
                     { label: t('job_state'), value: 'state' },
                     { label: t('job_foreign'), value: 'foreign' },
                     { label: t('job_private'), value: 'private' },
@@ -1528,77 +1524,77 @@ const SalaryCalculator = () => {
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                 <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('environment_location')}</h3>
                 <div className="space-y-5">
-                  <RadioGroup
-                    label={t('work_environment')}
-                    name="workEnvironment"
-                    value={formData.workEnvironment}
-                    onChange={handleInputChange}
-                    options={[
-                      { label: t('env_remote'), value: '0.8' },
-                      { label: t('env_factory'), value: '0.9' },
-                      { label: t('env_normal'), value: '1.0' },
-                      { label: t('env_cbd'), value: '1.1' },
-                    ]}
-                  />
+            <RadioGroup
+              label={t('work_environment')}
+              name="workEnvironment"
+              value={formData.workEnvironment}
+              onChange={handleInputChange}
+              options={[
+                { label: t('env_remote'), value: '0.8' },
+                { label: t('env_factory'), value: '0.9' },
+                { label: t('env_normal'), value: '1.0' },
+                { label: t('env_cbd'), value: '1.1' },
+              ]}
+            />
 
-                  <RadioGroup
-                    label={t('city_factor')}
-                    name="cityFactor"
-                    value={formData.cityFactor}
-                    onChange={handleInputChange}
-                    options={[
-                      { label: t('city_tier1'), value: '0.70' },
-                      { label: t('city_newtier1'), value: '0.80' },
-                      { label: t('city_tier2'), value: '1.0' },
-                      { label: t('city_tier3'), value: '1.10' },
-                      { label: t('city_tier4'), value: '1.25' },
-                      { label: t('city_county'), value: '1.40' },
-                      { label: t('city_town'), value: '1.50' },
-                    ]}
-                  />
+            <RadioGroup
+              label={t('city_factor')}
+              name="cityFactor"
+              value={formData.cityFactor}
+              onChange={handleInputChange}
+              options={[
+                { label: t('city_tier1'), value: '0.70' },
+                { label: t('city_newtier1'), value: '0.80' },
+                { label: t('city_tier2'), value: '1.0' },
+                { label: t('city_tier3'), value: '1.10' },
+                { label: t('city_tier4'), value: '1.25' },
+                { label: t('city_county'), value: '1.40' },
+                { label: t('city_town'), value: '1.50' },
+              ]}
+            />
 
-                  <RadioGroup
-                    label={t('hometown')}
-                    name="homeTown"
-                    value={formData.homeTown}
-                    onChange={handleInputChange}
-                    options={[
-                      { label: t('not_hometown'), value: 'no' },
-                      { label: t('is_hometown'), value: 'yes' },
-                    ]}
-                  />
+            <RadioGroup
+              label={t('hometown')}
+              name="homeTown"
+              value={formData.homeTown}
+              onChange={handleInputChange}
+              options={[
+                { label: t('not_hometown'), value: 'no' },
+                { label: t('is_hometown'), value: 'yes' },
+              ]}
+            />
                 </div>
               </div>
-              
+
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('relationships')}</h3>
                 <div className="space-y-5">
-                  <RadioGroup
-                    label={t('leadership')}
-                    name="leadership"
-                    value={formData.leadership}
-                    onChange={handleInputChange}
-                    options={[
-                      { label: t('leader_bad'), value: '0.7' },
-                      { label: t('leader_strict'), value: '0.9' },
-                      { label: t('leader_normal'), value: '1.0' },
-                      { label: t('leader_good'), value: '1.1' },
-                      { label: t('leader_favorite'), value: '1.3' },
-                    ]}
-                  />
+            <RadioGroup
+              label={t('leadership')}
+              name="leadership"
+              value={formData.leadership}
+              onChange={handleInputChange}
+              options={[
+                { label: t('leader_bad'), value: '0.7' },
+                { label: t('leader_strict'), value: '0.9' },
+                { label: t('leader_normal'), value: '1.0' },
+                { label: t('leader_good'), value: '1.1' },
+                { label: t('leader_favorite'), value: '1.3' },
+              ]}
+            />
 
-                  <RadioGroup
-                    label={t('teamwork')}
-                    name="teamwork"
-                    value={formData.teamwork}
-                    onChange={handleInputChange}
-                    options={[
-                      { label: t('team_bad'), value: '0.9' },
-                      { label: t('team_normal'), value: '1.0' },
-                      { label: t('team_good'), value: '1.1' },
-                      { label: t('team_excellent'), value: '1.2' },
-                    ]}
-                  />
+            <RadioGroup
+              label={t('teamwork')}
+              name="teamwork"
+              value={formData.teamwork}
+              onChange={handleInputChange}
+              options={[
+                { label: t('team_bad'), value: '0.9' },
+                { label: t('team_normal'), value: '1.0' },
+                { label: t('team_good'), value: '1.1' },
+                { label: t('team_excellent'), value: '1.2' },
+              ]}
+            />
                 </div>
               </div>
             </div>
@@ -1628,18 +1624,18 @@ const SalaryCalculator = () => {
                   
                   {formData.hasShuttle && (
                     <div className="ml-6 p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm">
-                      <RadioGroup
+            <RadioGroup
                         label=""
-                        name="shuttle"
-                        value={formData.shuttle}
-                        onChange={handleInputChange}
-                        options={[
-                          { label: t('shuttle_none'), value: '1.0' },
-                          { label: t('shuttle_inconvenient'), value: '0.9' },
-                          { label: t('shuttle_convenient'), value: '0.7' },
-                          { label: t('shuttle_direct'), value: '0.5' },
-                        ]}
-                      />
+              name="shuttle"
+              value={formData.shuttle}
+              onChange={handleInputChange}
+              options={[
+                { label: t('shuttle_none'), value: '1.0' },
+                { label: t('shuttle_inconvenient'), value: '0.9' },
+                { label: t('shuttle_convenient'), value: '0.7' },
+                { label: t('shuttle_direct'), value: '0.5' },
+              ]}
+            />
                     </div>
                   )}
                 </div>
@@ -1660,22 +1656,22 @@ const SalaryCalculator = () => {
                   
                   {formData.hasCanteen && (
                     <div className="ml-6 p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm">
-                      <RadioGroup
+            <RadioGroup
                         label=""
-                        name="canteen"
-                        value={formData.canteen}
-                        onChange={handleInputChange}
-                        options={[
-                          { label: t('canteen_none'), value: '1.0' },
-                          { label: t('canteen_average'), value: '1.05' },
-                          { label: t('canteen_good'), value: '1.1' },
-                          { label: t('canteen_excellent'), value: '1.15' },
-                        ]}
-                      />
-                    </div>
+              name="canteen"
+              value={formData.canteen}
+              onChange={handleInputChange}
+              options={[
+                { label: t('canteen_none'), value: '1.0' },
+                { label: t('canteen_average'), value: '1.05' },
+                { label: t('canteen_good'), value: '1.1' },
+                { label: t('canteen_excellent'), value: '1.15' },
+              ]}
+            />
+                  </div>
                   )}
+                  </div>
                 </div>
-              </div>
             </div>
           )}
           
@@ -1695,87 +1691,105 @@ const SalaryCalculator = () => {
             {activeStep < formSteps.length - 1 ? (
               <button
                 onClick={nextStep}
-                className="px-4 py-2 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 transition-colors"
+                className="px-5 py-2.5 rounded-md text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors flex items-center shadow-sm"
               >
                 {t('next')}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             ) : (
               <div></div> /* 占位 */
-            )}
+                )}
+              </div>
+
+          {/* 将完成度指示器移动到这里 */}
+          <div className="mt-4 px-1">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300 ease-in-out" 
+                style={{ width: `${(activeStep + 1) * 25}%` }}
+              ></div>
+              </div>
+            <div className="flex justify-between mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <span>{Math.min((activeStep + 1) * 25, 100)}% {t('completed')}</span>
+              <span>{activeStep + 1}/{formSteps.length} {t('steps')}</span>
+            </div>
           </div>
+          
+          {/* 删除提示信息 */}
         </div>
       </div>
 
-      {/* 结果卡片 - 保持不变 */}
-      <div ref={shareResultsRef} className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-inner">
-        <div className="grid grid-cols-3 gap-8">
-          <div>
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('working_days_per_year')}</div>
-            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">{calculateWorkingDays()}{t('days_unit')}</div>
-          </div>
-          <div>
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('average_daily_salary')}</div>
-            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
-              {getCurrencySymbol(selectedCountry)}{getDisplaySalary()}
+      {/* 结果卡片 - 完全重新设计 */}
+      <div className="rounded-xl overflow-hidden">
+        <div ref={shareResultsRef} className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-inner">
+          {/* 根据完成状态显示不同内容 */}
+          {activeStep < formSteps.length - 1 ? (
+            /* 未完成全部步骤 - 显示鼓励提示 */
+            <div className="text-center py-4">
+              <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">
+                {t('complete_steps_to_view')}
+              </div>
+              <div className="font-medium text-gray-700 dark:text-gray-300">
+                {Math.min((activeStep + 1) * 25, 100)}% {t('completed')}
+              </div>
             </div>
-          </div>
-          <div>
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('job_value')}</div>
-            <div className={`text-2xl font-semibold mt-1 ${getValueAssessment().color}`}>
-              {value.toFixed(2)}
-              <span className="text-base ml-2">({getValueAssessment().text})</span>
+          ) : (
+            /* 已完成全部步骤 - 显示查看报告按钮 */
+            <div className="text-center">
+              {formData.salary ? (
+                <Link
+                  href={{
+                    pathname: '/share',
+                    query: {
+                      value: value.toFixed(2),
+                      assessment: getValueAssessmentKey(),
+                      assessmentColor: getValueAssessment().color,
+                      cityFactor: formData.cityFactor,
+                      workHours: formData.workHours,
+                      commuteHours: formData.commuteHours,
+                      restTime: formData.restTime,
+                      dailySalary: getDisplaySalary(),
+                      isYuan: selectedCountry !== 'CN' ? 'false' : 'true',
+                      workDaysPerYear: calculateWorkingDays().toString(),
+                      workDaysPerWeek: formData.workDaysPerWeek,
+                      wfhDaysPerWeek: formData.wfhDaysPerWeek,
+                      annualLeave: formData.annualLeave,
+                      paidSickLeave: formData.paidSickLeave,
+                      publicHolidays: formData.publicHolidays,
+                      workEnvironment: formData.workEnvironment,
+                      leadership: formData.leadership,
+                      teamwork: formData.teamwork,
+                      degreeType: formData.degreeType,
+                      schoolType: formData.schoolType,
+                      education: formData.education,
+                      homeTown: formData.homeTown,
+                      shuttle: formData.hasShuttle ? formData.shuttle : '1.0',
+                      canteen: formData.hasCanteen ? formData.canteen : '1.0',
+                      workYears: formData.workYears,
+                      jobStability: formData.jobStability,
+                      bachelorType: formData.bachelorType,
+                      countryCode: selectedCountry,
+                      countryName: getCountryName(selectedCountry),
+                      currencySymbol: getCurrencySymbol(selectedCountry),
+                      hasShuttle: formData.hasShuttle,
+                      hasCanteen: formData.hasCanteen,
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-md text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors shadow-sm"
+                  onClick={() => saveToHistory()}
+                >
+                  <FileText className="w-5 h-5 mr-1" />
+                  {t('view_report')}
+                </Link>
+              ) : (
+                <div className="text-amber-600 dark:text-amber-400">
+                  {t('please_enter_salary')}
+                </div>
+              )}
             </div>
-          </div>
-        </div>
-        
-        {/* 修改分享按钮为链接到分享页面，并保存到历史 */}
-        <div className="mt-6 flex justify-end">
-          <Link
-            href={{
-              pathname: '/share',
-              query: {
-                value: value.toFixed(2),
-                assessment: getValueAssessmentKey(),
-                assessmentColor: getValueAssessment().color,
-                cityFactor: formData.cityFactor,
-                workHours: formData.workHours,
-                commuteHours: formData.commuteHours,
-                restTime: formData.restTime,
-                dailySalary: getDisplaySalary(),
-                isYuan: selectedCountry !== 'CN' ? 'false' : 'true',
-                workDaysPerYear: calculateWorkingDays().toString(),
-                workDaysPerWeek: formData.workDaysPerWeek,
-                wfhDaysPerWeek: formData.wfhDaysPerWeek,
-                annualLeave: formData.annualLeave,
-                paidSickLeave: formData.paidSickLeave,
-                publicHolidays: formData.publicHolidays,
-                workEnvironment: formData.workEnvironment,
-                leadership: formData.leadership,
-                teamwork: formData.teamwork,
-                degreeType: formData.degreeType,
-                schoolType: formData.schoolType,
-                education: formData.education,
-                homeTown: formData.homeTown,
-                shuttle: formData.hasShuttle ? formData.shuttle : '1.0',
-                canteen: formData.hasCanteen ? formData.canteen : '1.0',
-                workYears: formData.workYears,
-                jobStability: formData.jobStability,
-                bachelorType: formData.bachelorType,
-                countryCode: selectedCountry,
-                countryName: getCountryName(selectedCountry),
-                currencySymbol: getCurrencySymbol(selectedCountry),
-                hasShuttle: formData.hasShuttle,
-                hasCanteen: formData.hasCanteen,
-              }
-            }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors
-              ${formData.salary ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800' : 
-              'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'}`}
-            onClick={() => formData.salary ? saveToHistory() : null}
-          >
-            <FileText className="w-4 h-4" />
-            {t('view_report')}
-          </Link>
+          )}
         </div>
       </div>
     </div>

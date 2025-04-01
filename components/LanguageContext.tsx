@@ -573,13 +573,13 @@ const translations: Record<Language, Record<string, string>> = {
   zh: {
     // 标题和导航
     'title': '这b班上得值不值·测算版',
-    'github': 'GitHub',
+    'app_description': '计算薪资之外的工作真实价值',
     'email': 'Email',
     'xiaohongshu': '小红书',
     'redirect_notice': '已自动跳转，新网址无需科学上网',
     'visits': '访问量',
     'visitors': '访客数',
-    'star_request': '如果觉得好用，请给项目点个⭐Star吧！',
+    'star_request': '到GitHub给个⭐',
     'history': '历史记录',
     'no_history': '暂无历史记录',
     'history_notice': '查看报告后将自动保存',
@@ -824,17 +824,27 @@ const translations: Record<Language, Record<string, string>> = {
     'job_type': '工作类型',
     'previous': '上一步',
     'next': '下一步',
+    
+    // 添加表单完成度相关翻译
+    'completed': '已完成',
+    'steps': '步骤',
+    'continue_filling': '继续完成以下步骤可获得更准确的评估结果',
+    'preliminary_result': '初步结果 - 完成所有步骤获得更准确的评估',
+    
+    // 添加新的提示信息翻译
+    'complete_steps_to_view': '完成所有步骤后可查看工作性价比报告',
+    'please_enter_salary': '请输入年薪以生成报告',
   },
   en: {
     // Title and navigation
     'title': 'Is My Job Worth the Grind?',
-    'github': 'GitHub',
+    'app_description': 'Calculating the actual value of your job beyond just salary',
     'email': 'Email',
     'xiaohongshu': 'Rednote',
     'redirect_notice': 'Automatically redirected, no VPN needed',
     'visits': 'Visits',
     'visitors': 'Visitors',
-    'star_request': 'If you find this tool helpful, please give it a ⭐Star!',
+    'star_request': 'Star on GitHub',
     'history': 'History',
     'no_history': 'No history records',
     'history_notice': 'Records will be saved after viewing reports',
@@ -1079,17 +1089,27 @@ const translations: Record<Language, Record<string, string>> = {
     'job_type': 'Job Type',
     'previous': 'Previous',
     'next': 'Next',
+    
+    // 添加表单完成度相关翻译
+    'completed': 'completed',
+    'steps': 'steps',
+    'continue_filling': 'Continue with the next steps for a more accurate assessment',
+    'preliminary_result': 'Preliminary result - Complete all steps for better accuracy',
+    
+    // 添加新的提示信息翻译
+    'complete_steps_to_view': 'Complete all steps to view your job value report',
+    'please_enter_salary': 'Please enter your salary to generate the report',
   },
   ja: {
     // タイトルとナビゲーション
     'title': 'この仕事、割に合ってる？',
-    'github': 'GitHub',
+    'app_description': '給料だけでなく、仕事の本当の価値を計算する',
     'email': 'Email',
     'xiaohongshu': '小紅書',
     'redirect_notice': '自動的にリダイレクトされました',
     'visits': 'アクセス数',
     'visitors': '訪問者数',
-    'star_request': '役に立ったら、⭐スターを付けてください！',
+    'star_request': 'GitHubで⭐する',
     'history': '履歴',
     'no_history': '履歴がありません',
     'history_notice': 'レポートを見た後、自動的に保存されます',
@@ -1334,6 +1354,16 @@ const translations: Record<Language, Record<string, string>> = {
     'job_type': '雇用形態',
     'previous': '前へ',
     'next': '次へ',
+    
+    // 添加表单完成度相关翻译
+    'completed': '完了',
+    'steps': 'ステップ',
+    'continue_filling': 'より正確な評価のために次のステップを続けてください',
+    'preliminary_result': '暫定結果 - すべてのステップを完了してより正確な評価を得る',
+    
+    // 添加新的提示信息翻译
+    'complete_steps_to_view': 'すべてのステップを完了して仕事の価値レポートを確認してください',
+    'please_enter_salary': 'レポートを生成するには給与を入力してください',
   }
 };
 
