@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ArrowLeft, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from './LanguageContext';
+import { countryNames } from './LanguageContext'; // 导入countryNames对象
 
 // 扩展接口，支持更多属性
 interface ShareCardProps {
@@ -194,6 +195,17 @@ const getWorkYearsDesc = (years: string, t: (key: string) => string): string => 
   return t('fresh_graduate');
 };
 
+// 获取当前语言环境下的国家名称
+const getCountryName = (countryCode: string, currentLanguage: string): string => {
+  if (currentLanguage === 'en') {
+    return countryNames.en[countryCode] || countryCode || 'Unknown';
+  }
+  if (currentLanguage === 'ja') {
+    return countryNames.ja[countryCode] || countryCode || '不明';
+  }
+  return countryNames.zh[countryCode] || countryCode || '未知';
+};
+
 const ShareCard: React.FC<ShareCardProps> = (props) => {
   const reportRef = useRef<HTMLDivElement>(null);
   const simpleReportRef = useRef<HTMLDivElement>(null); // 添加简化版报告的引用
@@ -276,7 +288,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       details: [
         { label: t('share_work_city'), value: cityName },
         { label: t('share_is_hometown'), value: isHomeTown ? t('share_yes') : t('share_no') },
-        { label: t('share_country'), value: props.countryName }
+        { label: t('share_country'), value: getCountryName(props.countryCode, language) }
       ]
     });
     
@@ -693,7 +705,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
                       </div>
                       <div className="bg-gray-50 p-3 rounded-lg">
                         <div className="text-sm text-gray-500">{t('share_country')}</div>
-                        <div className="font-medium text-gray-800 mt-1">{props.countryName}</div>
+                        <div className="font-medium text-gray-800 mt-1">{getCountryName(props.countryCode, language)}</div>
                       </div>
                       <div className="bg-gray-50 p-3 rounded-lg">
                         <div className="text-sm text-gray-500">{t('share_is_hometown')}</div>

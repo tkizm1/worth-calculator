@@ -584,7 +584,8 @@ const translations: Record<Language, Record<string, string>> = {
     'no_history': '暂无历史记录',
     'history_notice': '查看报告后将自动保存',
     'delete_history': '删除',
-    'clear_all': '清空',
+    'clear_all': '清空全部',
+    'restore_history': '恢复此记录',
     
     // 表单标签
     'annual_salary_cny': '年薪总包（元）',
@@ -818,6 +819,7 @@ const translations: Record<Language, Record<string, string>> = {
     'history_notice': 'Records will be saved after viewing reports',
     'delete_history': 'Delete',
     'clear_all': 'Clear All',
+    'restore_history': 'Restore this record',
     
     // Form labels
     'annual_salary_cny': 'Annual Salary (CNY)',
@@ -1051,6 +1053,7 @@ const translations: Record<Language, Record<string, string>> = {
     'history_notice': 'レポートを見た後、自動的に保存されます',
     'delete_history': '削除',
     'clear_all': 'すべて削除',
+    'restore_history': 'この記録を復元',
     
     // フォームラベル
     'annual_salary_cny': '年収（元）',

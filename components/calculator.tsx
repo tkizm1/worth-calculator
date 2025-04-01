@@ -312,7 +312,31 @@ interface HistoryItem {
   salary: string;
   countryCode: string;
   countryName: string;
-  jobTitle?: string; // 可选的职位名称
+  
+  // 添加所有需要在分享页面展示的字段
+  cityFactor: string;
+  workHours: string;
+  commuteHours: string;
+  restTime: string;
+  dailySalary: string;
+  workDaysPerYear: string;
+  workDaysPerWeek: string;
+  wfhDaysPerWeek: string;
+  annualLeave: string;
+  paidSickLeave: string;
+  publicHolidays: string;
+  workEnvironment: string;
+  leadership: string;
+  teamwork: string;
+  degreeType: string;
+  schoolType: string;
+  education: string;
+  homeTown: string;
+  shuttle: string;
+  canteen: string;
+  workYears: string;
+  jobStability: string;
+  bachelorType: string;
 }
 
 // 定义表单数据接口
@@ -444,13 +468,52 @@ const SalaryCalculator = () => {
       const savedHistory = localStorage.getItem('jobValueHistory');
       if (savedHistory) {
         try {
-          setHistory(JSON.parse(savedHistory));
+          const parsedHistory = JSON.parse(savedHistory) as any[];
+          
+          // 处理历史记录，为可能缺失的字段添加默认值
+          const normalizedHistory = parsedHistory.map((item: any) => ({
+            id: item.id || Date.now().toString(),
+            timestamp: item.timestamp || Date.now(),
+            value: item.value || '0',
+            assessment: item.assessment || 'rating_enter_salary',
+            assessmentColor: item.assessmentColor || 'text-gray-500',
+            salary: item.salary || '',
+            countryCode: item.countryCode || 'CN',
+            countryName: item.countryName || '中国',
+            
+            // 为缺失的分享页面字段添加默认值
+            cityFactor: item.cityFactor || formData.cityFactor,
+            workHours: item.workHours || formData.workHours,
+            commuteHours: item.commuteHours || formData.commuteHours,
+            restTime: item.restTime || formData.restTime,
+            dailySalary: item.dailySalary || '0', // 简化，不使用函数
+            workDaysPerYear: item.workDaysPerYear || '250', // 简化，使用默认值
+            workDaysPerWeek: item.workDaysPerWeek || formData.workDaysPerWeek,
+            wfhDaysPerWeek: item.wfhDaysPerWeek || formData.wfhDaysPerWeek,
+            annualLeave: item.annualLeave || formData.annualLeave,
+            paidSickLeave: item.paidSickLeave || formData.paidSickLeave,
+            publicHolidays: item.publicHolidays || formData.publicHolidays,
+            workEnvironment: item.workEnvironment || formData.workEnvironment,
+            leadership: item.leadership || formData.leadership,
+            teamwork: item.teamwork || formData.teamwork,
+            degreeType: item.degreeType || formData.degreeType,
+            schoolType: item.schoolType || formData.schoolType,
+            education: item.education || formData.education,
+            homeTown: item.homeTown || formData.homeTown,
+            shuttle: item.shuttle || formData.shuttle,
+            canteen: item.canteen || formData.canteen,
+            workYears: item.workYears || formData.workYears,
+            jobStability: item.jobStability || formData.jobStability,
+            bachelorType: item.bachelorType || formData.bachelorType
+          }));
+          
+          setHistory(normalizedHistory);
         } catch (e) {
           console.error('加载历史记录失败', e);
         }
       }
     }
-  }, []);
+  }, [formData]);
 
   // 监听访客统计加载
   useEffect(() => {
@@ -789,11 +852,36 @@ const SalaryCalculator = () => {
       id: Date.now().toString(),
       timestamp: Date.now(),
       value: value.toFixed(2),
-      assessment: getValueAssessment().text,
+      assessment: getValueAssessmentKey(), // 使用翻译键而不是已翻译的文本
       assessmentColor: getValueAssessment().color,
       salary: formData.salary,
       countryCode: selectedCountry,
-      countryName: getCountryName(selectedCountry)
+      countryName: getCountryName(selectedCountry),
+      
+      // 添加所有需要在分享页面展示的字段
+      cityFactor: formData.cityFactor,
+      workHours: formData.workHours,
+      commuteHours: formData.commuteHours,
+      restTime: formData.restTime,
+      dailySalary: getDisplaySalary(),
+      workDaysPerYear: calculateWorkingDays().toString(),
+      workDaysPerWeek: formData.workDaysPerWeek,
+      wfhDaysPerWeek: formData.wfhDaysPerWeek,
+      annualLeave: formData.annualLeave,
+      paidSickLeave: formData.paidSickLeave,
+      publicHolidays: formData.publicHolidays,
+      workEnvironment: formData.workEnvironment,
+      leadership: formData.leadership,
+      teamwork: formData.teamwork,
+      degreeType: formData.degreeType,
+      schoolType: formData.schoolType,
+      education: formData.education,
+      homeTown: formData.homeTown,
+      shuttle: formData.shuttle,
+      canteen: formData.canteen,
+      workYears: formData.workYears,
+      jobStability: formData.jobStability,
+      bachelorType: formData.bachelorType
     };
     
     try {
@@ -806,7 +894,7 @@ const SalaryCalculator = () => {
     }
     
     return newHistoryItem;
-  }, [formData.salary, value, getValueAssessment, selectedCountry, history, getCountryName]);
+  }, [formData, value, getValueAssessmentKey, getValueAssessment, selectedCountry, history, getCountryName, calculateWorkingDays, getDisplaySalary]);
   
   // 删除单条历史记录
   const deleteHistoryItem = useCallback((id: string, e: React.MouseEvent) => {
@@ -941,43 +1029,89 @@ const SalaryCalculator = () => {
                           </div>
                           <div className="text-xs text-gray-500 flex items-center">
                             <span className="mr-2">{formatDate(item.timestamp)}</span>
-                            <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-400 text-[10px]">{item.countryName}</span>
+                            <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-400 text-[10px]">{getCountryName(item.countryCode)}</span>
+                            <span className="ml-1 text-[10px]">{t(item.assessment)}</span>
                           </div>
                         </div>
                         <div className="flex gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // 阻止事件冒泡
+                              e.preventDefault(); // 阻止默认行为
+                              
+                              // 恢复历史记录中的值到当前表单
+                              setFormData({
+                                ...formData,
+                                salary: item.salary,
+                                cityFactor: item.cityFactor,
+                                workHours: item.workHours,
+                                commuteHours: item.commuteHours,
+                                restTime: item.restTime,
+                                workDaysPerWeek: item.workDaysPerWeek,
+                                wfhDaysPerWeek: item.wfhDaysPerWeek,
+                                annualLeave: item.annualLeave,
+                                paidSickLeave: item.paidSickLeave,
+                                publicHolidays: item.publicHolidays,
+                                workEnvironment: item.workEnvironment,
+                                leadership: item.leadership,
+                                teamwork: item.teamwork,
+                                degreeType: item.degreeType,
+                                schoolType: item.schoolType,
+                                education: item.education,
+                                homeTown: item.homeTown,
+                                shuttle: item.shuttle,
+                                canteen: item.canteen,
+                                workYears: item.workYears,
+                                jobStability: item.jobStability,
+                                bachelorType: item.bachelorType
+                              });
+                              
+                              // 设置国家
+                              handleCountryChange(item.countryCode);
+                              
+                              // 关闭历史记录面板
+                              setShowHistory(false);
+                            }}
+                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
+                            title={t('restore_history')}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                          </button>
                           <Link
                             href={{
                               pathname: '/share',
                               query: {
                                 value: item.value,
-                                assessment: item.assessment,
+                                assessment: item.assessment, // 传递翻译键而不是文本
                                 assessmentColor: item.assessmentColor,
-                                cityFactor: formData.cityFactor,
-                                workHours: formData.workHours,
-                                commuteHours: formData.commuteHours,
-                                restTime: formData.restTime,
-                                dailySalary: getDisplaySalary(),
+                                cityFactor: item.cityFactor,
+                                workHours: item.workHours,
+                                commuteHours: item.commuteHours,
+                                restTime: item.restTime,
+                                dailySalary: item.dailySalary,
                                 isYuan: item.countryCode !== 'CN' ? 'false' : 'true',
-                                workDaysPerYear: calculateWorkingDays().toString(),
-                                workDaysPerWeek: formData.workDaysPerWeek,
-                                wfhDaysPerWeek: formData.wfhDaysPerWeek,
-                                annualLeave: formData.annualLeave,
-                                paidSickLeave: formData.paidSickLeave,
-                                publicHolidays: formData.publicHolidays,
-                                workEnvironment: formData.workEnvironment,
-                                leadership: formData.leadership,
-                                teamwork: formData.teamwork,
-                                degreeType: formData.degreeType,
-                                schoolType: formData.schoolType,
-                                education: formData.education,
-                                homeTown: formData.homeTown,
-                                shuttle: formData.shuttle,
-                                canteen: formData.canteen,
-                                workYears: formData.workYears,
-                                jobStability: formData.jobStability,
-                                bachelorType: formData.bachelorType,
+                                workDaysPerYear: item.workDaysPerYear,
+                                workDaysPerWeek: item.workDaysPerWeek,
+                                wfhDaysPerWeek: item.wfhDaysPerWeek,
+                                annualLeave: item.annualLeave,
+                                paidSickLeave: item.paidSickLeave,
+                                publicHolidays: item.publicHolidays,
+                                workEnvironment: item.workEnvironment,
+                                leadership: item.leadership,
+                                teamwork: item.teamwork,
+                                degreeType: item.degreeType,
+                                schoolType: item.schoolType,
+                                education: item.education,
+                                homeTown: item.homeTown,
+                                shuttle: item.shuttle,
+                                canteen: item.canteen,
+                                workYears: item.workYears,
+                                jobStability: item.jobStability,
+                                bachelorType: item.bachelorType,
                                 countryCode: item.countryCode,
-                                countryName: item.countryName
+                                countryName: getCountryName(item.countryCode)
                               }
                             }}
                             className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
