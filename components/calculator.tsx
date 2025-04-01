@@ -747,7 +747,7 @@ const SalaryCalculator = () => {
         </div>
         
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">v5.3.1</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v5.4.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"

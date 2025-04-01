@@ -252,17 +252,23 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
     const cityName = getCityName(props.cityFactor, t);
     const isHomeTown = props.homeTown === 'yes';
     let cityComment = "";
-    if (isHomeTown) {
-      cityComment = t('share_hometown_comment');
+    
+    // 先根据城市等级添加评价
+    if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
+      cityComment = t('share_tier1_city_comment');
+    } else if (props.cityFactor === '1.0' || props.cityFactor === '1.10') {
+      cityComment = t('share_tier2_city_comment');
     } else {
-      if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
-        cityComment = t('share_tier1_city_comment');
-      } else if (props.cityFactor === '1.0' || props.cityFactor === '1.10') {
-        cityComment = t('share_tier2_city_comment');
-      } else {
-        cityComment = t('share_tier3_city_comment');
-      }
+      cityComment = t('share_tier3_city_comment');
     }
+    
+    // 然后添加家乡相关评价
+    if (isHomeTown) {
+      cityComment += " " + t('share_hometown_comment');
+    } else {
+      cityComment += " " + t('share_not_hometown_comment');
+    }
+    
     comments.push({ 
       title: t('share_work_city'), 
       content: cityComment, 
@@ -508,6 +514,21 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
     return comments;
   })();
   
+  // 是否是移动设备（响应式设计辅助函数）
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // 检测设备类型
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkMobile = () => {
+        setIsMobile(window.innerWidth < 640);
+      };
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }
+  }, []);
+
   // 处理下载图片 - 使用简化版报告
   const handleDownload = async () => {
     if (!simpleReportRef.current || isDownloading) return;
@@ -561,47 +582,54 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${getBackground()} flex flex-col items-center justify-start p-4 md:p-8 transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'} dark:text-white`}>
       {/* 返回按钮 */}
-      <div className="w-full max-w-4xl mb-6">
-        <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
-          <ArrowLeft className="w-4 h-4" />
+      <div className="w-full max-w-4xl mb-4 md:mb-6">
+        <Link href="/" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+          <ArrowLeft className="w-3.5 h-3.5" />
           <span>{t('share_back_to_calculator')}</span>
         </Link>
       </div>
       
-      <div ref={reportRef} className="w-full max-w-4xl bg-white rounded-xl shadow-xl p-6 md:p-10">
-        {/* 标题 */}
-        <div className="mb-10 text-center">
-          <div className="text-6xl mb-4">{isClient ? getEmoji(parseFloat(props.value)) : '😊'}</div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+      <div ref={reportRef} className="w-full max-w-4xl bg-white rounded-xl shadow-xl p-4 md:p-10">
+        {/* 标题 - 移动端更紧凑 */}
+        <div className="mb-5 md:mb-10 text-center">
+          <div className="text-4xl md:text-6xl mb-2 md:mb-4">{isClient ? getEmoji(parseFloat(props.value)) : '😊'}</div>
+          <h1 className="text-xl md:text-3xl font-bold mb-2 md:mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
             {t('share_your_job_worth_report')}
           </h1>
-          <div className="flex justify-center items-center gap-3">
-            <span className="text-2xl font-bold px-3 py-1 rounded-lg" style={{ color: getColorFromClassName(props.assessmentColor), backgroundColor: `${getColorFromClassName(props.assessmentColor)}20` }}>
+          <div className="flex justify-center items-center gap-2">
+            <span className="text-lg md:text-2xl font-bold px-2 py-0.5 rounded-lg" style={{ color: getColorFromClassName(props.assessmentColor), backgroundColor: `${getColorFromClassName(props.assessmentColor)}20` }}>
               {props.value}
             </span>
-            <span className="text-lg text-gray-700">{isClient ? t(getAssessmentKey(props.assessment)) : ''}</span>
+            <span className="text-base md:text-lg text-gray-700">{isClient ? t(getAssessmentKey(props.assessment)) : ''}</span>
           </div>
         </div>
         
-        {/* 性价比评语卡片 */}
-        <div className="space-y-8">
+        {/* 性价比评语卡片 - 移动端更紧凑 */}
+        <div className="space-y-4 md:space-y-6">
           {isClient && personalizedComments.map((comment, index) => (
-            <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 shadow-md transition-all hover:shadow-lg">
-              <div className="flex items-start gap-4">
-                <div className="text-4xl flex-shrink-0">{comment.emoji}</div>
+            <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg md:rounded-xl p-3 md:p-5 shadow-sm transition-all hover:shadow-md">
+              <div className="flex items-start gap-2.5 md:gap-4">
+                <div className="text-2xl md:text-4xl flex-shrink-0 mt-0.5">{comment.emoji}</div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-2 text-gray-800">{comment.title}</h3>
-                  <p className="text-gray-700 leading-relaxed mb-4">{comment.content}</p>
+                  <h3 className="text-base md:text-lg font-bold mb-1 md:mb-2 text-gray-800">{comment.title}</h3>
+                  <p className="text-xs md:text-sm text-gray-700 leading-relaxed mb-2 md:mb-3">{comment.content}</p>
                   
-                  {/* 用户选项详情 */}
+                  {/* 用户选项详情 - 移动端使用行内排列 */}
                   {comment.details && comment.details.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="mt-2 pt-2 border-t border-gray-200">
+                      <div className={isMobile ? "flex flex-wrap gap-x-4 gap-y-1.5" : "grid grid-cols-2 gap-2"}>
                         {comment.details.map((detail, i) => (
-                          <div key={i} className="flex flex-col">
-                            <span className="text-xs text-gray-500">{detail.label}</span>
-                            <span className="text-sm font-medium text-gray-800">{detail.value}</span>
-                          </div>
+                          isMobile ? (
+                            <div key={i} className="flex items-center text-xs">
+                              <span className="text-gray-500 mr-1">{detail.label}:</span>
+                              <span className="font-medium text-gray-800">{detail.value}</span>
+                            </div>
+                          ) : (
+                            <div key={i} className="flex justify-between items-center">
+                              <span className="text-xs text-gray-500">{detail.label}</span>
+                              <span className="text-xs md:text-sm font-medium text-gray-800">{detail.value}</span>
+                            </div>
+                          )
                         ))}
                       </div>
                     </div>
@@ -612,21 +640,21 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
           ))}
         </div>
         
-        {/* 底部信息 */}
-        <div className="mt-10 text-center text-gray-500 space-y-1">
+        {/* 底部信息 - 更小的文字 */}
+        <div className="mt-6 md:mt-10 text-center text-gray-500 space-y-0.5 text-xs md:text-sm">
           <div>{t('share_custom_made')}</div>
           <div>worthjob.zippland.com</div>
         </div>
       </div>
       
-      {/* 操作按钮 */}
-      <div className="flex justify-center gap-4 mt-8">
+      {/* 操作按钮 - 更小的按钮 */}
+      <div className="flex justify-center gap-4 mt-4 md:mt-8">
         <button
           onClick={handleDownload}
           disabled={isDownloading}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 md:px-6 md:py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base rounded-lg shadow-md transition-colors"
         >
-          <Download className="w-5 h-5" />
+          <Download className="w-4 h-4 md:w-5 md:h-5" />
           {isDownloading ? t('share_generating') : t('share_download_report')}
         </button>
       </div>
