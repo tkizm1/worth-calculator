@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="title.png" alt="Job Worth Calculator" width="400" />
+<img src="title.png" alt="Job Worth Calculator" width="500" />
+<br><br>
 
 <a href="https://trendshift.io/repositories/13145" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13145" alt="Zippland%2Fworth-calculator | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
