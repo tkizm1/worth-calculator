@@ -1040,7 +1040,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   ja: {
     // タイトルとナビゲーション
-    'title': 'この仕事、割に合ってる？ブラック度診断',
+    'title': 'この仕事、割に合ってる？',
     'github': 'GitHub',
     'email': 'Email',
     'xiaohongshu': '小紅書',
@@ -1160,7 +1160,7 @@ const translations: Record<Language, Record<string, string>> = {
     'share_back_to_calculator': '計算機に戻る',
     'share_your_job_worth_report': 'あなたの仕事価値レポート',
     'share_job_worth_report': '仕事価値レポート',
-    'share_custom_made': '「この仕事、割に合ってる？ブラック度診断」による分析',
+    'share_custom_made': '「この仕事、割に合ってる？」による分析',
     'share_generating': '生成中...',
     'share_download_report': 'レポートをダウンロード',
     'share_basic_info': '基本情報',
