@@ -866,7 +866,7 @@ const SalaryCalculator = () => {
         </div>
         
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">v5.6.1</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v6.1.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
@@ -892,7 +892,7 @@ const SalaryCalculator = () => {
               className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <History className="h-3.5 w-3.5" />
-              {language === 'zh' ? '历史记录' : 'History'}
+              {t('history')}
             </button>
           )}
         </div>
@@ -905,7 +905,7 @@ const SalaryCalculator = () => {
                 <div className="flex justify-between items-center mb-3 border-b pb-2 border-gray-200 dark:border-gray-700">
                   <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
                     <History className="h-3.5 w-3.5 mr-1" />
-                    {language === 'zh' ? '历史记录' : 'History'}
+                    {t('history')}
                   </h3>
                   <div className="flex gap-2">
                     {history.length > 0 && (
@@ -913,7 +913,7 @@ const SalaryCalculator = () => {
                         onClick={clearAllHistory}
                         className="text-xs text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        {language === 'zh' ? '清空' : 'Clear All'}
+                        {t('clear_all')}
                       </button>
                     )}
                     <button 
@@ -987,7 +987,7 @@ const SalaryCalculator = () => {
                           <button
                             onClick={(e) => deleteHistoryItem(item.id, e)}
                             className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
-                            title={language === 'zh' ? '删除' : 'Delete'}
+                            title={t('delete_history')}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1005,10 +1005,10 @@ const SalaryCalculator = () => {
                       </svg>
                     </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {language === 'zh' ? '暂无历史记录' : 'No history records'}
+                      {t('no_history')}
                     </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                      {language === 'zh' ? '查看报告后将自动保存' : 'Records will be saved after viewing reports'}
+                      {t('history_notice')}
                     </p>
                   </div>
                 )}

@@ -580,6 +580,11 @@ const translations: Record<Language, Record<string, string>> = {
     'visits': '访问量',
     'visitors': '访客数',
     'star_request': '如果觉得好用，请给项目点个⭐Star吧！',
+    'history': '历史记录',
+    'no_history': '暂无历史记录',
+    'history_notice': '查看报告后将自动保存',
+    'delete_history': '删除',
+    'clear_all': '清空',
     
     // 表单标签
     'annual_salary_cny': '年薪总包（元）',
@@ -808,6 +813,11 @@ const translations: Record<Language, Record<string, string>> = {
     'visits': 'Visits',
     'visitors': 'Visitors',
     'star_request': 'If you find this tool helpful, please give it a ⭐Star!',
+    'history': 'History',
+    'no_history': 'No history records',
+    'history_notice': 'Records will be saved after viewing reports',
+    'delete_history': 'Delete',
+    'clear_all': 'Clear All',
     
     // Form labels
     'annual_salary_cny': 'Annual Salary (CNY)',
@@ -1036,6 +1046,11 @@ const translations: Record<Language, Record<string, string>> = {
     'visits': 'アクセス数',
     'visitors': '訪問者数',
     'star_request': '役に立ったら、⭐スターを付けてください！',
+    'history': '履歴',
+    'no_history': '履歴がありません',
+    'history_notice': 'レポートを見た後、自動的に保存されます',
+    'delete_history': '削除',
+    'clear_all': 'すべて削除',
     
     // フォームラベル
     'annual_salary_cny': '年収（元）',
