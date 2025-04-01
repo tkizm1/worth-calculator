@@ -389,6 +389,26 @@ const SalaryCalculator = () => {
   const [showPPPInput, setShowPPPInput] = useState(false);
   // 修改为国家代码，默认为中国
   const [selectedCountry, setSelectedCountry] = useState<string>('CN');
+  
+  // 初始化时从localStorage加载国家设置
+  useEffect(() => {
+    // 从本地存储读取国家设置
+    if (typeof window !== 'undefined') {
+      const savedCountry = localStorage.getItem('selectedCountry');
+      if (savedCountry) {
+        setSelectedCountry(savedCountry);
+      }
+    }
+  }, []);
+  
+  // 当国家选择改变时保存到localStorage
+  const handleCountryChange = (countryCode: string) => {
+    setSelectedCountry(countryCode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedCountry', countryCode);
+    }
+  };
+  
   const [result, setResult] = useState<Result | null>(null);
   const [showPPPList, setShowPPPList] = useState(false);
   const [assessment, setAssessment] = useState("");
@@ -747,7 +767,7 @@ const SalaryCalculator = () => {
         </div>
         
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">v5.4.1</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v5.5.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
@@ -821,7 +841,7 @@ const SalaryCalculator = () => {
                 id="country"
                 name="country"
                 value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
+                onChange={(e) => handleCountryChange(e.target.value)}
                 className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 {Object.keys(pppFactors).sort((a, b) => {
