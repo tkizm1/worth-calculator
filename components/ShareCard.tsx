@@ -813,9 +813,16 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
               {/* 页脚 */}
               <div className="bg-gray-50 py-4 px-6 border-t border-gray-200">
                 <div className="flex justify-between items-center">
-                  <div className="flex flex-col">
-                    <div className="text-sm font-medium text-gray-700">{t('share_custom_made')}</div>
-                    <div className="text-sm text-gray-500">worthjob.zippland.com</div>
+                  <div className="flex items-center">
+                    <img 
+                      src="/title.png" 
+                      alt="Job Worth Calculator" 
+                      className="h-20 mr-3" 
+                    />
+                    <div className="flex flex-col">
+                      <div className="text-sm font-medium text-gray-700">{t('share_custom_made')}</div>
+                      <div className="text-sm text-gray-500">worthjob.zippland.com</div>
+                    </div>
                   </div>
                   <img 
                     src="/website.png" 
