@@ -924,7 +924,7 @@ const translations: Record<Language, Record<string, string>> = {
     'share_back_to_calculator': 'Back to Calculator',
     'share_your_job_worth_report': 'Your Job Worth Report',
     'share_job_worth_report': 'Job Worth Report',
-    'share_custom_made': 'Custom made by "Is My Job Worth It?"',
+    'share_custom_made': 'Custom made by "Job Worth Calculator"',
     'share_generating': 'Generating...',
     'share_download_report': 'Download Report',
     'share_basic_info': 'Basic Information',
