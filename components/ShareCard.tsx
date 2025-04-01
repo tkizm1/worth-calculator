@@ -46,6 +46,10 @@ interface ShareCardProps {
   education: string;
   workYears: string;
   jobStability: string;
+  
+  // 新增属性
+  hasShuttle: boolean;
+  hasCanteen: boolean;
 }
 
 // 将中文评级转换为翻译键
@@ -147,6 +151,8 @@ const getJobStabilityDesc = (type: string, t: (key: string) => string): string =
   else if (type === 'foreign') return t('job_foreign');
   else if (type === 'state') return t('job_state');
   else if (type === 'government') return t('job_government');
+  else if (type === 'dispatch') return t('job_dispatch');
+  else if (type === 'freelance') return t('job_freelance');
   return t('job_private');
 };
 
@@ -268,11 +274,11 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
     
     // 先根据城市等级添加评价
     if (props.cityFactor === '0.70' || props.cityFactor === '0.80') {
-      cityComment = t('share_tier1_city_comment');
+      cityComment = t('share_tier1andnewtier1_city_comment');
     } else if (props.cityFactor === '1.0' || props.cityFactor === '1.10') {
-      cityComment = t('share_tier2_city_comment');
+      cityComment = t('share_tier2and3_city_comment');
     } else {
-      cityComment = t('share_tier3_city_comment');
+      cityComment = t('share_tier4andbelow_city_comment');
     }
     
     // 然后添加家乡相关评价
@@ -315,19 +321,26 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       commuteComment += " " + t('share_wfh_medium');
     }
     
-    if (props.shuttle === '0.7' || props.shuttle === '0.5') {
+    // 只有当用户勾选了班车选项，且班车对通勤有正面影响时才添加评价
+    if (props.hasShuttle && (props.shuttle === '0.7' || props.shuttle === '0.5')) {
       commuteComment += " " + t('share_shuttle_service_good');
+    }
+    
+    const commuteDetails = [
+      { label: t('share_daily_commute_hours'), value: `${props.commuteHours} ${t('share_hours')}` },
+      { label: t('share_remote_work'), value: `${props.wfhDaysPerWeek}/${props.workDaysPerWeek} ${t('share_days_per_week')} (${Math.round(wfhRatio * 100)}%)` }
+    ];
+    
+    // 只有当用户勾选了班车选项时才添加班车信息
+    if (props.hasShuttle) {
+      commuteDetails.push({ label: t('share_shuttle_service'), value: getShuttleDesc(props.shuttle, t) });
     }
     
     comments.push({ 
       title: t('share_daily_commute_hours'), 
       content: commuteComment, 
       emoji: wfhRatio >= 0.5 ? "🏠" : "🚌",
-      details: [
-        { label: t('share_daily_commute_hours'), value: `${props.commuteHours} ${t('share_hours')}` },
-        { label: t('share_remote_work'), value: `${props.wfhDaysPerWeek}/${props.workDaysPerWeek} ${t('share_days_per_week')} (${Math.round(wfhRatio * 100)}%)` },
-        { label: t('share_shuttle_service'), value: getShuttleDesc(props.shuttle, t) }
-      ]
+      details: commuteDetails
     });
     
     // 4. 工作环境与人际关系评价
@@ -369,16 +382,22 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       environmentComment += " " + t('share_teamwork_bad');
     }
     
+    const environmentDetails = [
+      { label: t('share_office_environment'), value: getWorkEnvironmentDesc(workEnvironment, t) },
+      { label: t('share_leadership_relation'), value: getLeadershipDesc(leadershipRating, t) },
+      { label: t('share_colleague_relationship'), value: getTeamworkDesc(teamworkRating, t) }
+    ];
+    
+    // 只有当用户勾选了食堂选项时才添加食堂信息
+    if (props.hasCanteen) {
+      environmentDetails.push({ label: t('share_canteen_quality'), value: getCanteenDesc(props.canteen, t) });
+    }
+    
     comments.push({ 
       title: t('share_work_environment_title'), 
       content: environmentComment, 
       emoji: "🏢",
-      details: [
-        { label: t('share_office_environment'), value: getWorkEnvironmentDesc(workEnvironment, t) },
-        { label: t('share_leadership_relation'), value: getLeadershipDesc(leadershipRating, t) },
-        { label: t('share_colleague_relationship'), value: getTeamworkDesc(teamworkRating, t) },
-        { label: t('share_canteen_quality'), value: getCanteenDesc(props.canteen, t) }
-      ]
+      details: environmentDetails
     });
     
     // 5. 工作时间与强度评价
@@ -450,8 +469,12 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
     
     if (jobStability === 'government') {
       careerComment += " " + t('share_government_job_comment');
-    } else if (jobStability === 'private') {
+    } else if (jobStability === 'private' || jobStability === 'foreign' || jobStability === 'state') {
       careerComment += " " + t('share_private_job_comment');
+    } else if (jobStability === 'dispatch') {
+      careerComment += " " + t('share_dispatch_job_comment');
+    } else if (jobStability === 'freelance') {
+      careerComment += " " + t('share_freelance_job_comment');
     }
     
     comments.push({ 
@@ -745,6 +768,12 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
                         <span className="text-sm text-gray-500">{t('share_weekly_work_days')}</span>
                         <span className="font-medium text-gray-800">{props.workDaysPerWeek} {t('share_days')}</span>
                       </div>
+                      {props.hasShuttle && (
+                        <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                          <span className="text-sm text-gray-500">{t('share_shuttle_service')}</span>
+                          <span className="font-medium text-gray-800">{getShuttleDesc(props.shuttle, t)}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   
@@ -766,10 +795,12 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
                         <span className="text-sm text-gray-500">{t('share_colleague_relationship')}</span>
                         <span className="font-medium text-gray-800">{getTeamworkDesc(props.teamwork, t)}</span>
                       </div>
-                      <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
-                        <span className="text-sm text-gray-500">{t('share_canteen_quality')}</span>
-                        <span className="font-medium text-gray-800">{getCanteenDesc(props.canteen, t)}</span>
-                      </div>
+                      {props.hasCanteen && (
+                        <div className="bg-gray-50 p-3 rounded-lg flex justify-between">
+                          <span className="text-sm text-gray-500">{t('share_canteen_quality')}</span>
+                          <span className="font-medium text-gray-800">{getCanteenDesc(props.canteen, t)}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   

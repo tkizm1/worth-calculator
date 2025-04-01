@@ -337,6 +337,8 @@ interface HistoryItem {
   workYears: string;
   jobStability: string;
   bachelorType: string;
+  hasShuttle: boolean;
+  hasCanteen: boolean;
 }
 
 // 定义表单数据接口
@@ -364,6 +366,8 @@ interface FormData {
   canteen: string;
   jobStability: string;
   education: string;
+  hasShuttle: boolean;
+  hasCanteen: boolean;
 }
 
 // 定义计算结果接口
@@ -429,7 +433,9 @@ const SalaryCalculator = () => {
     shuttle: '1.0',
     canteen: '1.0',
     jobStability: 'private',   // 新增：工作稳定度/类型
-    education: '1.0'
+    education: '1.0',
+    hasShuttle: false,         // 确保这是一个明确的布尔值
+    hasCanteen: false,         // 确保这是一个明确的布尔值
   });
 
   const [showPPPInput, setShowPPPInput] = useState(false);
@@ -460,6 +466,30 @@ const SalaryCalculator = () => {
   const [assessment, setAssessment] = useState("");
   const [assessmentColor, setAssessmentColor] = useState("text-gray-500");
   const [visitorVisible, setVisitorVisible] = useState(false);
+
+  // 添加步骤控制状态
+  const [activeStep, setActiveStep] = useState(0);
+  
+  // 定义表单步骤
+  const formSteps = [
+    { title: t('step_basic_info'), icon: "💰" },
+    { title: t('step_education_work'), icon: "🎓" },
+    { title: t('step_environment'), icon: "🏢" },
+    { title: t('step_extras'), icon: "✨" }
+  ];
+  
+  // 步骤切换函数
+  const nextStep = () => {
+    if (activeStep < formSteps.length - 1) {
+      setActiveStep(activeStep + 1);
+    }
+  };
+  
+  const prevStep = () => {
+    if (activeStep > 0) {
+      setActiveStep(activeStep - 1);
+    }
+  };
 
   // 添加检查document对象存在的逻辑
   useEffect(() => {
@@ -504,7 +534,10 @@ const SalaryCalculator = () => {
             canteen: item.canteen || formData.canteen,
             workYears: item.workYears || formData.workYears,
             jobStability: item.jobStability || formData.jobStability,
-            bachelorType: item.bachelorType || formData.bachelorType
+            bachelorType: item.bachelorType || formData.bachelorType,
+            // 确保 hasShuttle 和 hasCanteen 有合法的布尔值，即使历史记录中没有这些字段
+            hasShuttle: typeof item.hasShuttle === 'boolean' ? item.hasShuttle : false,
+            hasCanteen: typeof item.hasCanteen === 'boolean' ? item.hasCanteen : false,
           }));
           
           setHistory(normalizedHistory);
@@ -669,20 +702,19 @@ const SalaryCalculator = () => {
       effectiveCommute: commuteHours * officeDaysRatio 
     });
     
-    // 通勤时间按办公室工作比例计算，并考虑班车因素
-    const shuttleFactor = Number(formData.shuttle);
+    // 班车系数只在勾选时使用，否则为1.0
+    const shuttleFactor = formData.hasShuttle ? Number(formData.shuttle) : 1.0;
     const effectiveCommuteHours = commuteHours * officeDaysRatio * shuttleFactor;
     
+    // 食堂系数只在勾选时使用，否则为1.0
+    const canteenFactor = formData.hasCanteen ? Number(formData.canteen) : 1.0;
+    
     // 工作环境因素，包含食堂和家乡因素
-    const canteenFactor = Number(formData.canteen);
-    // 在家乡工作有额外加成
-    const homeTownFactor = formData.homeTown === 'yes' ? 1.4 : 1.0;
     const environmentFactor = Number(formData.workEnvironment) * 
                             Number(formData.leadership) * 
                             Number(formData.teamwork) *
                             Number(formData.cityFactor) *
-                            canteenFactor *
-                            homeTownFactor;
+                            canteenFactor;
     
     // 根据工作年限计算经验薪资倍数
     const workYears = Number(formData.workYears);
@@ -703,9 +735,13 @@ const SalaryCalculator = () => {
     if (formData.jobStability === 'foreign') {
       salaryGrowthFactor = 0.8;    // 外企涨薪幅度为私企的80%
     } else if (formData.jobStability === 'state') {
-      salaryGrowthFactor = 0.4;    // 央/国企涨薪幅度为私企的30%（原先为50%）
+      salaryGrowthFactor = 0.4;    // 央/国企涨薪幅度为私企的40%
     } else if (formData.jobStability === 'government') {
-      salaryGrowthFactor = 0.2;   // 体制内涨薪幅度为私企的15%（原先为30%）
+      salaryGrowthFactor = 0.2;    // 体制内涨薪幅度为私企的20%
+    } else if (formData.jobStability === 'dispatch') {
+      salaryGrowthFactor = 1.2;    // 派遣社员涨薪幅度为私企的120%（体现不稳定性）
+    } else if (formData.jobStability === 'freelance') {
+      salaryGrowthFactor = 1.2;    // 自由职业涨薪幅度为私企的120%（体现不稳定性）
     }
     
     // 根据公式: 1 + (对应幅度-1) * 工作单位系数，计算最终薪资倍数
@@ -877,11 +913,13 @@ const SalaryCalculator = () => {
       schoolType: formData.schoolType,
       education: formData.education,
       homeTown: formData.homeTown,
-      shuttle: formData.shuttle,
-      canteen: formData.canteen,
+      shuttle: formData.hasShuttle ? formData.shuttle : '1.0',
+      canteen: formData.hasCanteen ? formData.canteen : '1.0',
       workYears: formData.workYears,
       jobStability: formData.jobStability,
-      bachelorType: formData.bachelorType
+      bachelorType: formData.bachelorType,
+      hasShuttle: formData.hasShuttle,
+      hasCanteen: formData.hasCanteen,
     };
     
     try {
@@ -894,7 +932,7 @@ const SalaryCalculator = () => {
     }
     
     return newHistoryItem;
-  }, [formData, value, getValueAssessmentKey, getValueAssessment, selectedCountry, history, getCountryName, calculateWorkingDays, getDisplaySalary]);
+  }, [formData, value, getValueAssessmentKey, getValueAssessment, selectedCountry, history, getCountryName, calculateWorkingDays, getDisplaySalary, formData.hasShuttle, formData.hasCanteen]);
   
   // 删除单条历史记录
   const deleteHistoryItem = useCallback((id: string, e: React.MouseEvent) => {
@@ -954,7 +992,7 @@ const SalaryCalculator = () => {
         </div>
         
         <div className="flex items-center justify-center gap-3 mb-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400">v6.2.1</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">v6.3.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
@@ -1061,7 +1099,10 @@ const SalaryCalculator = () => {
                                 canteen: item.canteen,
                                 workYears: item.workYears,
                                 jobStability: item.jobStability,
-                                bachelorType: item.bachelorType
+                                bachelorType: item.bachelorType,
+                                // 确保 hasShuttle 和 hasCanteen 有合法的布尔值
+                                hasShuttle: typeof item.hasShuttle === 'boolean' ? item.hasShuttle : false,
+                                hasCanteen: typeof item.hasCanteen === 'boolean' ? item.hasCanteen : false,
                               });
                               
                               // 设置国家
@@ -1109,7 +1150,9 @@ const SalaryCalculator = () => {
                                 jobStability: item.jobStability,
                                 bachelorType: item.bachelorType,
                                 countryCode: item.countryCode,
-                                countryName: getCountryName(item.countryCode)
+                                countryName: getCountryName(item.countryCode),
+                                hasShuttle: item.hasShuttle,
+                                hasCanteen: item.hasCanteen,
                               }
                             }}
                             className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
@@ -1166,365 +1209,504 @@ const SalaryCalculator = () => {
         )}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30">
-        <div className="p-6 space-y-8">
-          {/* 薪资与工作时间 section */}
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {selectedCountry !== 'CN' ? 
-                  `${t('annual_salary')}(${getCurrencySymbol(selectedCountry)})` : 
-                  t('annual_salary_cny')}
-              </label>
-              <div className="flex items-center gap-2 mt-1">
-                <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                <input
-                  type="number"
-                  value={formData.salary}
-                  onChange={(e) => handleInputChange('salary', e.target.value)}
-                  placeholder={selectedCountry !== 'CN' ? 
-                    `${t('salary_placeholder')} ${getCurrencySymbol(selectedCountry)}` : 
-                    t('salary_placeholder_cny')}
-                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('country_selection')}
-                <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                  ?
-                  <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                    {t('ppp_tooltip')}
-                  </span>
-                </span>
-              </label>
-              <select
-                id="country"
-                name="country"
-                value={selectedCountry}
-                onChange={(e) => handleCountryChange(e.target.value)}
-                className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+      {/* 修改表单为步骤式表单 */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 mb-6">
+        {/* 步骤指示器 */}
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between px-4 py-3">
+            {formSteps.map((step, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveStep(index)}
+                className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg transition-colors ${
+                  activeStep === index
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                    : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400'
+                }`}
               >
-                {Object.keys(pppFactors).sort((a, b) => {
-                  // 确保中国始终排在第一位
-                  if (a === 'CN') return -1;
-                  if (b === 'CN') return 1;
-                  return getCountryName(a).localeCompare(getCountryName(b));
-                }).map(code => (
-                  <option key={code} value={code}>
-                    {getCountryName(code)} ({pppFactors[code].toFixed(2)})
-                  </option>
-                ))}
-              </select>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {t('selected_ppp')}: {(pppFactors[selectedCountry] || 4.19).toFixed(2)}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_days_per_week')}</label>
-                <input
-                  type="number"
-                  value={formData.workDaysPerWeek}
-                  onChange={(e) => handleInputChange('workDaysPerWeek', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('wfh_days_per_week')}
-                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                    ?
-                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      {t('wfh_tooltip')}
-                    </span>
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max={formData.workDaysPerWeek}
-                  step="1"
-                  value={formData.wfhDaysPerWeek}
-                  onChange={(e) => handleInputChange('wfhDaysPerWeek', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('annual_leave')}</label>
-                <input
-                  type="number"
-                  value={formData.annualLeave}
-                  onChange={(e) => handleInputChange('annualLeave', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('public_holidays')}</label>
-                <input
-                  type="number"
-                  value={formData.publicHolidays}
-                  onChange={(e) => handleInputChange('publicHolidays', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('paid_sick_leave')}</label>
-                <input
-                  type="number"
-                  value={formData.paidSickLeave}
-                  onChange={(e) => handleInputChange('paidSickLeave', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('work_hours')}
-                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                    ?
-                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      {t('work_hours_tooltip')}
-                    </span>
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  value={formData.workHours}
-                  onChange={(e) => handleInputChange('workHours', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('commute_hours')}
-                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
-                    ?
-                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
-                      {t('commute_tooltip')}
-                    </span>
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  value={formData.commuteHours}
-                  onChange={(e) => handleInputChange('commuteHours', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('rest_time')}</label>
-                <input
-                  type="number"
-                  value={formData.restTime}
-                  onChange={(e) => handleInputChange('restTime', e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
+                <span className="text-xl mb-1">{step.icon}</span>
+                <span className="text-sm font-medium">{step.title}</span>
+                {activeStep === index && (
+                  <div className="h-1 w-1/2 bg-blue-500 rounded-full mt-2"></div>
+                )}
+              </button>
+            ))}
           </div>
+        </div>
 
-          <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+        {/* 表单内容 */}
+        <div className="p-6 space-y-8">
+          {/* 步骤1: 基础信息 */}
+          {activeStep === 0 && (
+            <div className="space-y-6 animate-fadeIn">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-blue-500 pl-3">
+                {t('basic_info')}
+              </h2>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {selectedCountry !== 'CN' ? 
+                    `${t('annual_salary')}(${getCurrencySymbol(selectedCountry)})` : 
+                    t('annual_salary_cny')}
+                </label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Wallet className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <input
+                    type="number"
+                    value={formData.salary}
+                    onChange={(e) => handleInputChange('salary', e.target.value)}
+                    placeholder={selectedCountry !== 'CN' ? 
+                      `${t('salary_placeholder')} ${getCurrencySymbol(selectedCountry)}` : 
+                      t('salary_placeholder_cny')}
+                    className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
 
-          {/* 环境系数 */}
-          <div className="space-y-4">
-            {/* 添加工作类型RadioGroup */}
-            <RadioGroup
-              label={t('job_stability')}
-              name="jobStability"
-              value={formData.jobStability}
-              onChange={handleInputChange}
-              options={[
-                { label: t('job_private'), value: 'private' },
-                { label: t('job_foreign'), value: 'foreign' },
-                { label: t('job_state'), value: 'state' },
-                { label: t('job_government'), value: 'government' },
-              ]}
-            />
-            
-            <RadioGroup
-              label={t('work_environment')}
-              name="workEnvironment"
-              value={formData.workEnvironment}
-              onChange={handleInputChange}
-              options={[
-                { label: t('env_remote'), value: '0.8' },
-                { label: t('env_factory'), value: '0.9' },
-                { label: t('env_normal'), value: '1.0' },
-                { label: t('env_cbd'), value: '1.1' },
-              ]}
-            />
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('country_selection')}
+                  <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                    ?
+                    <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                      {t('ppp_tooltip')}
+                    </span>
+                  </span>
+                </label>
+                <select
+                  id="country"
+                  name="country"
+                  value={selectedCountry}
+                  onChange={(e) => handleCountryChange(e.target.value)}
+                  className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  {Object.keys(pppFactors).sort((a, b) => {
+                    // 确保中国始终排在第一位
+                    if (a === 'CN') return -1;
+                    if (b === 'CN') return 1;
+                    return getCountryName(a).localeCompare(getCountryName(b));
+                  }).map(code => (
+                    <option key={code} value={code}>
+                      {getCountryName(code)} ({pppFactors[code].toFixed(2)})
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {t('selected_ppp')}: {(pppFactors[selectedCountry] || 4.19).toFixed(2)}
+                </p>
+              </div>
 
-            <RadioGroup
-              label={t('city_factor')}
-              name="cityFactor"
-              value={formData.cityFactor}
-              onChange={handleInputChange}
-              options={[
-                { label: t('city_tier1'), value: '0.70' },
-                { label: t('city_newtier1'), value: '0.80' },
-                { label: t('city_tier2'), value: '1.0' },
-                { label: t('city_tier3'), value: '1.10' },
-                { label: t('city_tier4'), value: '1.25' },
-                { label: t('city_county'), value: '1.40' },
-                { label: t('city_town'), value: '1.50' },
-              ]}
-            />
-
-            <RadioGroup
-              label={t('hometown')}
-              name="homeTown"
-              value={formData.homeTown}
-              onChange={handleInputChange}
-              options={[
-                { label: t('not_hometown'), value: 'no' },
-                { label: t('is_hometown'), value: 'yes' },
-              ]}
-            />
-
-            <RadioGroup
-              label={t('leadership')}
-              name="leadership"
-              value={formData.leadership}
-              onChange={handleInputChange}
-              options={[
-                { label: t('leader_bad'), value: '0.7' },
-                { label: t('leader_strict'), value: '0.9' },
-                { label: t('leader_normal'), value: '1.0' },
-                { label: t('leader_good'), value: '1.1' },
-                { label: t('leader_favorite'), value: '1.3' },
-              ]}
-            />
-
-            <RadioGroup
-              label={t('teamwork')}
-              name="teamwork"
-              value={formData.teamwork}
-              onChange={handleInputChange}
-              options={[
-                { label: t('team_bad'), value: '0.9' },
-                { label: t('team_normal'), value: '1.0' },
-                { label: t('team_good'), value: '1.1' },
-                { label: t('team_excellent'), value: '1.2' },
-              ]}
-            />
-
-            <RadioGroup
-              label={t('shuttle')}
-              name="shuttle"
-              value={formData.shuttle}
-              onChange={handleInputChange}
-              options={[
-                { label: t('shuttle_none'), value: '1.0' },
-                { label: t('shuttle_inconvenient'), value: '0.9' },
-                { label: t('shuttle_convenient'), value: '0.7' },
-                { label: t('shuttle_direct'), value: '0.5' },
-              ]}
-            />
-
-            <RadioGroup
-              label={t('canteen')}
-              name="canteen"
-              value={formData.canteen}
-              onChange={handleInputChange}
-              options={[
-                { label: t('canteen_none'), value: '1.0' },
-                { label: t('canteen_average'), value: '1.05' },
-                { label: t('canteen_good'), value: '1.1' },
-                { label: t('canteen_excellent'), value: '1.15' },
-              ]}
-            />
-
-            {/* 学历和工作年限 */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('education_level')}</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('work_time_schedule')}</h3>
+                <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('degree_type')}</label>
-                    <select
-                      value={formData.degreeType}
-                      onChange={(e) => handleInputChange('degreeType', e.target.value)}
-                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    >
-                      <option value="belowBachelor">{t('below_bachelor')}</option>
-                      <option value="bachelor">{t('bachelor')}</option>
-                      <option value="masters">{t('masters')}</option>
-                      <option value="phd">{t('phd')}</option>
-                    </select>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_days_per_week')}</label>
+                    <input
+                      type="number"
+                      value={formData.workDaysPerWeek}
+                      onChange={(e) => handleInputChange('workDaysPerWeek', e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('school_type')}</label>
-                    <select
-                      value={formData.schoolType}
-                      onChange={(e) => handleInputChange('schoolType', e.target.value)}
-                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                      disabled={formData.degreeType === 'belowBachelor'}
-                    >
-                      <option value="secondTier">{t('school_second_tier')}</option>
-                      {formData.degreeType === 'bachelor' ? (
-                        <>
-                          <option value="firstTier">{t('school_first_tier_bachelor')}</option>
-                          <option value="elite">{t('school_elite_bachelor')}</option>
-                        </>
-                      ) : (
-                        <>
-                          <option value="firstTier">{t('school_first_tier_higher')}</option>
-                          <option value="elite">{t('school_elite_higher')}</option>
-                        </>
-                      )}
-                    </select>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('wfh_days_per_week')}
+                      <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                        ?
+                        <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                          {t('wfh_tooltip')}
+                        </span>
+                      </span>
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max={formData.workDaysPerWeek}
+                      step="1"
+                      value={formData.wfhDaysPerWeek}
+                      onChange={(e) => handleInputChange('wfhDaysPerWeek', e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
                   </div>
                 </div>
                 
-                {/* 硕士显示本科背景选项 */}
-                {formData.degreeType === 'masters' && (
-                  <div className="mt-4">
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('bachelor_background')}</label>
-                    <select
-                      value={formData.bachelorType}
-                      onChange={(e) => handleInputChange('bachelorType', e.target.value)}
-                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                    >
-                      <option value="secondTier">{t('school_second_tier')}</option>
-                      <option value="firstTier">{t('school_first_tier_bachelor')}</option>
-                      <option value="elite">{t('school_elite_bachelor')}</option>
-                    </select>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('annual_leave')}</label>
+                    <input
+                      type="number"
+                      value={formData.annualLeave}
+                      onChange={(e) => handleInputChange('annualLeave', e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
                   </div>
-                )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('public_holidays')}</label>
+                    <input
+                      type="number"
+                      value={formData.publicHolidays}
+                      onChange={(e) => handleInputChange('publicHolidays', e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('paid_sick_leave')}</label>
+                    <input
+                      type="number"
+                      value={formData.paidSickLeave}
+                      onChange={(e) => handleInputChange('paidSickLeave', e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* 工作年限选择 */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_years')}</label>
-                <select
-                  value={formData.workYears}
-                  onChange={(e) => handleInputChange('workYears', e.target.value)}
-                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                >
-                  <option value="0">{t('fresh_graduate')}</option>
-                  <option value="1">{t('years_1_3')}</option>
-                  <option value="2">{t('years_3_5')}</option>
-                  <option value="4">{t('years_5_8')}</option>
-                  <option value="6">{t('years_8_10')}</option>
-                  <option value="10">{t('years_10_12')}</option>
-                  <option value="15">{t('years_above_12')}</option>
-                </select>
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('daily_schedule')}</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('work_hours')}
+                      <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                        ?
+                        <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                          {t('work_hours_tooltip')}
+                        </span>
+                      </span>
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.workHours}
+                      onChange={(e) => handleInputChange('workHours', e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('commute_hours')}
+                      <span className="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300 cursor-pointer group relative">
+                        ?
+                        <span className="absolute z-10 invisible group-hover:visible bg-gray-900 text-white text-xs rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 w-48 sm:w-64">
+                          {t('commute_tooltip')}
+                        </span>
+                      </span>
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.commuteHours}
+                      onChange={(e) => handleInputChange('commuteHours', e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('rest_time')}</label>
+                    <input
+                      type="number"
+                      value={formData.restTime}
+                      onChange={(e) => handleInputChange('restTime', e.target.value)}
+                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+          )}
+          
+          {/* 步骤2: 学历和工作经验 */}
+          {activeStep === 1 && (
+            <div className="space-y-6 animate-fadeIn">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-yellow-500 pl-3">
+                {t('education_and_experience')}
+              </h2>
+              
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('education_level')}</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('degree_type')}</label>
+                        <select
+                          value={formData.degreeType}
+                          onChange={(e) => handleInputChange('degreeType', e.target.value)}
+                          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                        >
+                          <option value="belowBachelor">{t('below_bachelor')}</option>
+                          <option value="bachelor">{t('bachelor')}</option>
+                          <option value="masters">{t('masters')}</option>
+                          <option value="phd">{t('phd')}</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('school_type')}</label>
+                        <select
+                          value={formData.schoolType}
+                          onChange={(e) => handleInputChange('schoolType', e.target.value)}
+                          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                          disabled={formData.degreeType === 'belowBachelor'}
+                        >
+                          <option value="secondTier">{t('school_second_tier')}</option>
+                          {formData.degreeType === 'bachelor' ? (
+                            <>
+                              <option value="firstTier">{t('school_first_tier_bachelor')}</option>
+                              <option value="elite">{t('school_elite_bachelor')}</option>
+                            </>
+                          ) : (
+                            <>
+                              <option value="firstTier">{t('school_first_tier_higher')}</option>
+                              <option value="elite">{t('school_elite_higher')}</option>
+                            </>
+                          )}
+                        </select>
+                      </div>
+                    </div>
+                    
+                    {/* 硕士显示本科背景选项 */}
+                    {formData.degreeType === 'masters' && (
+                      <div className="mt-4">
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('bachelor_background')}</label>
+                        <select
+                          value={formData.bachelorType}
+                          onChange={(e) => handleInputChange('bachelorType', e.target.value)}
+                          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                        >
+                          <option value="secondTier">{t('school_second_tier')}</option>
+                          <option value="firstTier">{t('school_first_tier_bachelor')}</option>
+                          <option value="elite">{t('school_elite_bachelor')}</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 工作年限选择 */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_years')}</label>
+                    <select
+                      value={formData.workYears}
+                      onChange={(e) => handleInputChange('workYears', e.target.value)}
+                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    >
+                      <option value="0">{t('fresh_graduate')}</option>
+                      <option value="1">{t('years_1_3')}</option>
+                      <option value="2">{t('years_3_5')}</option>
+                      <option value="4">{t('years_5_8')}</option>
+                      <option value="6">{t('years_8_10')}</option>
+                      <option value="10">{t('years_10_12')}</option>
+                      <option value="15">{t('years_above_12')}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('job_type')}</h3>
+                <RadioGroup
+                  label={t('job_stability')}
+                  name="jobStability"
+                  value={formData.jobStability}
+                  onChange={handleInputChange}
+                  options={[
+                    { label: t('job_government'), value: 'government' },
+                    { label: t('job_state'), value: 'state' },
+                    { label: t('job_foreign'), value: 'foreign' },
+                    { label: t('job_private'), value: 'private' },
+                    { label: t('job_dispatch'), value: 'dispatch' },
+                    { label: t('job_freelance'), value: 'freelance' },
+                  ]}
+                />
+              </div>
+            </div>
+          )}
+          
+          {/* 步骤3: 工作环境 */}
+          {activeStep === 2 && (
+            <div className="space-y-6 animate-fadeIn">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-green-500 pl-3">
+                {t('work_environment_factors')}
+              </h2>
+              
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('environment_location')}</h3>
+                <div className="space-y-5">
+                  <RadioGroup
+                    label={t('work_environment')}
+                    name="workEnvironment"
+                    value={formData.workEnvironment}
+                    onChange={handleInputChange}
+                    options={[
+                      { label: t('env_remote'), value: '0.8' },
+                      { label: t('env_factory'), value: '0.9' },
+                      { label: t('env_normal'), value: '1.0' },
+                      { label: t('env_cbd'), value: '1.1' },
+                    ]}
+                  />
+
+                  <RadioGroup
+                    label={t('city_factor')}
+                    name="cityFactor"
+                    value={formData.cityFactor}
+                    onChange={handleInputChange}
+                    options={[
+                      { label: t('city_tier1'), value: '0.70' },
+                      { label: t('city_newtier1'), value: '0.80' },
+                      { label: t('city_tier2'), value: '1.0' },
+                      { label: t('city_tier3'), value: '1.10' },
+                      { label: t('city_tier4'), value: '1.25' },
+                      { label: t('city_county'), value: '1.40' },
+                      { label: t('city_town'), value: '1.50' },
+                    ]}
+                  />
+
+                  <RadioGroup
+                    label={t('hometown')}
+                    name="homeTown"
+                    value={formData.homeTown}
+                    onChange={handleInputChange}
+                    options={[
+                      { label: t('not_hometown'), value: 'no' },
+                      { label: t('is_hometown'), value: 'yes' },
+                    ]}
+                  />
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('relationships')}</h3>
+                <div className="space-y-5">
+                  <RadioGroup
+                    label={t('leadership')}
+                    name="leadership"
+                    value={formData.leadership}
+                    onChange={handleInputChange}
+                    options={[
+                      { label: t('leader_bad'), value: '0.7' },
+                      { label: t('leader_strict'), value: '0.9' },
+                      { label: t('leader_normal'), value: '1.0' },
+                      { label: t('leader_good'), value: '1.1' },
+                      { label: t('leader_favorite'), value: '1.3' },
+                    ]}
+                  />
+
+                  <RadioGroup
+                    label={t('teamwork')}
+                    name="teamwork"
+                    value={formData.teamwork}
+                    onChange={handleInputChange}
+                    options={[
+                      { label: t('team_bad'), value: '0.9' },
+                      { label: t('team_normal'), value: '1.0' },
+                      { label: t('team_good'), value: '1.1' },
+                      { label: t('team_excellent'), value: '1.2' },
+                    ]}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* 步骤4: 额外福利 */}
+          {activeStep === 3 && (
+            <div className="space-y-6 animate-fadeIn">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-purple-500 pl-3">
+                {t('additional_benefits')}
+              </h2>
+              
+              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg space-y-6">
+                <div className="space-y-2">
+                  <div className="flex items-center mb-2">
+                    <input
+                      id="hasShuttle"
+                      type="checkbox"
+                      checked={formData.hasShuttle === true}
+                      onChange={(e) => handleInputChange('hasShuttle', e.target.checked)}
+                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
+                    <label htmlFor="hasShuttle" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('shuttle')}
+                    </label>
+                  </div>
+                  
+                  {formData.hasShuttle && (
+                    <div className="ml-6 p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm">
+                      <RadioGroup
+                        label=""
+                        name="shuttle"
+                        value={formData.shuttle}
+                        onChange={handleInputChange}
+                        options={[
+                          { label: t('shuttle_none'), value: '1.0' },
+                          { label: t('shuttle_inconvenient'), value: '0.9' },
+                          { label: t('shuttle_convenient'), value: '0.7' },
+                          { label: t('shuttle_direct'), value: '0.5' },
+                        ]}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center mb-2">
+                    <input
+                      id="hasCanteen"
+                      type="checkbox"
+                      checked={formData.hasCanteen === true}
+                      onChange={(e) => handleInputChange('hasCanteen', e.target.checked)}
+                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
+                    <label htmlFor="hasCanteen" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('canteen')}
+                    </label>
+                  </div>
+                  
+                  {formData.hasCanteen && (
+                    <div className="ml-6 p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm">
+                      <RadioGroup
+                        label=""
+                        name="canteen"
+                        value={formData.canteen}
+                        onChange={handleInputChange}
+                        options={[
+                          { label: t('canteen_none'), value: '1.0' },
+                          { label: t('canteen_average'), value: '1.05' },
+                          { label: t('canteen_good'), value: '1.1' },
+                          { label: t('canteen_excellent'), value: '1.15' },
+                        ]}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* 步骤导航按钮 */}
+          <div className="flex justify-between mt-8">
+            <button
+              onClick={prevStep}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
+                ${activeStep > 0 
+                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'}`}
+              disabled={activeStep === 0}
+            >
+              {t('previous')}
+            </button>
+            
+            {activeStep < formSteps.length - 1 ? (
+              <button
+                onClick={nextStep}
+                className="px-4 py-2 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800 transition-colors"
+              >
+                {t('next')}
+              </button>
+            ) : (
+              <div></div> /* 占位 */
+            )}
           </div>
         </div>
       </div>
 
-      {/* 结果卡片优化 */}
+      {/* 结果卡片 - 保持不变 */}
       <div ref={shareResultsRef} className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-inner">
         <div className="grid grid-cols-3 gap-8">
           <div>
@@ -1574,14 +1756,16 @@ const SalaryCalculator = () => {
                 schoolType: formData.schoolType,
                 education: formData.education,
                 homeTown: formData.homeTown,
-                shuttle: formData.shuttle,
-                canteen: formData.canteen,
+                shuttle: formData.hasShuttle ? formData.shuttle : '1.0',
+                canteen: formData.hasCanteen ? formData.canteen : '1.0',
                 workYears: formData.workYears,
                 jobStability: formData.jobStability,
                 bachelorType: formData.bachelorType,
                 countryCode: selectedCountry,
                 countryName: getCountryName(selectedCountry),
-                currencySymbol: getCurrencySymbol(selectedCountry)
+                currencySymbol: getCurrencySymbol(selectedCountry),
+                hasShuttle: formData.hasShuttle,
+                hasCanteen: formData.hasCanteen,
               }
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors
