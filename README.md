@@ -12,12 +12,6 @@
    <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
 </p>
 
-<p>Calculating the actual value of your job beyond just salary</p>
-
-<p>计算薪资之外的工作真实价值</p>
-
-<p>給料だけでなく、仕事の本当の価値を計算する</p>
-
 <div align="center">
 
 **[⚡ Try it now ⚡](https://worthjob.zippland.com)**
@@ -40,7 +34,7 @@
 
 <h2 align="center">📊 Job Worth Calculator</h2>
 
-<p align="center"><i>Calculate how much your job is really worth considering all factors</i></p>
+<p align="center"><i>Calculating the actual value of your job beyond just salary</i></p>
 
 ### ✨ Features
 
@@ -92,7 +86,7 @@ Please make sure to test your changes before submitting a PR.
 
 <h2 align="center">📊 工作性价比计算器</h2>
 
-<p align="center"><i>全面考量各种因素，算一算你的工作到底值不值</i></p>
+<p align="center"><i>全面考量，计算薪资之外的工作真实价值</i></p>
 
 ### ✨ 特点
 
@@ -144,7 +138,7 @@ Please make sure to test your changes before submitting a PR.
 
 <h2 align="center">📊 仕事の価値計算機</h2>
 
-<p align="center"><i>あなたの仕事が本当にどれだけの価値があるか、様々な要素を考慮して計算します</i></p>
+<p align="center"><i>給料だけでなく、仕事の本当の価値を計算する</i></p>
 
 ### ✨ 特徴
 
