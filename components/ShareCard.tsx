@@ -827,11 +827,9 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
               <div className="bg-gray-50 py-4 px-6 border-t border-gray-200">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
-                    <Image 
+                    <img 
                       src="/title.png" 
                       alt="Job Worth Calculator" 
-                      width={80}
-                      height={80}
                       className="h-20 mr-3"
                     />
                     <div className="flex flex-col">
@@ -839,11 +837,9 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
                       <div className="text-sm text-gray-500">worthjob.zippland.com</div>
                     </div>
                   </div>
-                  <Image 
+                  <img 
                     src="/website.png" 
                     alt=""
-                    width={64}
-                    height={64}
                     className="h-16 w-16 opacity-85" 
                   />
                 </div>
