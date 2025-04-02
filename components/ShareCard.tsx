@@ -592,7 +592,7 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = image;
-      link.download = '工作性价比报告.png';
+      link.download = `${t('share_job_worth_report')}.png`;
       link.click();
       
     } catch (error) {
