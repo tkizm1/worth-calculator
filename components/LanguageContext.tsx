@@ -573,13 +573,13 @@ const translations: Record<Language, Record<string, string>> = {
   zh: {
     // 标题和导航
     'title': '这b班上得值不值·测算版',
-    'app_description': '计算薪资之外的工作真实价值',
+    'github': 'GitHub',
     'email': 'Email',
     'xiaohongshu': '小红书',
     'redirect_notice': '已自动跳转，新网址无需科学上网',
     'visits': '访问量',
     'visitors': '访客数',
-    'star_request': '到GitHub给个⭐',
+    'star_request': '如果觉得好用，请给项目点个⭐Star吧！',
     'history': '历史记录',
     'no_history': '暂无历史记录',
     'history_notice': '查看报告后将自动保存',
@@ -807,44 +807,17 @@ const translations: Record<Language, Record<string, string>> = {
     'rating_excellent': '爽到爆炸',
     'rating_perfect': '人生巅峰',
     'share_country': '工作国家/地区',
-    
-    // 添加步骤式表单相关翻译
-    'step_basic_info': '基本信息',
-    'step_education_work': '学历与工作',
-    'step_environment': '工作环境',
-    'step_extras': '额外福利',
-    'basic_info': '基本薪资与工作时间',
-    'work_time_schedule': '工作排班',
-    'daily_schedule': '日常时间分配',
-    'education_and_experience': '学历与工作经验',
-    'work_environment_factors': '工作环境因素',
-    'environment_location': '环境与位置',
-    'relationships': '人际关系',
-    'additional_benefits': '额外福利项目',
-    'job_type': '工作类型',
-    'previous': '上一步',
-    'next': '下一步',
-    
-    // 添加表单完成度相关翻译
-    'completed': '已完成',
-    'steps': '步骤',
-    'continue_filling': '继续完成以下步骤可获得更准确的评估结果',
-    'preliminary_result': '初步结果 - 完成所有步骤获得更准确的评估',
-    
-    // 添加新的提示信息翻译
-    'complete_steps_to_view': '完成所有步骤后可查看工作性价比报告',
-    'please_enter_salary': '请输入年薪以生成报告',
   },
   en: {
     // Title and navigation
     'title': 'Is My Job Worth the Grind?',
-    'app_description': 'Calculating the actual value of your job beyond just salary',
+    'github': 'GitHub',
     'email': 'Email',
     'xiaohongshu': 'Rednote',
     'redirect_notice': 'Automatically redirected, no VPN needed',
     'visits': 'Visits',
     'visitors': 'Visitors',
-    'star_request': 'Star on GitHub',
+    'star_request': 'If you find this tool helpful, please give it a ⭐Star!',
     'history': 'History',
     'no_history': 'No history records',
     'history_notice': 'Records will be saved after viewing reports',
@@ -1072,44 +1045,17 @@ const translations: Record<Language, Record<string, string>> = {
     'rating_excellent': 'Excellent',
     'rating_perfect': 'Outstanding',
     'share_country': 'Work Country/Region',
-    
-    // 添加步骤式表单相关翻译
-    'step_basic_info': 'Basic Info',
-    'step_education_work': 'Education',
-    'step_environment': 'Environment',
-    'step_extras': 'Benefits',
-    'basic_info': 'Basic Salary & Schedule',
-    'work_time_schedule': 'Work Schedule',
-    'daily_schedule': 'Daily Time Allocation',
-    'education_and_experience': 'Education & Experience',
-    'work_environment_factors': 'Work Environment',
-    'environment_location': 'Environment & Location',
-    'relationships': 'Relationships',
-    'additional_benefits': 'Additional Benefits',
-    'job_type': 'Job Type',
-    'previous': 'Previous',
-    'next': 'Next',
-    
-    // 添加表单完成度相关翻译
-    'completed': 'completed',
-    'steps': 'steps',
-    'continue_filling': 'Continue with the next steps for a more accurate assessment',
-    'preliminary_result': 'Preliminary result - Complete all steps for better accuracy',
-    
-    // 添加新的提示信息翻译
-    'complete_steps_to_view': 'Complete all steps to view your job value report',
-    'please_enter_salary': 'Please enter your salary to generate the report',
   },
   ja: {
     // タイトルとナビゲーション
     'title': 'この仕事、割に合ってる？',
-    'app_description': '給料だけでなく、仕事の本当の価値を計算する',
+    'github': 'GitHub',
     'email': 'Email',
     'xiaohongshu': '小紅書',
     'redirect_notice': '自動的にリダイレクトされました',
     'visits': 'アクセス数',
     'visitors': '訪問者数',
-    'star_request': 'GitHubで⭐する',
+    'star_request': '役に立ったら、⭐スターを付けてください！',
     'history': '履歴',
     'no_history': '履歴がありません',
     'history_notice': 'レポートを見た後、自動的に保存されます',
@@ -1337,33 +1283,6 @@ const translations: Record<Language, Record<string, string>> = {
     'rating_excellent': '非常に優れている',
     'rating_perfect': '理想的',
     'share_country': '勤務国・地域',
-    
-    // 添加步骤式表单相关翻译
-    'step_basic_info': '基本情報',
-    'step_education_work': '学歴・経験',
-    'step_environment': '職場環境',
-    'step_extras': '福利厚生',
-    'basic_info': '給与・勤務時間',
-    'work_time_schedule': '勤務スケジュール',
-    'daily_schedule': '日常の時間配分',
-    'education_and_experience': '学歴と職歴',
-    'work_environment_factors': '職場環境要素',
-    'environment_location': '環境と勤務地',
-    'relationships': '人間関係',
-    'additional_benefits': '追加の福利厚生',
-    'job_type': '雇用形態',
-    'previous': '前へ',
-    'next': '次へ',
-    
-    // 添加表单完成度相关翻译
-    'completed': '完了',
-    'steps': 'ステップ',
-    'continue_filling': 'より正確な評価のために次のステップを続けてください',
-    'preliminary_result': '暫定結果 - すべてのステップを完了してより正確な評価を得る',
-    
-    // 添加新的提示信息翻译
-    'complete_steps_to_view': 'すべてのステップを完了して仕事の価値レポートを確認してください',
-    'please_enter_salary': 'レポートを生成するには給与を入力してください',
   }
 };
 

@@ -467,30 +467,6 @@ const SalaryCalculator = () => {
   const [assessmentColor, setAssessmentColor] = useState("text-gray-500");
   const [visitorVisible, setVisitorVisible] = useState(false);
 
-  // 添加步骤控制状态
-  const [activeStep, setActiveStep] = useState(0);
-  
-  // 定义表单步骤
-  const formSteps = [
-    { title: t('step_basic_info'), icon: "💰" },
-    { title: t('step_education_work'), icon: "🎓" },
-    { title: t('step_environment'), icon: "🏢" },
-    { title: t('step_extras'), icon: "✨" }
-  ];
-  
-  // 步骤切换函数
-  const nextStep = () => {
-    if (activeStep < formSteps.length - 1) {
-      setActiveStep(activeStep + 1);
-    }
-  };
-  
-  const prevStep = () => {
-    if (activeStep > 0) {
-      setActiveStep(activeStep - 1);
-    }
-  };
-
   // 添加检查document对象存在的逻辑
   useEffect(() => {
     // 确保在客户端环境中执行
@@ -979,22 +955,28 @@ const SalaryCalculator = () => {
       <div className="mb-4 text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 py-2">{t('title')}</h1>
         
-        {/* 添加应用描述文字 - 调整样式使其更加醒目 */}
-        <p className="text-sm md:text-base text-gray-700 dark:text-gray-200 mb-5 font-medium">
-          {t('app_description')}
-        </p>
+        <div className="mb-3">
+          <a
+            href="https://github.com/zippland/worth-calculator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1.5"
+          >
+            <Star className="h-3.5 w-3.5" />
+            {t('star_request')}
+          </a>
+        </div>
         
-        {/* 删除单独的star_request元素，直接将star_request作为GitHub链接文本 */}
         <div className="flex items-center justify-center gap-3 mb-2">
           <p className="text-sm text-gray-500 dark:text-gray-400">v6.2.1</p>
           <a
             href="https://github.com/zippland/worth-calculator"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors inline-flex items-center gap-1"
+            className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
           >
-            <Github className="h-3 w-3" />
-            {t('star_request')}
+            <Github className="h-3.5 w-3.5" />
+            {t('github')}
           </a>
           {/* <a
             href="https://www.xiaohongshu.com/user/profile/623e8b080000000010007721?xsec_token=YBzoLUB4HsSITTBOgPAXY-0Gvqvn3HqHpcDeA3sHhDh-M%3D&xsec_source=app_share&xhsshare=CopyLink&appuid=5c5d5259000000001d00ef04&apptime=1743400694&share_id=b9bfcd5090f9473daf5c1d1dc3eb0921&share_channel=copy_link"
@@ -1009,9 +991,9 @@ const SalaryCalculator = () => {
           {isBrowser && (
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 transition-colors flex items-center gap-1 cursor-pointer"
+              className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1 cursor-pointer"
             >
-              <History className="h-3 w-3" />
+              <History className="h-3.5 w-3.5" />
               {t('history')}
             </button>
           )}
@@ -1203,42 +1185,10 @@ const SalaryCalculator = () => {
         )}
       </div>
 
-      {/* 修改表单为步骤式表单 */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30 mb-6">
-        {/* 步骤指示器 */}
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <div className="flex justify-between px-4 py-3">
-            {formSteps.map((step, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveStep(index)}
-                className={`flex flex-col items-center justify-center px-4 py-2 rounded-lg transition-colors ${
-                  activeStep === index
-                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                    : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400'
-                }`}
-              >
-                <span className="text-xl mb-1">{step.icon}</span>
-                <span className="text-sm font-medium">{step.title}</span>
-                {activeStep === index && (
-                  <div className="h-1 w-1/2 bg-blue-500 rounded-full mt-2"></div>
-                )}
-              </button>
-            ))}
-          </div>
-          
-          {/* 删除此处的完成度指示器 */}
-        </div>
-
-        {/* 表单内容 */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl shadow-gray-200/50 dark:shadow-black/30">
         <div className="p-6 space-y-8">
-          {/* 步骤1: 基础信息 */}
-          {activeStep === 0 && (
-            <div className="space-y-6 animate-fadeIn">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-blue-500 pl-3">
-                {t('basic_info')}
-              </h2>
-              
+          {/* 薪资与工作时间 section */}
+          <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {selectedCountry !== 'CN' ? 
@@ -1292,9 +1242,7 @@ const SalaryCalculator = () => {
               </p>
             </div>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('work_time_schedule')}</h3>
-                <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_days_per_week')}</label>
                 <input
@@ -1353,12 +1301,9 @@ const SalaryCalculator = () => {
                   onChange={(e) => handleInputChange('paidSickLeave', e.target.value)}
                   className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                 />
-                  </div>
               </div>
             </div>
 
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('daily_schedule')}</h3>
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1405,97 +1350,90 @@ const SalaryCalculator = () => {
               </div>
             </div>
           </div>
-            </div>
-          )}
-          
-          {/* 步骤2: 学历和工作经验 */}
-          {activeStep === 1 && (
-            <div className="space-y-6 animate-fadeIn">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-yellow-500 pl-3">
-                {t('education_and_experience')}
-              </h2>
-              
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
-          <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('education_level')}</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('degree_type')}</label>
-                        <select
-                          value={formData.degreeType}
-                          onChange={(e) => handleInputChange('degreeType', e.target.value)}
-                          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                        >
-                          <option value="belowBachelor">{t('below_bachelor')}</option>
-                          <option value="bachelor">{t('bachelor')}</option>
-                          <option value="masters">{t('masters')}</option>
-                          <option value="phd">{t('phd')}</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('school_type')}</label>
-                        <select
-                          value={formData.schoolType}
-                          onChange={(e) => handleInputChange('schoolType', e.target.value)}
-                          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                          disabled={formData.degreeType === 'belowBachelor'}
-                        >
-                          <option value="secondTier">{t('school_second_tier')}</option>
-                          {formData.degreeType === 'bachelor' ? (
-                            <>
-                              <option value="firstTier">{t('school_first_tier_bachelor')}</option>
-                              <option value="elite">{t('school_elite_bachelor')}</option>
-                            </>
-                          ) : (
-                            <>
-                              <option value="firstTier">{t('school_first_tier_higher')}</option>
-                              <option value="elite">{t('school_elite_higher')}</option>
-                            </>
-                          )}
-                        </select>
-                      </div>
-                    </div>
-                    
-                    {/* 硕士显示本科背景选项 */}
-                    {formData.degreeType === 'masters' && (
-                      <div className="mt-4">
-                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('bachelor_background')}</label>
-                        <select
-                          value={formData.bachelorType}
-                          onChange={(e) => handleInputChange('bachelorType', e.target.value)}
-                          className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
-                        >
-                          <option value="secondTier">{t('school_second_tier')}</option>
-                          <option value="firstTier">{t('school_first_tier_bachelor')}</option>
-                          <option value="elite">{t('school_elite_bachelor')}</option>
-                        </select>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* 工作年限选择 */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_years')}</label>
+          <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+
+          {/* 环境系数 */}
+          <div className="space-y-4">
+            {/* 学历和工作年限 */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('education_level')}</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('degree_type')}</label>
                     <select
-                      value={formData.workYears}
-                      onChange={(e) => handleInputChange('workYears', e.target.value)}
+                      value={formData.degreeType}
+                      onChange={(e) => handleInputChange('degreeType', e.target.value)}
                       className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
                     >
-                      <option value="0">{t('fresh_graduate')}</option>
-                      <option value="1">{t('years_1_3')}</option>
-                      <option value="2">{t('years_3_5')}</option>
-                      <option value="4">{t('years_5_8')}</option>
-                      <option value="6">{t('years_8_10')}</option>
-                      <option value="10">{t('years_10_12')}</option>
-                      <option value="15">{t('years_above_12')}</option>
+                      <option value="belowBachelor">{t('below_bachelor')}</option>
+                      <option value="bachelor">{t('bachelor')}</option>
+                      <option value="masters">{t('masters')}</option>
+                      <option value="phd">{t('phd')}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('school_type')}</label>
+                    <select
+                      value={formData.schoolType}
+                      onChange={(e) => handleInputChange('schoolType', e.target.value)}
+                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                      disabled={formData.degreeType === 'belowBachelor'}
+                    >
+                      <option value="secondTier">{t('school_second_tier')}</option>
+                      {formData.degreeType === 'bachelor' ? (
+                        <>
+                          <option value="firstTier">{t('school_first_tier_bachelor')}</option>
+                          <option value="elite">{t('school_elite_bachelor')}</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="firstTier">{t('school_first_tier_higher')}</option>
+                          <option value="elite">{t('school_elite_higher')}</option>
+                        </>
+                      )}
                     </select>
                   </div>
                 </div>
+                
+                {/* 硕士显示本科背景选项 */}
+                {formData.degreeType === 'masters' && (
+                  <div className="mt-4">
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('bachelor_background')}</label>
+                    <select
+                      value={formData.bachelorType}
+                      onChange={(e) => handleInputChange('bachelorType', e.target.value)}
+                      className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                    >
+                      <option value="secondTier">{t('school_second_tier')}</option>
+                      <option value="firstTier">{t('school_first_tier_bachelor')}</option>
+                      <option value="elite">{t('school_elite_bachelor')}</option>
+                    </select>
+                  </div>
+                )}
               </div>
-              
-              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('job_type')}</h3>
+
+              {/* 工作年限选择 */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('work_years')}</label>
+                <select
+                  value={formData.workYears}
+                  onChange={(e) => handleInputChange('workYears', e.target.value)}
+                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                >
+                  <option value="0">{t('fresh_graduate')}</option>
+                  <option value="1">{t('years_1_3')}</option>
+                  <option value="2">{t('years_3_5')}</option>
+                  <option value="4">{t('years_5_8')}</option>
+                  <option value="6">{t('years_8_10')}</option>
+                  <option value="10">{t('years_10_12')}</option>
+                  <option value="15">{t('years_above_12')}</option>
+                </select>
+              </div>
+            </div>
+
+            {/* 添加工作类型RadioGroup */}
             <RadioGroup
               label={t('job_stability')}
               name="jobStability"
@@ -1503,27 +1441,14 @@ const SalaryCalculator = () => {
               onChange={handleInputChange}
               options={[
                 { label: t('job_government'), value: 'government' },
-                    { label: t('job_state'), value: 'state' },
-                    { label: t('job_foreign'), value: 'foreign' },
-                    { label: t('job_private'), value: 'private' },
-                    { label: t('job_dispatch'), value: 'dispatch' },
-                    { label: t('job_freelance'), value: 'freelance' },
-                  ]}
-                />
-              </div>
-            </div>
-          )}
-          
-          {/* 步骤3: 工作环境 */}
-          {activeStep === 2 && (
-            <div className="space-y-6 animate-fadeIn">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-green-500 pl-3">
-                {t('work_environment_factors')}
-              </h2>
-              
-              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('environment_location')}</h3>
-                <div className="space-y-5">
+                { label: t('job_state'), value: 'state' },
+                { label: t('job_foreign'), value: 'foreign' },
+                { label: t('job_private'), value: 'private' },
+                { label: t('job_dispatch'), value: 'dispatch' },
+                { label: t('job_freelance'), value: 'freelance' },
+              ]}
+            />
+            
             <RadioGroup
               label={t('work_environment')}
               name="workEnvironment"
@@ -1563,12 +1488,7 @@ const SalaryCalculator = () => {
                 { label: t('is_hometown'), value: 'yes' },
               ]}
             />
-                </div>
-              </div>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">{t('relationships')}</h3>
-                <div className="space-y-5">
             <RadioGroup
               label={t('leadership')}
               name="leadership"
@@ -1595,201 +1515,141 @@ const SalaryCalculator = () => {
                 { label: t('team_excellent'), value: '1.2' },
               ]}
             />
-                </div>
+
+            {/* 班车和食堂选项作为加分项，加上勾选框控制 */}
+            <div className="space-y-2">
+              <div className="flex items-center mb-2">
+                <input
+                  id="hasShuttle"
+                  type="checkbox"
+                  checked={formData.hasShuttle === true}
+                  onChange={(e) => handleInputChange('hasShuttle', e.target.checked)}
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <label htmlFor="hasShuttle" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('shuttle')}
+                </label>
               </div>
-            </div>
-          )}
-          
-          {/* 步骤4: 额外福利 */}
-          {activeStep === 3 && (
-            <div className="space-y-6 animate-fadeIn">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white border-l-4 border-purple-500 pl-3">
-                {t('additional_benefits')}
-              </h2>
               
-              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg space-y-6">
-                <div className="space-y-2">
-                  <div className="flex items-center mb-2">
-                    <input
-                      id="hasShuttle"
-                      type="checkbox"
-                      checked={formData.hasShuttle === true}
-                      onChange={(e) => handleInputChange('hasShuttle', e.target.checked)}
-                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                    />
-                    <label htmlFor="hasShuttle" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('shuttle')}
-                    </label>
-                  </div>
-                  
-                  {formData.hasShuttle && (
-                    <div className="ml-6 p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm">
-            <RadioGroup
-                        label=""
-              name="shuttle"
-              value={formData.shuttle}
-              onChange={handleInputChange}
-              options={[
-                { label: t('shuttle_none'), value: '1.0' },
-                { label: t('shuttle_inconvenient'), value: '0.9' },
-                { label: t('shuttle_convenient'), value: '0.7' },
-                { label: t('shuttle_direct'), value: '0.5' },
-              ]}
-            />
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center mb-2">
-                    <input
-                      id="hasCanteen"
-                      type="checkbox"
-                      checked={formData.hasCanteen === true}
-                      onChange={(e) => handleInputChange('hasCanteen', e.target.checked)}
-                      className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                    />
-                    <label htmlFor="hasCanteen" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t('canteen')}
-                    </label>
-                  </div>
-                  
-                  {formData.hasCanteen && (
-                    <div className="ml-6 p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm">
-            <RadioGroup
-                        label=""
-              name="canteen"
-              value={formData.canteen}
-              onChange={handleInputChange}
-              options={[
-                { label: t('canteen_none'), value: '1.0' },
-                { label: t('canteen_average'), value: '1.05' },
-                { label: t('canteen_good'), value: '1.1' },
-                { label: t('canteen_excellent'), value: '1.15' },
-              ]}
-            />
-                  </div>
-                  )}
-                  </div>
-                </div>
+              {formData.hasShuttle && (
+                <RadioGroup
+                  label=""
+                  name="shuttle"
+                  value={formData.shuttle}
+                  onChange={handleInputChange}
+                  options={[
+                    { label: t('shuttle_none'), value: '1.0' },
+                    { label: t('shuttle_inconvenient'), value: '0.9' },
+                    { label: t('shuttle_convenient'), value: '0.7' },
+                    { label: t('shuttle_direct'), value: '0.5' },
+                  ]}
+                />
+              )}
             </div>
-          )}
-          
-          {/* 步骤导航按钮 */}
-          <div className="flex justify-between mt-8">
-            <button
-              onClick={prevStep}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-                ${activeStep > 0 
-                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'}`}
-              disabled={activeStep === 0}
-            >
-              {t('previous')}
-            </button>
-            
-            {activeStep < formSteps.length - 1 ? (
-              <button
-                onClick={nextStep}
-                className="px-5 py-2.5 rounded-md text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors flex items-center shadow-sm"
-              >
-                {t('next')}
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            ) : (
-              <div></div> /* 占位 */
-                )}
-              </div>
 
-          {/* 将完成度指示器移动到这里 */}
-          <div className="mt-4 px-1">
-            <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-              <div 
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300 ease-in-out" 
-                style={{ width: `${(activeStep + 1) * 25}%` }}
-              ></div>
+            <div className="space-y-2">
+              <div className="flex items-center mb-2">
+                <input
+                  id="hasCanteen"
+                  type="checkbox"
+                  checked={formData.hasCanteen === true}
+                  onChange={(e) => handleInputChange('hasCanteen', e.target.checked)}
+                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <label htmlFor="hasCanteen" className="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('canteen')}
+                </label>
               </div>
-            <div className="flex justify-between mt-1 text-xs text-gray-500 dark:text-gray-400">
-              <span>{Math.min((activeStep + 1) * 25, 100)}% {t('completed')}</span>
-              <span>{activeStep + 1}/{formSteps.length} {t('steps')}</span>
+              
+              {formData.hasCanteen && (
+                <RadioGroup
+                  label=""
+                  name="canteen"
+                  value={formData.canteen}
+                  onChange={handleInputChange}
+                  options={[
+                    { label: t('canteen_none'), value: '1.0' },
+                    { label: t('canteen_average'), value: '1.05' },
+                    { label: t('canteen_good'), value: '1.1' },
+                    { label: t('canteen_excellent'), value: '1.15' },
+                  ]}
+                />
+              )}
             </div>
           </div>
-          
-          {/* 删除提示信息 */}
         </div>
       </div>
 
-      {/* 结果卡片 - 完全重新设计 */}
-      <div className="rounded-xl overflow-hidden">
-        <div ref={shareResultsRef} className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-inner">
-          {/* 根据完成状态显示不同内容 */}
-          {activeStep < formSteps.length - 1 ? (
-            /* 未完成全部步骤 - 显示鼓励提示 */
-            <div className="text-center py-4">
-              <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">
-                {t('complete_steps_to_view')}
-              </div>
-              <div className="font-medium text-gray-700 dark:text-gray-300">
-                {Math.min((activeStep + 1) * 25, 100)}% {t('completed')}
-              </div>
+      {/* 结果卡片优化 */}
+      <div ref={shareResultsRef} className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 shadow-inner">
+        <div className="grid grid-cols-3 gap-8">
+          <div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('working_days_per_year')}</div>
+            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">{calculateWorkingDays()}{t('days_unit')}</div>
+          </div>
+          <div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('average_daily_salary')}</div>
+            <div className="text-2xl font-semibold mt-1 text-gray-900 dark:text-white">
+              {getCurrencySymbol(selectedCountry)}{getDisplaySalary()}
             </div>
-          ) : (
-            /* 已完成全部步骤 - 显示查看报告按钮 */
-            <div className="text-center">
-              {formData.salary ? (
-                <Link
-                  href={{
-                    pathname: '/share',
-                    query: {
-                      value: value.toFixed(2),
-                      assessment: getValueAssessmentKey(),
-                      assessmentColor: getValueAssessment().color,
-                      cityFactor: formData.cityFactor,
-                      workHours: formData.workHours,
-                      commuteHours: formData.commuteHours,
-                      restTime: formData.restTime,
-                      dailySalary: getDisplaySalary(),
-                      isYuan: selectedCountry !== 'CN' ? 'false' : 'true',
-                      workDaysPerYear: calculateWorkingDays().toString(),
-                      workDaysPerWeek: formData.workDaysPerWeek,
-                      wfhDaysPerWeek: formData.wfhDaysPerWeek,
-                      annualLeave: formData.annualLeave,
-                      paidSickLeave: formData.paidSickLeave,
-                      publicHolidays: formData.publicHolidays,
-                      workEnvironment: formData.workEnvironment,
-                      leadership: formData.leadership,
-                      teamwork: formData.teamwork,
-                      degreeType: formData.degreeType,
-                      schoolType: formData.schoolType,
-                      education: formData.education,
-                      homeTown: formData.homeTown,
-                      shuttle: formData.hasShuttle ? formData.shuttle : '1.0',
-                      canteen: formData.hasCanteen ? formData.canteen : '1.0',
-                      workYears: formData.workYears,
-                      jobStability: formData.jobStability,
-                      bachelorType: formData.bachelorType,
-                      countryCode: selectedCountry,
-                      countryName: getCountryName(selectedCountry),
-                      currencySymbol: getCurrencySymbol(selectedCountry),
-                      hasShuttle: formData.hasShuttle,
-                      hasCanteen: formData.hasCanteen,
-                    }
-                  }}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-md text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors shadow-sm"
-                  onClick={() => saveToHistory()}
-                >
-                  <FileText className="w-5 h-5 mr-1" />
-                  {t('view_report')}
-                </Link>
-              ) : (
-                <div className="text-amber-600 dark:text-amber-400">
-                  {t('please_enter_salary')}
-                </div>
-              )}
+          </div>
+          <div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('job_value')}</div>
+            <div className={`text-2xl font-semibold mt-1 ${getValueAssessment().color}`}>
+              {value.toFixed(2)}
+              <span className="text-base ml-2">({getValueAssessment().text})</span>
             </div>
-          )}
+          </div>
+        </div>
+        
+        {/* 修改分享按钮为链接到分享页面，并保存到历史 */}
+        <div className="mt-6 flex justify-end">
+          <Link
+            href={{
+              pathname: '/share',
+              query: {
+                value: value.toFixed(2),
+                assessment: getValueAssessmentKey(),
+                assessmentColor: getValueAssessment().color,
+                cityFactor: formData.cityFactor,
+                workHours: formData.workHours,
+                commuteHours: formData.commuteHours,
+                restTime: formData.restTime,
+                dailySalary: getDisplaySalary(),
+                isYuan: selectedCountry !== 'CN' ? 'false' : 'true',
+                workDaysPerYear: calculateWorkingDays().toString(),
+                workDaysPerWeek: formData.workDaysPerWeek,
+                wfhDaysPerWeek: formData.wfhDaysPerWeek,
+                annualLeave: formData.annualLeave,
+                paidSickLeave: formData.paidSickLeave,
+                publicHolidays: formData.publicHolidays,
+                workEnvironment: formData.workEnvironment,
+                leadership: formData.leadership,
+                teamwork: formData.teamwork,
+                degreeType: formData.degreeType,
+                schoolType: formData.schoolType,
+                education: formData.education,
+                homeTown: formData.homeTown,
+                shuttle: formData.hasShuttle ? formData.shuttle : '1.0',
+                canteen: formData.hasCanteen ? formData.canteen : '1.0',
+                workYears: formData.workYears,
+                jobStability: formData.jobStability,
+                bachelorType: formData.bachelorType,
+                countryCode: selectedCountry,
+                countryName: getCountryName(selectedCountry),
+                currencySymbol: getCurrencySymbol(selectedCountry),
+                hasShuttle: formData.hasShuttle,
+                hasCanteen: formData.hasCanteen,
+              }
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors
+              ${formData.salary ? 'bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800' : 
+              'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'}`}
+            onClick={() => formData.salary ? saveToHistory() : null}
+          >
+            <FileText className="w-4 h-4" />
+            {t('view_report')}
+          </Link>
         </div>
       </div>
     </div>
