@@ -1280,7 +1280,7 @@ const SalaryCalculator = () => {
                   // 确保中国始终排在第一位
                   if (a === 'CN') return -1;
                   if (b === 'CN') return 1;
-                  return getCountryName(a).localeCompare(getCountryName(b));
+                  return new Intl.Collator(['zh', 'ja', 'en']).compare(getCountryName(a), getCountryName(b));
                 }).map(code => (
                   <option key={code} value={code}>
                     {getCountryName(code)} ({pppFactors[code].toFixed(2)})
