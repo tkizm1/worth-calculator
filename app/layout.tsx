@@ -104,7 +104,7 @@ export default function RootLayout({
                     <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-xs mt-1.5 text-gray-700 dark:text-gray-300 font-medium">AI解题</span>
+                <span className="text-xs mt-1.5 text-gray-700 dark:text-gray-300 font-medium">AI笔试</span>
                 <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-2 max-w-[200px] text-xs text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700">
                     <p>AI笔试题解答工具，截图上传获取解答</p>
