@@ -55,6 +55,22 @@ export default function RootLayout({
             <p className="text-center text-xs text-gray-500 dark:text-gray-400 mb-3">作者的其他实用工具 👇</p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <a 
+                href="https://offerselect.zippland.com/" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto max-w-xs flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 bg-white/80 dark:bg-gray-800/80 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 shadow-sm hover:shadow"
+              >
+                <div className="flex-shrink-0 bg-gradient-to-br from-yellow-400 to-orange-500 dark:from-yellow-500 dark:to-orange-600 p-2 rounded-md">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="font-medium mb-0.5">✨ OfferSelect ✨</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">帮助您总结Offer，并截图至社交平台询问,以便于在多个工作机会之间做出最佳选择。</div>
+                </div>
+              </a>
+              <a 
                 href="https://citycompare.zippland.com/" 
                 target="_blank"
                 rel="noopener noreferrer"
@@ -66,8 +82,8 @@ export default function RootLayout({
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium mb-0.5">Offer选择/对比工具</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">把不同城市的offer一起拉通对比，分别要赚多少钱才能保持同样生活水平？</div>
+                  <div className="font-medium mb-0.5">城市生活成本对比</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">把不同城市的生活成本拉通对比，分别要赚多少钱才能保持同样生活水平？</div>
                 </div>
               </a>
               <a 
@@ -83,7 +99,7 @@ export default function RootLayout({
                 </div>
                 <div className="flex-1">
                   <div className="font-medium mb-0.5">AI笔试题解答神器</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">笔试测评工具，一键截图识别，AI自动给出详细解答</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">用于网络考试的AI笔试测评工具，专为学生、考生和自学者设计。</div>
                 </div>
               </a>
             </div>
