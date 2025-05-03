@@ -65,12 +65,6 @@ export default function RootLayout({
                   </svg>
                 </div>
                 <span className="text-xs mt-1.5 text-gray-700 dark:text-gray-300 font-medium">OfferSelect</span>
-                <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-2 max-w-[200px] text-xs text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700">
-                    <p>一站式求职Offer比较工具，帮助您在多个工作机会之间做出选择</p>
-                  </div>
-                  <div className="w-2 h-2 bg-white dark:bg-gray-800 rotate-45 border-b border-r border-gray-100 dark:border-gray-700 absolute left-1/2 -bottom-1 -translate-x-1/2"></div>
-                </div>
               </a>
               
               <a 
@@ -85,12 +79,6 @@ export default function RootLayout({
                   </svg>
                 </div>
                 <span className="text-xs mt-1.5 text-gray-700 dark:text-gray-300 font-medium">城市对比</span>
-                <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-2 max-w-[200px] text-xs text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700">
-                    <p>对比不同城市的生活成本，计算等价薪资</p>
-                  </div>
-                  <div className="w-2 h-2 bg-white dark:bg-gray-800 rotate-45 border-b border-r border-gray-100 dark:border-gray-700 absolute left-1/2 -bottom-1 -translate-x-1/2"></div>
-                </div>
               </a>
               
               <a 
@@ -105,12 +93,20 @@ export default function RootLayout({
                   </svg>
                 </div>
                 <span className="text-xs mt-1.5 text-gray-700 dark:text-gray-300 font-medium">AI笔试</span>
-                <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-2 max-w-[200px] text-xs text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700">
-                    <p>AI笔试题解答工具，截图上传获取解答</p>
-                  </div>
-                  <div className="w-2 h-2 bg-white dark:bg-gray-800 rotate-45 border-b border-r border-gray-100 dark:border-gray-700 absolute left-1/2 -bottom-1 -translate-x-1/2"></div>
+              </a>
+              
+              <a 
+                href="https://perlerbeads.zippland.com/" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative flex flex-col items-center"
+              >
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-red-400 to-blue-400 shadow-sm transform transition-all duration-200 group-hover:scale-110">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
                 </div>
+                <span className="text-xs mt-1.5 text-gray-700 dark:text-gray-300 font-medium">拼豆图纸</span>
               </a>
             </div>
             <div className="text-center">
