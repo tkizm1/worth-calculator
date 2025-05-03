@@ -978,15 +978,15 @@ const SalaryCalculator = () => {
             <Github className="h-3.5 w-3.5" />
             {t('github')}
           </a>
-          {/* <a
+          <a
             href="https://www.xiaohongshu.com/user/profile/623e8b080000000010007721?xsec_token=YBzoLUB4HsSITTBOgPAXY-0Gvqvn3HqHpcDeA3sHhDh-M%3D&xsec_source=app_share&xhsshare=CopyLink&appuid=5c5d5259000000001d00ef04&apptime=1743400694&share_id=b9bfcd5090f9473daf5c1d1dc3eb0921&share_channel=copy_link"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
+            className="text-sm text-gray-500 hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400 transition-colors flex items-center gap-1"
           >
             <Book className="h-3.5 w-3.5" />
             {t('xiaohongshu')}
-          </a> */}
+          </a>
           {/* 仅在客户端渲染历史记录按钮 */}
           {isBrowser && (
             <button
