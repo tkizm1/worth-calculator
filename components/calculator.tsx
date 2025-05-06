@@ -696,32 +696,51 @@ const SalaryCalculator = () => {
     const workYears = Number(formData.workYears);
     let experienceSalaryMultiplier = 1.0;
     
-    // 基准薪资增长曲线（适用于私企）
-    let baseSalaryMultiplier = 1.0;
-    if (workYears === 0) baseSalaryMultiplier = 1.0;         // 应届生基准值
-    else if (workYears === 1) baseSalaryMultiplier = 1.5;    // 1年：1.50-2.00，取中间值
-    else if (workYears <= 3) baseSalaryMultiplier = 2.2;     // 2-3年：2.20-2.50，取中间值
-    else if (workYears <= 5) baseSalaryMultiplier = 2.7;     // 4-5年：2.70-3.00，取中间值
-    else if (workYears <= 8) baseSalaryMultiplier = 3.2;     // 6-8年：3.20-3.50，取中间值
-    else if (workYears <= 10) baseSalaryMultiplier = 3.6;    // 9-10年：3.60-3.80，取中间值
-    else baseSalaryMultiplier = 3.9;                         // 11-13年：3.90-4.20，取中间值
-    
-    // 工作单位类型对涨薪幅度的影响系数
-    let salaryGrowthFactor = 1.0;  // 私企基准
-    if (formData.jobStability === 'foreign') {
-      salaryGrowthFactor = 0.8;    // 外企涨薪幅度为私企的80%
-    } else if (formData.jobStability === 'state') {
-      salaryGrowthFactor = 0.4;    // 央/国企涨薪幅度为私企的40%
-    } else if (formData.jobStability === 'government') {
-      salaryGrowthFactor = 0.2;    // 体制内涨薪幅度为私企的20%
-    } else if (formData.jobStability === 'dispatch') {
-      salaryGrowthFactor = 1.2;    // 派遣社员涨薪幅度为私企的120%（体现不稳定性）
-    } else if (formData.jobStability === 'freelance') {
-      salaryGrowthFactor = 1.2;    // 自由职业涨薪幅度为私企的120%（体现不稳定性）
+    if (workYears === 0) {
+      // 应届生：直接根据工作类型设定初始调整系数，反映稳定性/风险价值
+      // 注意：这些系数在分母中，系数越小，最终价值越高
+      if (formData.jobStability === 'government') {
+        experienceSalaryMultiplier = 0.8;    // 体制内稳定性高，价值相对高
+      } else if (formData.jobStability === 'state') {
+        experienceSalaryMultiplier = 0.9;    // 央/国企较稳定，价值相对高
+      } else if (formData.jobStability === 'foreign') {
+        experienceSalaryMultiplier = 0.95;   // 外企，较为稳定
+      } else if (formData.jobStability === 'private') {
+        experienceSalaryMultiplier = 1.0;    // 私企作为基准
+      } else if (formData.jobStability === 'dispatch') {
+        experienceSalaryMultiplier = 1.1;    // 派遣社员风险高，价值相对低
+      } else if (formData.jobStability === 'freelance') {
+        experienceSalaryMultiplier = 1.1;    // 自由职业风险高，价值相对低
+      }
+    } else {
+      // 非应届生：使用基于增长预期的模型
+      
+      // 基准薪资增长曲线（适用于私企）
+      let baseSalaryMultiplier = 1.0;
+      if (workYears === 1) baseSalaryMultiplier = 1.5;    // 1年：1.50-2.00，取中间值
+      else if (workYears <= 3) baseSalaryMultiplier = 2.2;     // 2-3年：2.20-2.50，取中间值
+      else if (workYears <= 5) baseSalaryMultiplier = 2.7;     // 4-5年：2.70-3.00，取中间值
+      else if (workYears <= 8) baseSalaryMultiplier = 3.2;     // 6-8年：3.20-3.50，取中间值
+      else if (workYears <= 10) baseSalaryMultiplier = 3.6;    // 9-10年：3.60-3.80，取中间值
+      else baseSalaryMultiplier = 3.9;                         // 11-13年：3.90-4.20，取中间值
+      
+      // 工作单位类型对涨薪幅度的影响系数
+      let salaryGrowthFactor = 1.0;  // 私企基准
+      if (formData.jobStability === 'foreign') {
+        salaryGrowthFactor = 0.8;    // 外企涨薪幅度为私企的80%
+      } else if (formData.jobStability === 'state') {
+        salaryGrowthFactor = 0.4;    // 央/国企涨薪幅度为私企的40%
+      } else if (formData.jobStability === 'government') {
+        salaryGrowthFactor = 0.2;    // 体制内涨薪幅度为私企的20%
+      } else if (formData.jobStability === 'dispatch') {
+        salaryGrowthFactor = 1.2;    // 派遣社员涨薪幅度为私企的120%（体现不稳定性）
+      } else if (formData.jobStability === 'freelance') {
+        salaryGrowthFactor = 1.2;    // 自由职业涨薪幅度为私企的120%（体现不稳定性）
+      }
+      
+      // 根据公式: 1 + (对应幅度-1) * 工作单位系数，计算最终薪资倍数
+      experienceSalaryMultiplier = 1 + (baseSalaryMultiplier - 1) * salaryGrowthFactor;
     }
-    
-    // 根据公式: 1 + (对应幅度-1) * 工作单位系数，计算最终薪资倍数
-    experienceSalaryMultiplier = 1 + (baseSalaryMultiplier - 1) * salaryGrowthFactor;
     
     // 薪资满意度应该受到经验薪资倍数的影响
     // 相同薪资，对于高经验者来说价值更低，对应的计算公式需要考虑经验倍数
