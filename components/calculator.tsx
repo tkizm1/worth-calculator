@@ -1372,6 +1372,21 @@ const SalaryCalculator = () => {
 
           <div className="border-t border-gray-200 dark:border-gray-700 my-6"></div>
 
+          {/* Google AdSense 广告单元 */}
+          <div className="my-8 flex justify-center">
+            <ins className="adsbygoogle"
+                 style={{display:'block', textAlign:'center'}}
+                 data-ad-layout="in-article"
+                 data-ad-format="fluid"
+                 data-ad-client="ca-pub-8196371508613271"
+                 data-ad-slot="1659127609"></ins>
+          </div>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: '(adsbygoogle = window.adsbygoogle || []).push({});'
+            }}
+          />
+
           {/* 环境系数 */}
           <div className="space-y-4">
             {/* 学历和工作年限 */}

@@ -651,36 +651,58 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         {/* 性价比评语卡片 - 移动端更紧凑 */}
         <div className="space-y-4 md:space-y-6">
           {isClient && personalizedComments.map((comment, index) => (
-            <div key={index} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg md:rounded-xl p-3 md:p-5 shadow-sm transition-all hover:shadow-md">
-              <div className="flex items-start gap-2.5 md:gap-4">
-                <div className="text-2xl md:text-4xl flex-shrink-0 mt-0.5">{comment.emoji}</div>
-                <div className="flex-1">
-                  <h3 className="text-base md:text-lg font-bold mb-1 md:mb-2 text-gray-800">{comment.title}</h3>
-                  <p className="text-xs md:text-sm text-gray-700 leading-relaxed mb-2 md:mb-3">{comment.content}</p>
-                  
-                  {/* 用户选项详情 - 移动端使用行内排列 */}
-                  {comment.details && comment.details.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-gray-200">
-                      <div className={isMobile ? "flex flex-wrap gap-x-4 gap-y-1.5" : "grid grid-cols-2 gap-2"}>
-                        {comment.details.map((detail, i) => (
-                          isMobile ? (
-                            <div key={i} className="flex items-center text-xs">
-                              <span className="text-gray-500 mr-1">{detail.label}:</span>
-                              <span className="font-medium text-gray-800">{detail.value}</span>
-                            </div>
-                          ) : (
-                            <div key={i} className="flex justify-between items-center">
-                              <span className="text-xs text-gray-500">{detail.label}</span>
-                              <span className="text-xs md:text-sm font-medium text-gray-800">{detail.value}</span>
-                            </div>
-                          )
-                        ))}
+            <React.Fragment key={index}>
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg md:rounded-xl p-3 md:p-5 shadow-sm transition-all hover:shadow-md">
+                <div className="flex items-start gap-2.5 md:gap-4">
+                  <div className="text-2xl md:text-4xl flex-shrink-0 mt-0.5">{comment.emoji}</div>
+                  <div className="flex-1">
+                    <h3 className="text-base md:text-lg font-bold mb-1 md:mb-2 text-gray-800">{comment.title}</h3>
+                    <p className="text-xs md:text-sm text-gray-700 leading-relaxed mb-2 md:mb-3">{comment.content}</p>
+                    
+                    {/* 用户选项详情 - 移动端使用行内排列 */}
+                    {comment.details && comment.details.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-gray-200">
+                        <div className={isMobile ? "flex flex-wrap gap-x-4 gap-y-1.5" : "grid grid-cols-2 gap-2"}>
+                          {comment.details.map((detail, i) => (
+                            isMobile ? (
+                              <div key={i} className="flex items-center text-xs">
+                                <span className="text-gray-500 mr-1">{detail.label}:</span>
+                                <span className="font-medium text-gray-800">{detail.value}</span>
+                              </div>
+                            ) : (
+                              <div key={i} className="flex justify-between items-center">
+                                <span className="text-xs text-gray-500">{detail.label}</span>
+                                <span className="text-xs md:text-sm font-medium text-gray-800">{detail.value}</span>
+                              </div>
+                            )
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+              
+              {/* 在第2个评语卡片后插入广告 */}
+              {index === 1 && (
+                <>
+                  {/* Google AdSense 广告单元 */}
+                  <div className="my-6 flex justify-center">
+                    <ins className="adsbygoogle"
+                         style={{display:'block', textAlign:'center'}}
+                         data-ad-layout="in-article"
+                         data-ad-format="fluid"
+                         data-ad-client="ca-pub-8196371508613271"
+                         data-ad-slot="1659127609"></ins>
+                  </div>
+                  <script
+                    dangerouslySetInnerHTML={{
+                      __html: '(adsbygoogle = window.adsbygoogle || []).push({});'
+                    }}
+                  />
+                </>
+              )}
+            </React.Fragment>
           ))}
         </div>
         
