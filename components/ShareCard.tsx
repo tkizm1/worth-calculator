@@ -687,7 +687,6 @@ const ShareCard: React.FC<ShareCardProps> = (props) => {
         {/* 底部信息 - 更小的文字 */}
         <div className="mt-6 md:mt-10 text-center text-gray-500 space-y-0.5 text-xs md:text-sm">
           <div>{t('share_custom_made')}</div>
-          <!--<div>worthjob.zippland.com</div>-->
         </div>
       </div>
       
